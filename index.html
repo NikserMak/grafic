@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>График сотрудников — ЖП / ЦУМ</title>
-<!-- Подключаем шрифт Inter -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -40,9 +39,7 @@ h1{
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
-  transition: all 0.3s;
 }
-h1:hover{transform:scale(1.02);}
 .small{color:var(--muted);}
 .controls{display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin-top:12px;}
 .control{display:flex;flex-direction:column;font-size:13px;color:var(--text-color);}
@@ -51,7 +48,7 @@ select,input[type="date"],button{
 }
 select:focus, input[type="date"]:focus {border-color:#3b82f6; outline:none;}
 button{background:var(--accent);color:#fff;border:none;cursor:pointer;transition:all 0.3s;}
-button:hover{background:var(--accent-hover); transform:scale(1.05);}
+button:hover{background:var(--accent-hover);}
 .table-wrap{
   margin-top:18px;
   background:var(--card);
@@ -67,7 +64,6 @@ table{
   border-collapse:collapse;
   font-size:14px;
   table-layout: fixed;
-  transition: all 0.3s;
 }
 thead th{
   position: static;
@@ -98,9 +94,14 @@ tbody td{
   text-align:center;
   border-radius:6px;
   word-break: break-word;
-  transition: all 0.3s;
+  opacity:0;
+  transform: translateY(10px);
+  transition: all 0.4s ease;
 }
-tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
+tbody tr.visible td{
+  opacity:1;
+  transform: translateY(0);
+}
 .legend{display:flex;gap:12px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);}
 .legend .item{display:inline-flex;gap:6px;align-items:center;}
 .chip{width:20px;height:14px;border-radius:4px;display:inline-block;border:1px solid #555;}
@@ -116,7 +117,7 @@ tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
 <header>
   <div>
     <h1>График сотрудников — Жар-Птица / ЦУМ</h1>
-    <div class="small">Выберите точку, месяц и начало недели. </div>
+    <div class="small">Выберите точку, месяц и начало недели. Данные подтягиваются из Google Sheets.</div>
   </div>
   <div class="legend">
     <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
@@ -156,14 +157,8 @@ tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
 </div>
 
 <script>
-const tableIDs = {
-  jp:"1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U",
-  czm:"1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao"
-};
-const monthsGIDs = {
-  jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321},
-  czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321}
-};
+const tableIDs = { jp:"1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", czm:"1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" };
+const monthsGIDs = { jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321}, czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321} };
 let scheduleData=[];
 
 async function loadCSV(branch, month){
@@ -184,9 +179,7 @@ function populateMonths(branch){
 async function populateEmployees(branch, month){
   scheduleData=await loadCSV(branch, month);
   const employeesSet=new Set();
-  for(let i=2;i<=15;i++){
-    if(scheduleData[i] && scheduleData[i][0]) employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/,""));
-  }
+  for(let i=2;i<=15;i++){ if(scheduleData[i] && scheduleData[i][0]) employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/,"")); }
   const select=document.getElementById("employee");
   select.innerHTML='<option value="all">Все</option>';
   Array.from(employeesSet).forEach(name=>{
@@ -213,7 +206,6 @@ function loadSchedule(){
   const tableHead=document.getElementById("tableHead");
   const tableBody=document.getElementById("tableBody");
 
-  // --- Получаем реальные даты из таблицы (C2:AG2) ---
   const dateRow=scheduleData[1].slice(2);
   const dateMap=dateRow.map(d=>{
     const parts=d.split('.');
@@ -227,16 +219,13 @@ function loadSchedule(){
   const headRow=["Сотрудник"];
   const visibleIndexes=[];
   dateMap.forEach((d,i)=>{
-    if(d>=start && d<=end){
-      headRow.push(`${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`);
-      visibleIndexes.push(i+2);
-    }
+    if(d>=start && d<=end){ headRow.push(`${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`); visibleIndexes.push(i+2); }
   });
   tableHead.innerHTML="<tr>"+headRow.map((h,i)=>`<th${i===0?' class="name"':''}>${h}</th>`).join("")+"</tr>";
 
   const rows=scheduleData.slice(2,16).filter(r=>r[0] && r[0].trim()!=="");
   tableBody.innerHTML="";
-  rows.forEach(r=>{
+  rows.forEach((r,rowIndex)=>{
     if(employee!=="all" && r[0]!==employee) return;
     const tr=document.createElement("tr");
     let html=`<td class="name">${r[0]}</td>`;
@@ -247,6 +236,8 @@ function loadSchedule(){
     });
     tr.innerHTML=html;
     tableBody.appendChild(tr);
+    // плавная анимация появления
+    setTimeout(()=>{tr.classList.add("visible");}, rowIndex*80);
   });
 }
 
