@@ -202,12 +202,16 @@ function loadSchedule(){
   const tableHead=document.getElementById("tableHead");
   const tableBody=document.getElementById("tableBody");
 
+  // --- Заголовок с корректными датами
   const headRow=["Сотрудник"];
   for(let i=0;i<7;i++){
-    const d=new Date(startDate); d.setDate(d.getDate()+i);
-    headRow.push(d.toLocaleDateString());
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
+    const day = d.getDate().toString().padStart(2,'0');
+    const month = (d.getMonth()+1).toString().padStart(2,'0');
+    headRow.push(`${day}.${month}`);
   }
-  tableHead.innerHTML="<tr>"+headRow.map((h,i)=>`<th${i===0?' class="name"':''}>${h}</th>`).join("")+"</tr>";
+  tableHead.innerHTML = "<tr>"+headRow.map((h,i)=>`<th${i===0?' class="name"':''}>${h}</th>`).join("")+"</tr>";
 
   const rows = scheduleData.slice(2,16).filter(r=>r[0] && r[0].trim()!=="");
   tableBody.innerHTML="";
