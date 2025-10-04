@@ -62,7 +62,7 @@ table{
 thead th{
   position: sticky;
   top: 0;
-  z-index:2; /* даты под колонкой ФИО */
+  z-index: 1; /* даты под колонкой ФИО */
   background: #3a3a3a;
   color:#fff;
   border-bottom:1px solid var(--thin-border);
@@ -72,13 +72,12 @@ thead th{
 td.name, th.name{
   position: sticky;
   left: 0;
-  z-index:3; /* колонка ФИО над шапкой */
+  z-index: 2; /* колонка ФИО над датами */
   background: var(--card);
-  color: #fff;
-  min-width:140px;
+  text-align: left;
+  padding-left: 10px;
+  min-width: 140px;
   max-width:160px;
-  text-align:left;
-  padding-left:10px;
   font-weight:600;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -209,9 +208,9 @@ function loadSchedule(){
   head.innerHTML="<tr>"+["Сотрудник", ...weekDates].map(h=>`<th class="name">${h}</th>`).join("")+"</tr>";
 
   body.innerHTML="";
-  const rows=scheduleData.slice(2,16)
-    .filter(r=>employee==="all"||r[0]===employee)
-    .filter(r=>r.slice(2,9).some(cell=>cell && cell.trim()!=="")); // убираем пустые строки
+  const rows = scheduleData.slice(2,16)
+    .filter(r => r[0] && r[0].trim() !== "") // оставляем строки только с именем сотрудника
+    .filter(r => employee === "all" || r[0] === employee);
 
   rows.forEach((r,rowIdx)=>{ 
     const tr=document.createElement("tr"); 
