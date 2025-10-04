@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>График сотрудников — ЖП / ЦУМ</title>
+<!-- Подключаем шрифт Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg-gradient: linear-gradient(135deg,#1e1e1e,#2c2c2c);
@@ -15,7 +17,7 @@
   --evening:#665500; 
   --fullday:#b3571e; 
   --empty:#2a2a2a;
-  --font-sans:"Helvetica Neue",Arial,sans-serif;
+  --font-sans:'Inter', sans-serif;
   --shadow:0 6px 18px rgba(0,0,0,0.5);
   --text-color:#ffffff;
 }
@@ -31,7 +33,16 @@ body{
   padding:18px;
 }
 header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
-h1{margin:0;font-size:26px;color:var(--text-color);}
+h1{
+  font-size:36px;
+  font-weight:700;
+  background: linear-gradient(90deg, #4caf50, #00bcd4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+  transition: all 0.3s;
+}
+h1:hover{transform:scale(1.02);}
 .small{color:var(--muted);}
 .controls{display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin-top:12px;}
 .control{display:flex;flex-direction:column;font-size:13px;color:var(--text-color);}
@@ -105,7 +116,7 @@ tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
 <header>
   <div>
     <h1>График сотрудников — Жар-Птица / ЦУМ</h1>
-    <div class="small">Выберите точку, месяц и начало недели. Данные подтягиваются из Google Sheets.</div>
+    <div class="small">Выберите точку, месяц и начало недели. </div>
   </div>
   <div class="legend">
     <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
