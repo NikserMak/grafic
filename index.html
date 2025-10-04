@@ -62,21 +62,19 @@ table{
 thead th{
   position: sticky;
   top: 0;
-  z-index:10;
+  z-index:2; /* даты под колонкой ФИО */
   background: #3a3a3a;
   color:#fff;
   border-bottom:1px solid var(--thin-border);
   text-align:center;
   font-weight:600;
 }
-thead th.today{background:#3a6ea5;}
-td, th{white-space: nowrap; color:#fff;}
 td.name, th.name{
   position: sticky;
   left: 0;
+  z-index:3; /* колонка ФИО над шапкой */
   background: var(--card);
   color: #fff;
-  z-index:5;
   min-width:140px;
   max-width:160px;
   text-align:left;
@@ -103,7 +101,6 @@ tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
 .legend{display:flex;gap:12px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);}
 .legend .item{display:inline-flex;gap:6px;align-items:center;}
 .chip{width:20px;height:14px;border-radius:4px;display:inline-block;border:1px solid #555;}
-.small{font-size:13px;color:var(--muted);}
 @media (max-width:760px){
   td.name, th.name { min-width:120px; max-width:140px; font-size:13px; }
   .controls{gap:8px}
@@ -199,15 +196,23 @@ function loadSchedule(){
   const startDate=new Date(document.getElementById("startDate").value);
   if(!startDate.getTime()){ alert("Выберите дату начала недели"); return;}
   const head=document.getElementById("tableHead"), body=document.getElementById("tableBody");
+  
   const allDates = scheduleData[1].slice(2).map(d=>d.trim());
   const startDay=startDate.getDate(), startMonth=startDate.getMonth()+1;
-  const weekDates = allDates.filter(d=>{ const [day, month]=d.split(".").map(n=>parseInt(n,10)); if(isNaN(day)||isNaN(month)) return false; let diff=(month-startMonth)*31+(day-startDay); return diff>=0&&diff<7; });
+  const weekDates = allDates.filter(d=>{ 
+    const [day, month]=d.split(".").map(n=>parseInt(n,10)); 
+    if(isNaN(day)||isNaN(month)) return false; 
+    let diff=(month-startMonth)*31+(day-startDay); 
+    return diff>=0&&diff<7; 
+  });
 
-  const today=new Date();
-  head.innerHTML="<tr>"+["Сотрудник", ...weekDates].map(h=>{ const [day,month]=h.split(".").map(n=>parseInt(n,10)); return `<th class="name ${day===today.getDate()&&month===today.getMonth()+1?'today':''}">${h}</th>` }).join("")+"</tr>";
+  head.innerHTML="<tr>"+["Сотрудник", ...weekDates].map(h=>`<th class="name">${h}</th>`).join("")+"</tr>";
 
   body.innerHTML="";
-  const rows=scheduleData.slice(2,16).filter(r=>employee==="all"||r[0]===employee);
+  const rows=scheduleData.slice(2,16)
+    .filter(r=>employee==="all"||r[0]===employee)
+    .filter(r=>r.slice(2,9).some(cell=>cell && cell.trim()!=="")); // убираем пустые строки
+
   rows.forEach((r,rowIdx)=>{ 
     const tr=document.createElement("tr"); 
     let html=`<td class="name">${r[0]}</td>`; 
@@ -243,4 +248,3 @@ document.getElementById("refreshBtn").addEventListener("click", async ()=>{ awai
 </script>
 </body>
 </html>
-
