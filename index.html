@@ -10,6 +10,7 @@
   --card:#fff; --muted:#6b7280;
   --accent:#4caf50; --accent-hover:#45a049; --thin-border:#e6e9ee;
   --morning:#d0e7ff; --evening:#fff3cc; --fullday:#ffcc99; --empty:#fff;
+  --highlight:#cce5ff;
   --font-sans:"Segoe UI", Roboto, Arial, sans-serif;
   --shadow:0 6px 18px rgba(15,23,42,0.06);
 }
@@ -25,14 +26,15 @@ select,input[type="date"],button{
 select:focus, input[type="date"]:focus {border-color:#3b82f6; outline:none;}
 button{background:var(--accent);color:#fff;border:none;cursor:pointer;transition:all 0.2s;}
 button:hover{background:var(--accent-hover);transform:scale(1.03);}
-.table-wrap{margin-top:18px;background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);}
+.table-wrap{margin-top:18px;background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:14px; table-layout: fixed;}
 thead th{
   position:sticky;top:0;
   background:linear-gradient(90deg,#f3f6fb,#e6ebf2);
   padding:10px; border-bottom:1px solid var(--thin-border); text-align:center; font-weight:600; border-radius:6px 6px 0 0;
 }
-tbody td{padding:8px;border-bottom:1px solid #f0f2f6;text-align:center; border-radius:4px; word-break: break-word;}
+thead th.today{background:#b3d7ff;}
+tbody td{padding:8px;border-bottom:1px solid #f0f2f6;text-align:center; border-radius:4px; word-break: break-word; transition: background 0.2s;}
 tbody tr:hover{background-color: rgba(200,220,255,0.15);}
 td.name{text-align:left;padding-left:12px;font-weight:600; width:220px;}
 td.empty{background:var(--empty);}
@@ -95,7 +97,6 @@ td.fullday{background:var(--fullday);}
 </div>
 
 <script>
-// --- Настройки таблиц ---
 const tableIDs = {
   jp: "1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U",
   czm: "1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao"
@@ -106,7 +107,6 @@ const monthsGIDs = {
 };
 let scheduleData = [];
 
-// --- Загрузка CSV ---
 async function loadCSV(branch, month){
   const gid = monthsGIDs[branch][month];
   const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
@@ -115,7 +115,6 @@ async function loadCSV(branch, month){
   return text.split("\n").map(r=>r.split(","));
 }
 
-// --- Заполнение месяцев ---
 function populateMonths(branch){
   const monthSelect = document.getElementById("month");
   monthSelect.innerHTML="";
@@ -126,7 +125,6 @@ function populateMonths(branch){
   });
 }
 
-// --- Заполнение сотрудников ---
 async function populateEmployees(branch, month){
   scheduleData = await loadCSV(branch, month);
   const employeesSet = new Set();
@@ -145,7 +143,6 @@ async function populateEmployees(branch, month){
   });
 }
 
-// --- Парсинг смен ---
 function parseShift(val){
   if(!val) return {type:"empty", label:""};
   const s = String(val).trim().toLowerCase();
@@ -155,16 +152,13 @@ function parseShift(val){
   return {type:"empty", label:""};
 }
 
-// --- Загрузка графика ---
 function loadSchedule(){
   const branch=document.getElementById("branch").value;
   const employee=document.getElementById("employee").value;
   const startDate=new Date(document.getElementById("startDate").value);
   if(!startDate.getTime()){ alert("Выберите дату начала недели"); return;}
-
   const head=document.getElementById("tableHead");
   const body=document.getElementById("tableBody");
-
   const allDates = scheduleData[1].slice(2).map(d=>d.trim());
   const startDay = startDate.getDate();
   const startMonth = startDate.getMonth()+1;
@@ -176,7 +170,13 @@ function loadSchedule(){
     return diff >=0 && diff <7;
   });
 
-  head.innerHTML="<tr>"+["Сотрудник", ...weekDates].map(h=>`<th>${h}</th>`).join("")+"</tr>";
+  // заголовок с подсветкой текущего дня
+  const today = new Date();
+  head.innerHTML="<tr>"+["Сотрудник", ...weekDates].map(h=>{
+    const [day, month] = h.split(".").map(n=>parseInt(n,10));
+    const isToday = day===today.getDate() && month===today.getMonth()+1;
+    return `<th class="${isToday?'today':''}">${h}</th>`;
+  }).join("")+"</tr>";
 
   body.innerHTML="";
   const rows = scheduleData.slice(2,16).filter(r=>employee==="all"||r[0]===employee);
@@ -194,13 +194,11 @@ function loadSchedule(){
   });
 }
 
-// --- Инициализация ---
 async function init(){
   const branchSelect=document.getElementById("branch");
   populateMonths(branchSelect.value);
   const firstMonth=document.getElementById("month").options[0].value;
   await populateEmployees(branchSelect.value, firstMonth);
-
   const today = new Date();
   const dayOfWeek = today.getDay()===0?7:today.getDay();
   const firstDay=new Date(today); firstDay.setDate(today.getDate()-dayOfWeek+1);
@@ -208,7 +206,6 @@ async function init(){
 }
 init();
 
-// --- События ---
 document.getElementById("branch").addEventListener("change", async e=>{
   const b=e.target.value; populateMonths(b);
   const firstMonth=document.getElementById("month").options[0].value;
