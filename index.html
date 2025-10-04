@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>График сотрудников</title>
+<title>График</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -15,6 +15,7 @@
   --morning:#264f6b; 
   --evening:#665500; 
   --fullday:#b3571e; 
+  --training:#28a745; 
   --empty:#2a2a2a;
   --font-sans:'Inter', sans-serif;
   --shadow:0 6px 18px rgba(0,0,0,0.5);
@@ -89,6 +90,7 @@ td.empty{background:var(--empty);}
 td.morning{background:var(--morning);}
 td.evening{background:var(--evening);}
 td.fullday{background:var(--fullday);}
+td.training{background:var(--training);}
 tbody td{
   padding:8px;
   text-align:center;
@@ -117,12 +119,13 @@ tbody tr.visible td{
 <header>
   <div>
     <h1>График сотрудников</h1>
-    <div class="small">Выберите точку, месяц и начало недели. </div>
+    <div class="small">Выберите точку, месяц и начало недели.</div>
   </div>
   <div class="legend">
     <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
     <div class="item"><span class="chip" style="background:var(--evening)"></span>Вечер</div>
     <div class="item"><span class="chip" style="background:var(--fullday)"></span>Весь день</div>
+    <div class="item"><span class="chip" style="background:var(--training)"></span>Обучение</div>
   </div>
 </header>
 
@@ -191,11 +194,12 @@ async function populateEmployees(branch, month){
 }
 
 function parseShift(val){
-  if(!val) return {type:"empty",label:""}; 
+  if(!val) return {type:"empty",label:""};
   const s=String(val).trim().toLowerCase();
   if(s.includes("вд")) return {type:"fullday",label:"Весь день"};
   if(s.endsWith("у")) return {type:"morning",label:"Утро"};
   if(s.endsWith("в")) return {type:"evening",label:"Вечер"};
+  if(s.endsWith("о")) return {type:"training",label:"Обучение"}; // новая смена
   return {type:"empty",label:""};
 }
 
