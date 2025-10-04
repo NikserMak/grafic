@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>График сотрудников — ЖП / ЦУМ</title>
+<title>График сотрудников</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -61,28 +61,29 @@ button:hover{background:var(--accent-hover);}
 table{
   width:max-content;
   min-width:100%;
-  border-collapse:collapse;
+  border-collapse: collapse;
   font-size:14px;
   table-layout: fixed;
 }
-thead th{
-  position: static;
+thead th {
   background: #3a3a3a;
   color:#fff;
-  border-bottom:1px solid var(--thin-border);
-  text-align:center;
-  font-weight:600;
+  border: 1px solid var(--thin-border);
+  text-align: center;
+  font-weight: 600;
 }
-td.name, th.name{
-  position: static;
-  background: var(--card);
+td, th {
+  border: 1px solid var(--thin-border);
+}
+td.name, th.name {
+  min-width: 140px;
+  max-width: 160px;
   text-align: left;
   padding-left: 10px;
-  min-width: 140px;
-  max-width:160px;
-  font-weight:600;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
+  background: var(--card);
 }
 td.empty{background:var(--empty);}
 td.morning{background:var(--morning);}
@@ -90,7 +91,6 @@ td.evening{background:var(--evening);}
 td.fullday{background:var(--fullday);}
 tbody td{
   padding:8px;
-  border-bottom:1px solid #444;
   text-align:center;
   border-radius:6px;
   word-break: break-word;
@@ -116,8 +116,8 @@ tbody tr.visible td{
 <div class="container">
 <header>
   <div>
-    <h1>График сотрудников — Жар-Птица / ЦУМ</h1>
-    <div class="small">Выберите точку, месяц и начало недели. Данные подтягиваются из Google Sheets.</div>
+    <h1>График сотрудников</h1>
+    <div class="small">Выберите точку, месяц и начало недели. </div>
   </div>
   <div class="legend">
     <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
@@ -236,7 +236,6 @@ function loadSchedule(){
     });
     tr.innerHTML=html;
     tableBody.appendChild(tr);
-    // плавная анимация появления
     setTimeout(()=>{tr.classList.add("visible");}, rowIndex*80);
   });
 }
