@@ -103,7 +103,6 @@ const monthsGIDs = {
 };
 let scheduleData = [];
 
-// --- Загрузка CSV ---
 async function loadCSV(branch, month){
   const gid = monthsGIDs[branch][month];
   const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
@@ -112,7 +111,6 @@ async function loadCSV(branch, month){
   return text.split("\n").map(r=>r.split(","));
 }
 
-// --- Заполнение месяцев ---
 function populateMonths(branch){
   const monthSelect = document.getElementById("month");
   monthSelect.innerHTML="";
@@ -123,11 +121,10 @@ function populateMonths(branch){
   });
 }
 
-// --- Заполнение сотрудников ---
 async function populateEmployees(branch, month){
   scheduleData = await loadCSV(branch, month);
   const employeesSet = new Set();
-  for(let i=2;i<=15;i++){ // строки 3–16
+  for(let i=2;i<=15;i++){
     if(scheduleData[i] && scheduleData[i][0]){
       const name = scheduleData[i][0].trim().replace(/^\uFEFF/, "");
       if(name) employeesSet.add(name);
@@ -142,7 +139,6 @@ async function populateEmployees(branch, month){
   });
 }
 
-// --- Определение смены ---
 function parseShift(val){
   if(!val) return {type:"empty", label:""};
   const s = String(val).trim().toLowerCase();
@@ -152,7 +148,6 @@ function parseShift(val){
   return {type:"empty", label:""};
 }
 
-// --- Показ графика ---
 function loadSchedule(){
   const branch=document.getElementById("branch").value;
   const employee=document.getElementById("employee").value;
@@ -162,26 +157,17 @@ function loadSchedule(){
   const head=document.getElementById("tableHead");
   const body=document.getElementById("tableBody");
 
-  // Даты из C2:AG2
   const allDates = scheduleData[1].slice(2).map(d=>d.trim());
-
-  // Преобразуем startDate в день и месяц
-  const startDay = startDate.getDate();
-  const startMonth = startDate.getMonth()+1;
-
-  // Фильтруем даты недели
+  const startTS = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
   const weekDates = allDates.filter(d=>{
     const [day, month] = d.split(".").map(n=>parseInt(n,10));
     if(isNaN(day)||isNaN(month)) return false;
-    const diff = (month - startMonth)*30 + (day - startDay); // грубая проверка <=7
-    return diff >=0 && diff <7;
+    const dt = new Date(startDate.getFullYear(), month-1, day).getTime();
+    return dt >= startTS && dt < startTS + 7*24*60*60*1000;
   });
 
-  // Заголовок
-  let rowHead=["Сотрудник", ...weekDates];
-  head.innerHTML="<tr>"+rowHead.map(h=>`<th>${h}</th>`).join("")+"</tr>";
+  head.innerHTML="<tr>"+["Сотрудник", ...weekDates].map(h=>`<th>${h}</th>`).join("")+"</tr>";
 
-  // Тело
   body.innerHTML="";
   const rows=scheduleData.slice(2,16).filter(r=>employee==="all"||r[0]===employee);
   rows.forEach(r=>{
