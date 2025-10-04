@@ -154,12 +154,17 @@ function loadSchedule(){
   const head=document.getElementById("tableHead");
   const body=document.getElementById("tableBody");
 
+  // Берём даты из C2:AG2
+  const allDates = scheduleData[1].slice(2).map(d=>d.trim());
+  const weekDates = allDates.filter((d)=>{
+    const parts = d.split(/[.\-\/]/); // например 3.10
+    if(parts.length<2) return false;
+    const dt = new Date(new Date().getFullYear(), parseInt(parts[1],10)-1, parseInt(parts[0],10));
+    return dt >= startDate && dt < new Date(startDate.getTime()+7*24*60*60*1000);
+  });
+
   // Заголовок
-  let rowHead=["Сотрудник"];
-  for(let i=0;i<7;i++){
-    const d=new Date(startDate); d.setDate(d.getDate()+i);
-    rowHead.push(d.toLocaleDateString());
-  }
+  let rowHead=["Сотрудник", ...weekDates];
   head.innerHTML="<tr>"+rowHead.map(h=>`<th>${h}</th>`).join("")+"</tr>";
 
   // Тело
@@ -168,11 +173,13 @@ function loadSchedule(){
   rows.forEach(r=>{
     const tr=document.createElement("tr");
     let html=`<td class="name">${r[0]}</td>`;
-    for(let i=0;i<7;i++){
-      const cellVal=r[i+2]?r[i+2].trim():"";
-      const shift=parseShift(cellVal);
+    // соответствующие столбцы недели
+    weekDates.forEach(d=>{
+      const idx = allDates.indexOf(d);
+      const val = idx>=0 ? r[idx+2]?.trim() : "";
+      const shift=parseShift(val);
       html+=`<td class="${shift.type}">${shift.label}</td>`;
-    }
+    });
     tr.innerHTML=html;
     body.appendChild(tr);
   });
