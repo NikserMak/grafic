@@ -7,23 +7,31 @@
 <style>
 :root{
   --bg:#f5f7fa; --card:#fff; --muted:#6b7280;
-  --accent:#4caf50; --thin-border:#e6e9ee;
+  --accent:#4caf50; --accent-hover:#45a049; --thin-border:#e6e9ee;
   --morning:#d0e7ff; --evening:#fff3cc; --fullday:#ffcc99; --empty:#fff;
   --font-sans:"Segoe UI", Roboto, Arial, sans-serif;
 }
 body{font-family:var(--font-sans); margin:0; background:var(--bg); color:#222;}
 .container{max-width:1100px; margin:28px auto; padding:18px;}
 header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-h1{margin:0;font-size:20px;color:#111}
+h1{margin:0;font-size:22px;color:#111}
 .controls{display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin-top:12px;}
 .control{display:flex;flex-direction:column;font-size:13px;color:var(--muted)}
-select,input[type="date"],button{padding:8px 10px;border-radius:8px;border:1px solid var(--thin-border);font-size:14px}
-button{background:var(--accent);color:#fff;border:none;cursor:pointer}
-button:active{transform:translateY(1px)}
+select,input[type="date"],button{
+  padding:8px 12px; font-size:14px; border-radius:6px; border:1px solid #cbd5e1; transition: all 0.2s;
+}
+select:focus, input[type="date"]:focus {border-color:#3b82f6; outline:none;}
+button{background:var(--accent);color:#fff;border:none;cursor:pointer;transition:all 0.2s;}
+button:hover{background:var(--accent-hover);transform:scale(1.03);}
 .table-wrap{margin-top:18px;background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
 table{width:100%;border-collapse:collapse;font-size:14px}
-thead th{position:sticky;top:0;background:#fbfdff;padding:10px;border-bottom:1px solid var(--thin-border);text-align:center;font-weight:600}
-tbody td{padding:8px;border-bottom:1px solid #f0f2f6;text-align:center}
+thead th{
+  position:sticky;top:0;
+  background:linear-gradient(90deg,#f3f6fb,#e6ebf2);
+  padding:10px; border-bottom:1px solid var(--thin-border); text-align:center; font-weight:600; border-radius:6px 6px 0 0;
+}
+tbody td{padding:8px;border-bottom:1px solid #f0f2f6;text-align:center; border-radius:4px;}
+tbody tr:hover{background-color: rgba(200,220,255,0.15);}
 td.name{text-align:left;padding-left:12px;font-weight:600; width:220px}
 td.empty{background:var(--empty)}
 td.morning{background:var(--morning)}
@@ -154,13 +162,19 @@ function loadSchedule(){
   const head=document.getElementById("tableHead");
   const body=document.getElementById("tableBody");
 
-  // Берём даты из C2:AG2
+  // Даты из C2:AG2
   const allDates = scheduleData[1].slice(2).map(d=>d.trim());
-  const weekDates = allDates.filter((d)=>{
-    const parts = d.split(/[.\-\/]/); // например 3.10
-    if(parts.length<2) return false;
-    const dt = new Date(new Date().getFullYear(), parseInt(parts[1],10)-1, parseInt(parts[0],10));
-    return dt >= startDate && dt < new Date(startDate.getTime()+7*24*60*60*1000);
+
+  // Преобразуем startDate в день и месяц
+  const startDay = startDate.getDate();
+  const startMonth = startDate.getMonth()+1;
+
+  // Фильтруем даты недели
+  const weekDates = allDates.filter(d=>{
+    const [day, month] = d.split(".").map(n=>parseInt(n,10));
+    if(isNaN(day)||isNaN(month)) return false;
+    const diff = (month - startMonth)*30 + (day - startDay); // грубая проверка <=7
+    return diff >=0 && diff <7;
   });
 
   // Заголовок
@@ -173,7 +187,6 @@ function loadSchedule(){
   rows.forEach(r=>{
     const tr=document.createElement("tr");
     let html=`<td class="name">${r[0]}</td>`;
-    // соответствующие столбцы недели
     weekDates.forEach(d=>{
       const idx = allDates.indexOf(d);
       const val = idx>=0 ? r[idx+2]?.trim() : "";
