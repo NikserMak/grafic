@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>График сотрудников — ЖП / ЦУМ</title>
+<style>
+:root{
+  --bg:#f5f7fa; --card:#fff; --muted:#6b7280;
+  --accent:#4caf50; --thin-border:#e6e9ee;
+  --morning:#d0e7ff; --evening:#fff3cc; --fullday:#ffcc99; --empty:#fff;
+  --font-sans:"Segoe UI", Roboto, Arial, sans-serif;
+}
+body{font-family:var(--font-sans); margin:0; background:var(--bg); color:#222;}
+.container{max-width:1100px; margin:28px auto; padding:18px;}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{margin:0;font-size:20px;color:#111}
+.controls{display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin-top:12px;}
+.control{display:flex;flex-direction:column;font-size:13px;color:var(--muted)}
+select,input[type="date"],button{padding:8px 10px;border-radius:8px;border:1px solid var(--thin-border);font-size:14px}
+button{background:var(--accent);color:#fff;border:none;cursor:pointer}
+button:active{transform:translateY(1px)}
+.table-wrap{margin-top:18px;background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead th{position:sticky;top:0;background:#fbfdff;padding:10px;border-bottom:1px solid var(--thin-border);text-align:center;font-weight:600}
+tbody td{padding:8px;border-bottom:1px solid #f0f2f6;text-align:center}
+td.name{text-align:left;padding-left:12px;font-weight:600; width:220px}
+td.empty{background:var(--empty)}
+td.morning{background:var(--morning)}
+td.evening{background:var(--evening)}
+td.fullday{background:var(--fullday)}
+.legend{display:flex;gap:12px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted)}
+.legend .item{display:inline-flex;gap:6px;align-items:center}
+.chip{width:18px;height:14px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,0.06)}
+.small{font-size:13px;color:var(--muted)}
+@media (max-width:760px){td.name{width:140px}.controls{gap:8px}thead th, tbody td{font-size:13px;padding:6px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div>
+    <h1>График сотрудников — Жар-Птица / ЦУМ</h1>
+    <div class="small">Выберите точку, месяц и начало недели. Данные подтягиваются из Google Sheets (CSV).</div>
+  </div>
+  <div class="legend">
+    <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
+    <div class="item"><span class="chip" style="background:var(--evening)"></span>Вечер</div>
+    <div class="item"><span class="chip" style="background:var(--fullday)"></span>Весь день</div>
+  </div>
+</header>
+
+<div class="controls">
+  <label class="control">Точка:
+    <select id="branch">
+      <option value="jp">Жар-Птица</option>
+      <option value="czm">ЦУМ</option>
+    </select>
+  </label>
+
+  <label class="control">Месяц:
+    <select id="month"></select>
+  </label>
+
+  <label class="control">Сотрудник:
+    <select id="employee"><option value="all">Все</option></select>
+  </label>
+
+  <label class="control">Неделя с:
+    <input id="startDate" type="date"/>
+  </label>
+
+  <div style="display:flex;align-items:center;gap:8px">
+    <button id="showBtn">Показать график</button>
+    <button id="refreshBtn" style="background:#3b82f6">Обновить</button>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table id="scheduleTable">
+    <thead id="tableHead"></thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+</div>
+
+<script>
+const tableIDs = {
+  jp: "1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U",
+  czm: "1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao"
+};
+const monthsGIDs = {
+  jp: { "Октябрь": 0, "Ноябрь": 1956542531, "Декабрь": 987654321 },
+  czm: { "Октябрь": 0, "Ноябрь": 1078468054, "Декабрь": 987654321 }
+};
+let scheduleData = [];
+
+// --- Загрузка CSV ---
+async function loadCSV(branch, month){
+  const gid = monthsGIDs[branch][month];
+  const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
+  const res = await fetch(url);
+  const text = await res.text();
+  return text.split("\n").map(r=>r.split(","));
+}
+
+// --- Заполнение месяцев ---
+function populateMonths(branch){
+  const monthSelect = document.getElementById("month");
+  monthSelect.innerHTML="";
+  Object.keys(monthsGIDs[branch]).forEach(m=>{
+    const opt=document.createElement("option");
+    opt.value=m; opt.textContent=m;
+    monthSelect.appendChild(opt);
+  });
+}
+
+// --- Заполнение сотрудников ---
+async function populateEmployees(branch, month){
+  scheduleData = await loadCSV(branch, month);
+  const employeesSet = new Set();
+  for(let i=2;i<=15;i++){ // строки 3–16
+    if(scheduleData[i] && scheduleData[i][0]){
+      const name = scheduleData[i][0].trim().replace(/^\uFEFF/, "");
+      if(name) employeesSet.add(name);
+    }
+  }
+  const select = document.getElementById("employee");
+  select.innerHTML = '<option value="all">Все</option>';
+  Array.from(employeesSet).forEach(name=>{
+    const opt=document.createElement("option");
+    opt.value=name; opt.textContent=name;
+    select.appendChild(opt);
+  });
+}
+
+// --- Определение смены ---
+function parseShift(val){
+  if(!val) return {type:"empty", label:""};
+  const s = String(val).trim().toLowerCase();
+  if(s.includes("вд")) return {type:"fullday", label:"Весь день"};
+  if(s.endsWith("у")) return {type:"morning", label:"Утро"};
+  if(s.endsWith("в")) return {type:"evening", label:"Вечер"};
+  return {type:"empty", label:""};
+}
+
+// --- Показ графика ---
+function loadSchedule(){
+  const branch=document.getElementById("branch").value;
+  const employee=document.getElementById("employee").value;
+  const startDate=new Date(document.getElementById("startDate").value);
+  if(!startDate.getTime()){ alert("Выберите дату начала недели"); return;}
+
+  const head=document.getElementById("tableHead");
+  const body=document.getElementById("tableBody");
+
+  // Заголовок
+  let rowHead=["Сотрудник"];
+  for(let i=0;i<7;i++){
+    const d=new Date(startDate); d.setDate(d.getDate()+i);
+    rowHead.push(d.toLocaleDateString());
+  }
+  head.innerHTML="<tr>"+rowHead.map(h=>`<th>${h}</th>`).join("")+"</tr>";
+
+  // Тело
+  body.innerHTML="";
+  const rows=scheduleData.slice(2,16).filter(r=>employee==="all"||r[0]===employee);
+  rows.forEach(r=>{
+    const tr=document.createElement("tr");
+    let html=`<td class="name">${r[0]}</td>`;
+    for(let i=0;i<7;i++){
+      const cellVal=r[i+2]?r[i+2].trim():"";
+      const shift=parseShift(cellVal);
+      html+=`<td class="${shift.type}">${shift.label}</td>`;
+    }
+    tr.innerHTML=html;
+    body.appendChild(tr);
+  });
+}
+
+// --- Инициализация ---
+async function init(){
+  const branchSelect=document.getElementById("branch");
+  populateMonths(branchSelect.value);
+  const firstMonth=document.getElementById("month").options[0].value;
+  await populateEmployees(branchSelect.value, firstMonth);
+
+  const today = new Date();
+  const dayOfWeek = today.getDay()===0?7:today.getDay();
+  const firstDay=new Date(today); firstDay.setDate(today.getDate()-dayOfWeek+1);
+  document.getElementById("startDate").valueAsDate=firstDay;
+}
+init();
+
+// --- События ---
+document.getElementById("branch").addEventListener("change", async e=>{
+  const b=e.target.value; populateMonths(b);
+  const firstMonth=document.getElementById("month").options[0].value;
+  await populateEmployees(b, firstMonth);
+});
+document.getElementById("month").addEventListener("change", async e=>{
+  await populateEmployees(document.getElementById("branch").value, e.target.value);
+});
+document.getElementById("showBtn").addEventListener("click", loadSchedule);
+document.getElementById("refreshBtn").addEventListener("click", async ()=>{
+  await populateEmployees(document.getElementById("branch").value, document.getElementById("month").value);
+  loadSchedule();
+});
+</script>
+</body>
+</html>
