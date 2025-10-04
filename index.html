@@ -105,7 +105,7 @@ tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
 <header>
   <div>
     <h1>График сотрудников — Жар-Птица / ЦУМ</h1>
-    <div class="small">Выберите точку, месяц и начало недели. </div>
+    <div class="small">Выберите точку, месяц и начало недели. Данные подтягиваются из Google Sheets.</div>
   </div>
   <div class="legend">
     <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
@@ -153,30 +153,30 @@ const monthsGIDs = {
   jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321},
   czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321}
 };
-let scheduleData = [];
+let scheduleData=[];
 
 async function loadCSV(branch, month){
-  const gid = monthsGIDs[branch][month];
-  const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
-  const res = await fetch(url);
-  const text = await res.text();
+  const gid=monthsGIDs[branch][month];
+  const url=`https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
+  const res=await fetch(url);
+  const text=await res.text();
   return text.split("\n").map(r=>r.split(","));
 }
 
 function populateMonths(branch){
-  const monthSelect = document.getElementById("month"); monthSelect.innerHTML="";
+  const monthSelect=document.getElementById("month"); monthSelect.innerHTML="";
   Object.keys(monthsGIDs[branch]).forEach(m=>{
     const opt=document.createElement("option"); opt.value=m; opt.textContent=m; monthSelect.appendChild(opt);
   });
 }
 
 async function populateEmployees(branch, month){
-  scheduleData = await loadCSV(branch, month);
-  const employeesSet = new Set();
-  for(let i=2;i<=15;i++){ // Берем A3:A16
+  scheduleData=await loadCSV(branch, month);
+  const employeesSet=new Set();
+  for(let i=2;i<=15;i++){
     if(scheduleData[i] && scheduleData[i][0]) employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/,""));
   }
-  const select = document.getElementById("employee");
+  const select=document.getElementById("employee");
   select.innerHTML='<option value="all">Все</option>';
   Array.from(employeesSet).forEach(name=>{
     const opt=document.createElement("option");
@@ -197,33 +197,43 @@ function parseShift(val){
 
 function loadSchedule(){
   const employee=document.getElementById("employee").value;
-  const startDate=new Date(document.getElementById("startDate").value);
-  if(!startDate.getTime()){ alert("Выберите дату начала недели"); return;}
+  const start=new Date(document.getElementById("startDate").value);
+  if(!start.getTime()){ alert("Выберите дату начала недели"); return;}
   const tableHead=document.getElementById("tableHead");
   const tableBody=document.getElementById("tableBody");
 
-  // --- Заголовок с корректными датами
-  const headRow=["Сотрудник"];
-  for(let i=0;i<7;i++){
-    const d = new Date(startDate);
-    d.setDate(startDate.getDate() + i);
-    const day = d.getDate().toString().padStart(2,'0');
-    const month = (d.getMonth()+1).toString().padStart(2,'0');
-    headRow.push(`${day}.${month}`);
-  }
-  tableHead.innerHTML = "<tr>"+headRow.map((h,i)=>`<th${i===0?' class="name"':''}>${h}</th>`).join("")+"</tr>";
+  // --- Получаем реальные даты из таблицы (C2:AG2) ---
+  const dateRow=scheduleData[1].slice(2);
+  const dateMap=dateRow.map(d=>{
+    const parts=d.split('.');
+    const day=parseInt(parts[0],10);
+    const month=parseInt(parts[1],10)-1;
+    const year=new Date().getFullYear();
+    return new Date(year,month,day);
+  });
 
-  const rows = scheduleData.slice(2,16).filter(r=>r[0] && r[0].trim()!=="");
+  const end=new Date(start); end.setDate(start.getDate()+6);
+  const headRow=["Сотрудник"];
+  const visibleIndexes=[];
+  dateMap.forEach((d,i)=>{
+    if(d>=start && d<=end){
+      headRow.push(`${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`);
+      visibleIndexes.push(i+2);
+    }
+  });
+  tableHead.innerHTML="<tr>"+headRow.map((h,i)=>`<th${i===0?' class="name"':''}>${h}</th>`).join("")+"</tr>";
+
+  const rows=scheduleData.slice(2,16).filter(r=>r[0] && r[0].trim()!=="");
   tableBody.innerHTML="";
   rows.forEach(r=>{
     if(employee!=="all" && r[0]!==employee) return;
     const tr=document.createElement("tr");
     let html=`<td class="name">${r[0]}</td>`;
-    for(let i=1;i<=7;i++){
-      const val=r[i] ? r[i].trim() : "";
+    visibleIndexes.forEach(col=>{
+      const val=r[col] ? r[col].trim() : "";
       const sh=parseShift(val);
       html+=`<td class="${sh.type}">${sh.label}</td>`;
-    }
+    });
     tr.innerHTML=html;
     tableBody.appendChild(tr);
   });
@@ -257,4 +267,3 @@ document.getElementById("refreshBtn").addEventListener("click", async ()=>{
 </script>
 </body>
 </html>
-
