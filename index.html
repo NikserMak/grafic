@@ -158,25 +158,27 @@ function loadSchedule(){
   const body=document.getElementById("tableBody");
 
   const allDates = scheduleData[1].slice(2).map(d=>d.trim());
-  const startTS = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
+  const startDay = startDate.getDate();
+  const startMonth = startDate.getMonth()+1;
+
   const weekDates = allDates.filter(d=>{
     const [day, month] = d.split(".").map(n=>parseInt(n,10));
     if(isNaN(day)||isNaN(month)) return false;
-    const dt = new Date(startDate.getFullYear(), month-1, day).getTime();
-    return dt >= startTS && dt < startTS + 7*24*60*60*1000;
+    let diff = (month - startMonth)*31 + (day - startDay);
+    return diff >=0 && diff <7;
   });
 
   head.innerHTML="<tr>"+["Сотрудник", ...weekDates].map(h=>`<th>${h}</th>`).join("")+"</tr>";
 
   body.innerHTML="";
-  const rows=scheduleData.slice(2,16).filter(r=>employee==="all"||r[0]===employee);
+  const rows = scheduleData.slice(2,16).filter(r=>employee==="all"||r[0]===employee);
   rows.forEach(r=>{
     const tr=document.createElement("tr");
     let html=`<td class="name">${r[0]}</td>`;
     weekDates.forEach(d=>{
       const idx = allDates.indexOf(d);
       const val = idx>=0 ? r[idx+2]?.trim() : "";
-      const shift=parseShift(val);
+      const shift = parseShift(val);
       html+=`<td class="${shift.type}">${shift.label}</td>`;
     });
     tr.innerHTML=html;
