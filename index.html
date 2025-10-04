@@ -5,120 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>График сотрудников — ЖП / ЦУМ</title>
 <style>
-:root{
-  --bg-gradient: linear-gradient(135deg,#1e1e1e,#2c2c2c);
-  --card:#2a2a2a; 
-  --muted:#aaaaaa;
-  --accent:#4caf50; --accent-hover:#45a049; 
-  --thin-border:#444;
-  --morning:#264f6b; 
-  --evening:#665500; 
-  --fullday:#b3571e; 
-  --empty:#2a2a2a;
-  --highlight:#3a6ea5;
-  --font-sans:"Helvetica Neue",Arial,sans-serif;
-  --shadow:0 6px 18px rgba(0,0,0,0.5);
-  --text-color:#ffffff;
-}
 body{
-  font-family: var(--font-sans);
+  font-family: "Helvetica Neue", Arial, sans-serif;
   margin:0;
-  background:var(--bg-gradient);
-  color: var(--text-color);
+  background:#1e1e1e;
+  color:#fff;
 }
 .container{
   max-width:1100px;
   margin:28px auto;
   padding:18px;
 }
-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
-h1{margin:0;font-size:26px;color:var(--text-color);}
-.small{color:var(--muted);}
-.controls{display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin-top:12px;}
-.control{display:flex;flex-direction:column;font-size:13px;color:var(--text-color);}
+header h1{margin:0;font-size:26px;}
+.controls{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
+.control{display:flex;flex-direction:column;font-size:13px;}
 select,input[type="date"],button{
-  padding:8px 12px; font-size:14px; border-radius:10px; border:1px solid #555; background:#3a3a3a; color:#fff; transition: all 0.3s;
+  padding:8px 12px;
+  font-size:14px;
+  border-radius:10px;
+  border:1px solid #555;
+  background:#3a3a3a;
+  color:#fff;
 }
-select:focus, input[type="date"]:focus {border-color:#3b82f6; outline:none;}
-button{background:var(--accent);color:#fff;border:none;cursor:pointer;transition:all 0.3s;}
-button:hover{background:var(--accent-hover); transform:scale(1.05);}
+button{background:#4caf50; cursor:pointer; border:none;}
+button:hover{background:#45a049;}
 .table-wrap{
   margin-top:18px;
-  background:var(--card);
-  border-radius:14px;
+  background:#2a2a2a;
+  border-radius:10px;
   padding:12px;
-  box-shadow:var(--shadow);
   overflow-x:auto;
-  -webkit-overflow-scrolling: touch;
 }
 table{
   width:max-content;
   min-width:100%;
-  border-collapse:collapse;
+  border-collapse: collapse;
   font-size:14px;
-  table-layout: fixed;
-  transition: all 0.3s;
 }
-thead th{
-  position: sticky;
-  top: 0;
-  z-index: 1; /* даты под колонкой ФИО */
-  background: #3a3a3a;
-  color:#fff;
-  border-bottom:1px solid var(--thin-border);
-  text-align:center;
-  font-weight:600;
-}
-td.name, th.name{
-  position: sticky;
-  left: 0;
-  z-index: 2; /* колонка ФИО над датами */
-  background: var(--card);
-  text-align: left;
-  padding-left: 10px;
-  min-width: 140px;
-  max-width:160px;
-  font-weight:600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-td.empty{background:var(--empty);}
-td.morning{background:var(--morning);}
-td.evening{background:var(--evening);}
-td.fullday{background:var(--fullday);}
-tbody td{
+th, td{
+  border:1px solid #444;
   padding:8px;
-  border-bottom:1px solid #444;
   text-align:center;
-  border-radius:6px;
-  word-break: break-word;
-  transition: all 0.3s;
-  opacity:0;
-  transform: translateY(10px);
 }
-tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
-.legend{display:flex;gap:12px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);}
-.legend .item{display:inline-flex;gap:6px;align-items:center;}
-.chip{width:20px;height:14px;border-radius:4px;display:inline-block;border:1px solid #555;}
-@media (max-width:760px){
-  td.name, th.name { min-width:120px; max-width:140px; font-size:13px; }
-  .controls{gap:8px}
-  thead th, tbody td{font-size:13px;padding:6px}
-}
+thead th{background:#3a3a3a; color:#fff; font-weight:600;}
+td.morning{background:#264f6b;}
+td.evening{background:#665500;}
+td.fullday{background:#b3571e;}
+td.empty{background:#2a2a2a;}
 </style>
 </head>
 <body>
 <div class="container">
 <header>
-  <div>
-    <h1>График сотрудников — Жар-Птица / ЦУМ</h1>
-    <div class="small">Выберите точку, месяц и начало недели. </div>
-  </div>
-  <div class="legend">
-    <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
-    <div class="item"><span class="chip" style="background:var(--evening)"></span>Вечер</div>
-    <div class="item"><span class="chip" style="background:var(--fullday)"></span>Весь день</div>
-  </div>
+  <h1>График сотрудников — Жар-Птица / ЦУМ</h1>
 </header>
 
 <div class="controls">
@@ -137,10 +76,7 @@ tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
   <label class="control">Неделя с:
     <input id="startDate" type="date"/>
   </label>
-  <div style="display:flex;align-items:center;gap:8px">
-    <button id="showBtn">Показать график</button>
-    <button id="refreshBtn" style="background:#3b82f6">Обновить</button>
-  </div>
+  <button id="showBtn">Показать график</button>
 </div>
 
 <div class="table-wrap">
@@ -190,44 +126,36 @@ function parseShift(val){
 }
 
 function loadSchedule(){
-  const branch=document.getElementById("branch").value;
   const employee=document.getElementById("employee").value;
   const startDate=new Date(document.getElementById("startDate").value);
   if(!startDate.getTime()){ alert("Выберите дату начала недели"); return;}
-  const head=document.getElementById("tableHead"), body=document.getElementById("tableBody");
-  
-  const allDates = scheduleData[1].slice(2).map(d=>d.trim());
-  const startDay=startDate.getDate(), startMonth=startDate.getMonth()+1;
-  const weekDates = allDates.filter(d=>{ 
-    const [day, month]=d.split(".").map(n=>parseInt(n,10)); 
-    if(isNaN(day)||isNaN(month)) return false; 
-    let diff=(month-startMonth)*31+(day-startDay); 
-    return diff>=0&&diff<7; 
-  });
+  const tableHead=document.getElementById("tableHead");
+  const tableBody=document.getElementById("tableBody");
 
-  head.innerHTML="<tr>"+["Сотрудник", ...weekDates].map(h=>`<th class="name">${h}</th>`).join("")+"</tr>";
+  // Заголовок
+  const headRow=["Сотрудник"];
+  for(let i=0;i<7;i++){
+    const d=new Date(startDate); d.setDate(d.getDate()+i);
+    headRow.push(d.toLocaleDateString());
+  }
+  tableHead.innerHTML="<tr>"+headRow.map(h=>`<th>${h}</th>`).join("")+"</tr>";
 
-  body.innerHTML="";
-  const rows = scheduleData.slice(2,16)
-    .filter(r => r[0] && r[0].trim() !== "") // оставляем строки только с именем сотрудника
-    .filter(r => employee === "all" || r[0] === employee);
-
-  rows.forEach((r,rowIdx)=>{ 
-    const tr=document.createElement("tr"); 
-    let html=`<td class="name">${r[0]}</td>`; 
-    weekDates.forEach(d=>{ 
-      const idx=allDates.indexOf(d); 
-      const val=idx>=0?r[idx+2]?.trim():""; 
-      const shift=parseShift(val); 
-      html+=`<td class="${shift.type}" style="transition-delay:${rowIdx*50}ms">${shift.label}</td>` 
-    }); 
-    tr.innerHTML=html; 
-    body.appendChild(tr); 
-  });
-
-  Array.from(body.querySelectorAll("td")).forEach(td=>{
-    td.style.opacity="1";
-    td.style.transform="translateY(0)";
+  // Фильтруем строки с именем сотрудника
+  const rows = scheduleData.slice(2,16).filter(r=>r[0] && r[0].trim()!=="");
+  tableBody.innerHTML="";
+  rows.forEach(r=>{
+    const tr=document.createElement("tr");
+    let html=`<td>${r[0]}</td>`;
+    for(let i=1;i<=7;i++){
+      const val=r[i] ? r[i].trim() : "";
+      let type="empty",label="";
+      if(val.toLowerCase().includes("вд")){type="fullday";label="Весь день";}
+      else if(val.endsWith("у")){type="morning";label="Утро";}
+      else if(val.endsWith("в")){type="evening";label="Вечер";}
+      html+=`<td class="${type}">${label}</td>`;
+    }
+    tr.innerHTML=html;
+    tableBody.appendChild(tr);
   });
 }
 
@@ -238,12 +166,11 @@ async function init(){
   const today=new Date(); const dayOfWeek=today.getDay()===0?7:today.getDay();
   const firstDay=new Date(today); firstDay.setDate(today.getDate()-dayOfWeek+1); document.getElementById("startDate").valueAsDate=firstDay;
 }
-init();
 
+init();
 document.getElementById("branch").addEventListener("change", async e=>{ const b=e.target.value; populateMonths(b); const firstMonth=document.getElementById("month").options[0].value; await populateEmployees(b, firstMonth); });
 document.getElementById("month").addEventListener("change", async e=>{ await populateEmployees(document.getElementById("branch").value, e.target.value); });
 document.getElementById("showBtn").addEventListener("click", loadSchedule);
-document.getElementById("refreshBtn").addEventListener("click", async ()=>{ await populateEmployees(document.getElementById("branch").value, document.getElementById("month").value); loadSchedule(); });
 </script>
 </body>
 </html>
