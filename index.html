@@ -59,7 +59,6 @@ table{
   transition: all 0.3s;
 }
 thead th{
-  /* Убираем закрепление */
   position: static;
   background: #3a3a3a;
   color:#fff;
@@ -68,7 +67,6 @@ thead th{
   font-weight:600;
 }
 td.name, th.name{
-  /* Убираем закрепление колонки ФИО */
   position: static;
   background: var(--card);
   text-align: left;
@@ -90,8 +88,6 @@ tbody td{
   border-radius:6px;
   word-break: break-word;
   transition: all 0.3s;
-  opacity:0;
-  transform: translateY(10px);
 }
 tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
 .legend{display:flex;gap:12px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);}
@@ -109,7 +105,7 @@ tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
 <header>
   <div>
     <h1>График сотрудников — Жар-Птица / ЦУМ</h1>
-    <div class="small">Выберите точку, месяц и начало недели. </div>
+    <div class="small">Выберите точку, месяц и начало недели. Данные подтягиваются из Google Sheets.</div>
   </div>
   <div class="legend">
     <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
@@ -149,9 +145,14 @@ tbody tr:hover td{background-color: rgba(100,150,200,0.2);}
 </div>
 
 <script>
-// Настройки таблиц
-const tableIDs = { jp:"1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", czm:"1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" };
-const monthsGIDs = { jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321}, czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321} };
+const tableIDs = {
+  jp:"1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U",
+  czm:"1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao"
+};
+const monthsGIDs = {
+  jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321},
+  czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321}
+};
 let scheduleData = [];
 
 async function loadCSV(branch, month){
@@ -172,14 +173,22 @@ function populateMonths(branch){
 async function populateEmployees(branch, month){
   scheduleData = await loadCSV(branch, month);
   const employeesSet = new Set();
-  for(let i=2;i<=15;i++){ if(scheduleData[i] && scheduleData[i][0]) employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/,"")); }
+  for(let i=2;i<=15;i++){ // Берем A3:A16
+    if(scheduleData[i] && scheduleData[i][0]) employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/,""));
+  }
   const select = document.getElementById("employee");
   select.innerHTML='<option value="all">Все</option>';
-  Array.from(employeesSet).forEach(name=>{ const opt=document.createElement("option"); opt.value=name; opt.textContent=name; select.appendChild(opt); });
+  Array.from(employeesSet).forEach(name=>{
+    const opt=document.createElement("option");
+    opt.value=name;
+    opt.textContent=name;
+    select.appendChild(opt);
+  });
 }
 
 function parseShift(val){
-  if(!val) return {type:"empty",label:""}; const s=String(val).trim().toLowerCase();
+  if(!val) return {type:"empty",label:""}; 
+  const s=String(val).trim().toLowerCase();
   if(s.includes("вд")) return {type:"fullday",label:"Весь день"};
   if(s.endsWith("у")) return {type:"morning",label:"Утро"};
   if(s.endsWith("в")) return {type:"evening",label:"Вечер"};
@@ -193,7 +202,6 @@ function loadSchedule(){
   const tableHead=document.getElementById("tableHead");
   const tableBody=document.getElementById("tableBody");
 
-  // Заголовок
   const headRow=["Сотрудник"];
   for(let i=0;i<7;i++){
     const d=new Date(startDate); d.setDate(d.getDate()+i);
@@ -201,7 +209,6 @@ function loadSchedule(){
   }
   tableHead.innerHTML="<tr>"+headRow.map((h,i)=>`<th${i===0?' class="name"':''}>${h}</th>`).join("")+"</tr>";
 
-  // Фильтруем строки с именем сотрудника
   const rows = scheduleData.slice(2,16).filter(r=>r[0] && r[0].trim()!=="");
   tableBody.innerHTML="";
   rows.forEach(r=>{
@@ -219,18 +226,30 @@ function loadSchedule(){
 }
 
 async function init(){
-  const branchSelect=document.getElementById("branch"); populateMonths(branchSelect.value);
+  const branchSelect=document.getElementById("branch"); 
+  populateMonths(branchSelect.value);
   const firstMonth=document.getElementById("month").options[0].value;
   await populateEmployees(branchSelect.value, firstMonth);
   const today=new Date(); const dayOfWeek=today.getDay()===0?7:today.getDay();
-  const firstDay=new Date(today); firstDay.setDate(today.getDate()-dayOfWeek+1); document.getElementById("startDate").valueAsDate=firstDay;
+  const firstDay=new Date(today); firstDay.setDate(today.getDate()-dayOfWeek+1); 
+  document.getElementById("startDate").valueAsDate=firstDay;
 }
 
 init();
-document.getElementById("branch").addEventListener("change", async e=>{ const b=e.target.value; populateMonths(b); const firstMonth=document.getElementById("month").options[0].value; await populateEmployees(b, firstMonth); });
-document.getElementById("month").addEventListener("change", async e=>{ populateEmployees(document.getElementById("branch").value, e.target.value); });
+document.getElementById("branch").addEventListener("change", async e=>{
+  const b=e.target.value; 
+  populateMonths(b); 
+  const firstMonth=document.getElementById("month").options[0].value; 
+  await populateEmployees(b, firstMonth); 
+});
+document.getElementById("month").addEventListener("change", async e=>{
+  populateEmployees(document.getElementById("branch").value, e.target.value); 
+});
 document.getElementById("showBtn").addEventListener("click", loadSchedule);
-document.getElementById("refreshBtn").addEventListener("click", async ()=>{await populateEmployees(document.getElementById("branch").value, document.getElementById("month").value); loadSchedule();});
+document.getElementById("refreshBtn").addEventListener("click", async ()=>{
+  await populateEmployees(document.getElementById("branch").value, document.getElementById("month").value); 
+  loadSchedule();
+});
 </script>
 </body>
 </html>
