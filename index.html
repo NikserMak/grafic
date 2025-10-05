@@ -3,52 +3,135 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>График сотрудников</title>
+<title>График</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#1e1e1e;
-  --card:#2a2a2a;
-  --text:#fff;
-  --muted:#aaa;
-  --accent:#4caf50;
-  --accent-hover:#45a049;
-  --border:#444;
-  --morning:#264f6b;
-  --evening:#665500;
-  --fullday:#b3571e;
-  --training:#28a745;
+  --bg-gradient: linear-gradient(135deg,#1e1e1e,#2c2c2c);
+  --card:#2a2a2a; 
+  --muted:#aaaaaa;
+  --accent:#4caf50; --accent-hover:#45a049; 
+  --thin-border:#444;
+  --morning:#264f6b; 
+  --evening:#665500; 
+  --fullday:#b3571e; 
+  --training:#28a745; 
+  --empty:#2a2a2a;
+  --font-sans:'Inter', sans-serif;
+  --shadow:0 6px 18px rgba(0,0,0,0.5);
+  --text-color:#ffffff;
 }
-body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
-.container{max-width:1100px;margin:28px auto;padding:18px;}
-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
-h1{font-size:36px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--accent),#00bcd4);padding:10px 20px;border-radius:12px;display:inline-block;box-shadow:0 6px 18px rgba(0,0,0,0.5);}
+body{
+  font-family: var(--font-sans);
+  margin:0;
+  background:var(--bg-gradient);
+  color: var(--text-color);
+}
+.container{
+  max-width:1100px;
+  margin:28px auto;
+  padding:18px;
+}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+h1{
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg,#4caf50,#00bcd4);
+  padding: 10px 20px;
+  border-radius: 12px;
+  display: inline-block;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
 .small{color:var(--muted);}
-.controls{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-top:12px;}
-.control{display:flex;flex-direction:column;font-size:13px;color:var(--text);}
-select,input[type="date"],button{padding:8px 12px;font-size:14px;border-radius:10px;border:1px solid var(--border);background:#3a3a3a;color:#fff;transition:0.3s;}
-select:focus,input[type="date"]:focus{border-color:#3b82f6;outline:none;}
-button{background:var(--accent);color:#fff;border:none;cursor:pointer;transition:0.3s;}
+.controls{display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin-top:12px;}
+.control{display:flex;flex-direction:column;font-size:13px;color:var(--text-color);}
+select,input[type="date"],button{
+  padding:8px 12px; font-size:14px; border-radius:10px; border:1px solid #555; background:#3a3a3a; color:#fff; transition: all 0.3s;
+}
+select:focus, input[type="date"]:focus {border-color:#3b82f6; outline:none;}
+button{background:var(--accent);color:#fff;border:none;cursor:pointer;transition:all 0.3s;}
 button:hover{background:var(--accent-hover);}
-.table-wrap{margin-top:18px;background:var(--card);border-radius:14px;padding:12px;overflow-x:auto;box-shadow:0 6px 18px rgba(0,0,0,0.5);}
-table{width:max-content;min-width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed;}
-thead th{background:#3a3a3a;color:#fff;border:1px solid var(--border);text-align:center;font-weight:600;}
-thead th.today{background:#00bcd4;color:#fff;}
-td,th{border:1px solid var(--border);}
-td.name,th.name{min-width:140px;max-width:160px;text-align:left;padding-left:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;background:var(--card);}
-td.empty{background:var(--card);}
+.table-wrap{
+  margin-top:18px;
+  background:var(--card);
+  border-radius:14px;
+  padding:12px;
+  box-shadow:var(--shadow);
+  overflow-x:auto;
+  -webkit-overflow-scrolling: touch;
+}
+table{
+  width:max-content;
+  min-width:100%;
+  border-collapse: collapse;
+  font-size:14px;
+  table-layout: fixed;
+}
+thead th {
+  background: #3a3a3a;
+  color:#fff;
+  border: 1px solid var(--thin-border);
+  text-align: center;
+  font-weight: 600;
+}
+thead th.today {background:#00bcd4; color:#fff;}
+td, th {
+  border: 1px solid var(--thin-border);
+}
+td.name, th.name {
+  min-width: 140px;
+  max-width: 160px;
+  text-align: left;
+  padding-left: 10px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--card);
+}
+td.empty{background:var(--empty);}
 td.morning{background:var(--morning);}
 td.evening{background:var(--evening);}
 td.fullday{background:var(--fullday);}
 td.training{background:var(--training);}
-tbody td{padding:8px;text-align:center;border-radius:6px;word-break:break-word;opacity:0;transform:translateY(10px);transition:all 0.4s ease,background 0.5s ease;position:relative;}
-tbody tr.visible td{opacity:1;transform:translateY(0);}
-tbody td::after{content:attr(data-tooltip);position:absolute;background:rgba(0,0,0,0.75);color:#fff;padding:2px 6px;font-size:11px;border-radius:4px;white-space:nowrap;top:-28px;left:50%;transform:translateX(-50%);display:none;pointer-events:none;z-index:10;}
+tbody td{
+  padding:8px;
+  text-align:center;
+  border-radius:6px;
+  word-break: break-word;
+  opacity:0;
+  transform: translateY(10px);
+  transition: all 0.4s ease, background 0.5s ease;
+  position: relative;
+}
+tbody tr.visible td{
+  opacity:1;
+  transform: translateY(0);
+}
+tbody td::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 4px;
+  white-space: nowrap;
+  top:-28px; left:50%;
+  transform: translateX(-50%);
+  display:none;
+  pointer-events:none;
+  z-index:10;
+}
 tbody td:hover::after{display:block;}
 .legend{display:flex;gap:12px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);}
 .legend .item{display:inline-flex;gap:6px;align-items:center;}
 .chip{width:20px;height:14px;border-radius:4px;display:inline-block;border:1px solid #555;}
-@media(max-width:760px){td.name,th.name{min-width:120px;max-width:140px;font-size:13px}.controls{gap:8px}thead th,tbody td{font-size:13px;padding:6px}}
+@media (max-width:760px){
+  td.name, th.name { min-width:120px; max-width:140px; font-size:13px; }
+  .controls{gap:8px}
+  thead th, tbody td{font-size:13px;padding:6px}
+}
 </style>
 </head>
 <body>
@@ -84,8 +167,8 @@ tbody td:hover::after{display:block;}
   </label>
   <div style="display:flex;align-items:center;gap:8px">
     <button id="showBtn">Показать график</button>
-    <button id="todayBtn" style="background:#f39c12">Сегодня</button>
     <button id="refreshBtn" style="background:#3b82f6">Обновить</button>
+    <button id="todayBtn" style="background:#ff9800">Сегодня</button>
   </div>
 </div>
 
@@ -98,41 +181,38 @@ tbody td:hover::after{display:block;}
 </div>
 
 <script>
-const tableIDs={jp:"1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U",czm:"1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao"};
-const monthsGIDs={jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321},czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321}};
+const tableIDs = { jp:"1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", czm:"1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" };
+const monthsGIDs = { jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321}, czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321} };
 let scheduleData=[];
-const csvCache={};
 
-async function loadCSV(branch,month){
-  const key=branch+"_"+month;
-  if(csvCache[key]) return csvCache[key];
+async function loadCSV(branch, month){
   const gid=monthsGIDs[branch][month];
   const url=`https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
   const res=await fetch(url);
   const text=await res.text();
-  const data=text.split("\n").map(r=>r.split(","));
-  csvCache[key]=data;
-  return data;
+  return text.split("\n").map(r=>r.split(","));
 }
 
 function populateMonths(branch){
-  const monthSelect=document.getElementById("month");
-  monthSelect.innerHTML="";
+  const monthSelect=document.getElementById("month"); monthSelect.innerHTML="";
   Object.keys(monthsGIDs[branch]).forEach(m=>{
-    const opt=document.createElement("option");
-    opt.value=m; opt.textContent=m; monthSelect.appendChild(opt);
+    const opt=document.createElement("option"); opt.value=m; opt.textContent=m; monthSelect.appendChild(opt);
   });
 }
 
-async function populateEmployees(branch,month){
-  scheduleData=await loadCSV(branch,month);
+async function populateEmployees(branch, month){
+  scheduleData=await loadCSV(branch, month);
   const employeesSet=new Set();
-  for(let i=2;i<=15;i++){if(scheduleData[i] && scheduleData[i][0]) employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/,""));}
+  for(let i=2;i<=15;i++){ 
+    if(scheduleData[i] && scheduleData[i][0]) employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/,"")); 
+  }
   const select=document.getElementById("employee");
   select.innerHTML='<option value="all">Все</option>';
   Array.from(employeesSet).forEach(name=>{
     const opt=document.createElement("option");
-    opt.value=name; opt.textContent=name; select.appendChild(opt);
+    opt.value=name;
+    opt.textContent=name;
+    select.appendChild(opt);
   });
 }
 
@@ -146,30 +226,47 @@ function parseShift(val){
   return {type:"empty",label:""};
 }
 
-function loadSchedule(){
+function loadSchedule(singleDay=false){
   const employee=document.getElementById("employee").value;
   let start=new Date(document.getElementById("startDate").value);
   if(!start.getTime()){alert("Выберите дату начала недели"); return;}
   const tableHead=document.getElementById("tableHead");
   const tableBody=document.getElementById("tableBody");
+
   const dateRow=scheduleData[1].slice(2);
   const dateMap=dateRow.map(d=>{
     const parts=d.split('.');
     return new Date(new Date().getFullYear(),parseInt(parts[1],10)-1,parseInt(parts[0],10));
   });
 
-  const startDay=start.getDay()===0?1:start.getDay();
-  start.setDate(start.getDate()-startDay+1);
-  const end=new Date(start); end.setDate(start.getDate()+6);
+  let visibleIndexes=[], headRow=["Сотрудник"];
+  if(singleDay){
+    const today=new Date(); today.setHours(0,0,0,0);
+    dateMap.forEach((d,i)=>{
+      if(d.getTime()===today.getTime()){
+        headRow.push(`${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`);
+        visibleIndexes.push(i+2);
+      }
+    });
+  } else {
+    const startDay=start.getDay()===0?1:start.getDay();
+    start.setDate(start.getDate()-startDay+1);
+    const end=new Date(start); end.setDate(start.getDate()+6);
+    dateMap.forEach((d,i)=>{
+      if(d>=start && d<=end){
+        headRow.push(`${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`);
+        visibleIndexes.push(i+2);
+      }
+    });
+  }
 
-  const headRow=["Сотрудник"]; const visibleIndexes=[];
-  dateMap.forEach((d,i)=>{if(d>=start && d<=end){headRow.push(`${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`);visibleIndexes.push(i+2);}});
   const today=new Date();
   tableHead.innerHTML="<tr>"+headRow.map((h,i)=>`<th${i===0?' class="name"':''}${(today.getDate()===parseInt(h.split('.')[0],10)&&today.getMonth()===parseInt(h.split('.')[1],10)-1)?' class="today"':''}>${h}</th>`).join("")+"</tr>";
 
   const rows=scheduleData.slice(2,16).filter(r=>r[0] && r[0].trim()!=="");
   tableBody.innerHTML="";
   rows.forEach((r,rowIndex)=>{
+    if(singleDay && visibleIndexes.every(idx => !r[idx]?.trim())) return;
     if(employee!=="all" && r[0]!==employee) return;
     const tr=document.createElement("tr");
     let html=`<td class="name">${r[0]}</td>`;
@@ -186,26 +283,31 @@ function loadSchedule(){
 }
 
 async function init(){
-  const branchSelect=document.getElementById("branch");
+  const branchSelect=document.getElementById("branch"); 
   populateMonths(branchSelect.value);
   const firstMonth=document.getElementById("month").options[0].value;
-  await populateEmployees(branchSelect.value,firstMonth);
+  await populateEmployees(branchSelect.value, firstMonth);
   const today=new Date(); const dayOfWeek=today.getDay()===0?7:today.getDay();
-  const firstDay=new Date(today); firstDay.setDate(today.getDate()-dayOfWeek+1);
+  const firstDay=new Date(today); firstDay.setDate(today.getDate()-dayOfWeek+1); 
   document.getElementById("startDate").valueAsDate=firstDay;
 }
 
 init();
-document.getElementById("branch").addEventListener("change", async e=>{const b=e.target.value; populateMonths(b); const firstMonth=document.getElementById("month").options[0].value; await populateEmployees(b,firstMonth);});
-document.getElementById("month").addEventListener("change", async e=>{populateEmployees(document.getElementById("branch").value,e.target.value);});
-document.getElementById("showBtn").addEventListener("click",loadSchedule);
-document.getElementById("refreshBtn").addEventListener("click", async ()=>{await populateEmployees(document.getElementById("branch").value,document.getElementById("month").value); loadSchedule();});
-document.getElementById("todayBtn").addEventListener("click",()=>{
-  const today=new Date(); const dayOfWeek=today.getDay()===0?7:today.getDay();
-  today.setDate(today.getDate()-dayOfWeek+1);
-  document.getElementById("startDate").valueAsDate=today;
-  loadSchedule();
+document.getElementById("branch").addEventListener("change", async e=>{
+  const b=e.target.value; 
+  populateMonths(b); 
+  const firstMonth=document.getElementById("month").options[0].value; 
+  await populateEmployees(b, firstMonth); 
 });
+document.getElementById("month").addEventListener("change", async e=>{
+  populateEmployees(document.getElementById("branch").value, e.target.value); 
+});
+document.getElementById("showBtn").addEventListener("click", ()=>loadSchedule(false));
+document.getElementById("refreshBtn").addEventListener("click", async ()=>{
+  await populateEmployees(document.getElementById("branch").value, document.getElementById("month").value);
+  loadSchedule(false);
+});
+document.getElementById("todayBtn").addEventListener("click", ()=>loadSchedule(true));
 </script>
 </body>
 </html>
