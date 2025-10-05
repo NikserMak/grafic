@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>График</title>
+<title>График сотрудников</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -132,6 +132,21 @@ tbody td:hover::after{display:block;}
   .controls{gap:8px}
   thead th, tbody td{font-size:13px;padding:6px}
 }
+.calendar-week{
+  display:flex; gap:2px; margin-bottom:8px; justify-content:center; flex-wrap:wrap;
+}
+.calendar-week .day{
+  flex:1;
+  text-align:center;
+  padding:6px 0;
+  border-radius:6px;
+  background:#3a3a3a;
+  color:#fff;
+  font-weight:600;
+}
+.calendar-week .day.today{
+  background:#00bcd4;
+}
 </style>
 </head>
 <body>
@@ -170,6 +185,8 @@ tbody td:hover::after{display:block;}
     <button id="refreshBtn" style="background:#3b82f6">Обновить</button>
   </div>
 </div>
+
+<div class="calendar-week" id="calendarWeek"></div>
 
 <div class="table-wrap">
   <table id="scheduleTable">
@@ -223,33 +240,46 @@ function parseShift(val){
   return {type:"empty",label:""};
 }
 
+function getWeekStart(date){
+  const d = new Date(date);
+  const day = d.getDay() || 7;
+  d.setDate(d.getDate() - day + 1);
+  return d;
+}
+
+function formatDate(d){
+  return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`;
+}
+
 function loadSchedule(){
   const employee=document.getElementById("employee").value;
-  const start=new Date(document.getElementById("startDate").value);
-  if(!start.getTime()){ alert("Выберите дату начала недели"); return;}
+  const selectedDate=new Date(document.getElementById("startDate").value);
+  if(!selectedDate.getTime()){ alert("Выберите дату начала недели"); return;}
+  
   const tableHead=document.getElementById("tableHead");
   const tableBody=document.getElementById("tableBody");
+  const calendarDiv=document.getElementById("calendarWeek");
 
-  const dateRow=scheduleData[1].slice(2);
-  const dateMap=dateRow.map(d=>{
-    const parts=d.split('.');
-    const day=parseInt(parts[0],10);
-    const month=parseInt(parts[1],10)-1;
-    const year=new Date().getFullYear();
-    return new Date(year,month,day);
+  const weekStart=getWeekStart(selectedDate);
+  const weekDates=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(weekStart); d.setDate(weekStart.getDate()+i);
+    weekDates.push(d);
+  }
+
+  // мини-календарь
+  calendarDiv.innerHTML="";
+  weekDates.forEach(d=>{
+    const dayDiv=document.createElement("div");
+    dayDiv.className="day"+(d.toDateString()===new Date().toDateString()?" today":"");
+    dayDiv.textContent=`${["Пн","Вт","Ср","Чт","Пт","Сб","Вс"][d.getDay()===0?6:d.getDay()-1]} ${d.getDate()}`;
+    calendarDiv.appendChild(dayDiv);
   });
 
-  const end=new Date(start); end.setDate(start.getDate()+6);
-  const headRow=["Сотрудник"];
-  const visibleIndexes=[];
+  // заголовок таблицы
   const today=new Date();
-  dateMap.forEach((d,i)=>{
-    if(d>=start && d<=end){ 
-      headRow.push(`${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`); 
-      visibleIndexes.push(i+2); 
-    }
-  });
-  tableHead.innerHTML="<tr>"+headRow.map((h,i)=>`<th${i===0?' class="name"':''}${(today.getDate()===parseInt(h.split('.')[0],10)&&today.getMonth()===parseInt(h.split('.')[1],10)-1)?' class="today"':''}>${h}</th>`).join("")+"</tr>";
+  tableHead.innerHTML="<tr><th class='name'>Сотрудник</th>"+
+    weekDates.map(d=>`<th${d.toDateString()===today.toDateString()?' class="today"':''}>${formatDate(d)}</th>`).join("")+"</tr>";
 
   const rows=scheduleData.slice(2,16).filter(r=>r[0] && r[0].trim()!=="");
   tableBody.innerHTML="";
@@ -257,11 +287,17 @@ function loadSchedule(){
     if(employee!=="all" && r[0]!==employee) return;
     const tr=document.createElement("tr");
     let html=`<td class="name">${r[0]}</td>`;
-    visibleIndexes.forEach(col=>{
-      const val=r[col] ? r[col].trim() : "";
+    weekDates.forEach(d=>{
+      let val="";
+      for(let col=2; col<r.length; col++){
+        const parts=r[1][col]?r[1][col].split('.'):[];
+        if(parts.length>=2 && parseInt(parts[0],10)===d.getDate() && parseInt(parts[1],10)===d.getMonth()+1){
+          val=r[col] || "";
+          break;
+        }
+      }
       const sh=parseShift(val);
-      const tooltip=(val?`${val}`:"");
-      html+=`<td class="${sh.type}" data-tooltip="${tooltip}">${sh.label}</td>`;
+      html+=`<td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>`;
     });
     tr.innerHTML=html;
     tableBody.appendChild(tr);
@@ -274,7 +310,8 @@ async function init(){
   populateMonths(branchSelect.value);
   const firstMonth=document.getElementById("month").options[0].value;
   await populateEmployees(branchSelect.value, firstMonth);
-  const today=new Date(); const dayOfWeek=today.getDay()===0?7:today.getDay();
+  const today=new Date(); 
+  const dayOfWeek=today.getDay()===0?7:today.getDay();
   const firstDay=new Date(today); firstDay.setDate(today.getDate()-dayOfWeek+1); 
   document.getElementById("startDate").valueAsDate=firstDay;
 }
