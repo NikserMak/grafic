@@ -91,14 +91,24 @@ tbody td:hover::after{display:block;}
 <script>
 const tableIDs = { jp:"1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", czm:"1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" };
 const monthsGIDs = { jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321}, czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321} };
+
+// ✅ КЭШ
+const cachedCSVs = {};
+
 let scheduleData=[];
 
 async function loadCSV(branch, month){
+  const cacheKey = `${branch}_${month}`;
+  if (cachedCSVs[cacheKey]) {
+    return cachedCSVs[cacheKey];
+  }
   const gid = monthsGIDs[branch][month];
   const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
   const res = await fetch(url);
   const text = await res.text();
-  return text.split("\n").map(r => r.split(","));
+  const parsed = text.split("\n").map(r => r.split(","));
+  cachedCSVs[cacheKey] = parsed;
+  return parsed;
 }
 
 function populateMonths(branch){
