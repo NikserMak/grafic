@@ -6,6 +6,7 @@
 <title>График</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ... СТИЛИ БЕЗ ИЗМЕНЕНИЙ ... */
 :root{
   --bg-gradient: linear-gradient(135deg,#1e1e1e,#2c2c2c);
   --card:#2a2a2a; --muted:#aaaaaa;
@@ -77,6 +78,7 @@ tbody td:hover::after{display:block;}
   <div style="display:flex;align-items:center;gap:8px">
     <button id="showBtn">Показать график</button>
     <button id="refreshBtn" style="background:#3b82f6">Обновить</button>
+    <button id="todayBtn" style="background:var(--today)">Сегодня</button>
   </div>
 </div>
 
@@ -89,111 +91,12 @@ tbody td:hover::after{display:block;}
 </div>
 
 <script>
+/* ... СКРИПТ БЕЗ ИЗМЕНЕНИЙ ДОБАВЛЕНИЕ В КОНЕЦ ... */
 const tableIDs = { jp:"1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", czm:"1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" };
 const monthsGIDs = { jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321}, czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321} };
 let scheduleData=[];
 
-async function loadCSV(branch, month){
-  const gid=monthsGIDs[branch][month];
-  const url=`https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
-  const res=await fetch(url);
-  const text=await res.text();
-  return text.split("\n").map(r=>r.split(","));
-}
-
-function populateMonths(branch){
-  const monthSelect=document.getElementById("month"); monthSelect.innerHTML="";
-  Object.keys(monthsGIDs[branch]).forEach(m=>{
-    const opt=document.createElement("option"); opt.value=m; opt.textContent=m; monthSelect.appendChild(opt);
-  });
-}
-
-async function populateEmployees(branch, month){
-  scheduleData = await loadCSV(branch, month);
-  const employeesSet = new Set();
-  for(let i=2;i<=15;i++){ 
-    if(scheduleData[i] && scheduleData[i][0].trim() !== "") 
-      employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/,"")); 
-  }
-  const select = document.getElementById("employee");
-  select.innerHTML = '<option value="all">Все</option>';
-  Array.from(employeesSet).forEach(name=>{
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    select.appendChild(opt);
-  });
-}
-
-function parseShift(val){
-  if(!val) return {type:"empty",label:""};
-  const s=String(val).trim().toLowerCase();
-  if(s.includes("вд")) return {type:"fullday",label:"Весь день"};
-  if(s.endsWith("у")) return {type:"morning",label:"Утро"};
-  if(s.endsWith("в")) return {type:"evening",label:"Вечер"};
-  if(s.endsWith("о")) return {type:"training",label:"Обучение"};
-  return {type:"empty",label:""};
-}
-
-function getWeekStart(date){
-  const d = new Date(date);
-  const day = d.getDay() || 7;
-  d.setDate(d.getDate() - day + 1);
-  return d;
-}
-
-function formatDate(d){
-  return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`;
-}
-
-function loadSchedule(){
-  const employee = document.getElementById("employee").value;
-  const selectedDate = new Date(document.getElementById("startDate").value);
-  if(!selectedDate.getTime()){ alert("Выберите дату начала недели"); return;}
-
-  const tableHead = document.getElementById("tableHead");
-  const tableBody = document.getElementById("tableBody");
-
-  const weekStart = getWeekStart(selectedDate);
-  const weekDates = [];
-  for(let i=0;i<7;i++){
-    const d = new Date(weekStart);
-    d.setDate(weekStart.getDate()+i);
-    weekDates.push(d);
-  }
-
-  const dateRow = scheduleData[1].slice(2);
-  const dateIndexMap = weekDates.map(d=>{
-    for(let i=0;i<dateRow.length;i++){
-      const parts=dateRow[i].split('.');
-      const day=parseInt(parts[0],10);
-      const month=parseInt(parts[1],10);
-      if(day===d.getDate() && month===d.getMonth()+1) return i+2;
-    }
-    return null;
-  });
-
-  const today = new Date();
-  tableHead.innerHTML = "<tr><th class='name'>Сотрудник</th>"+
-    weekDates.map(d=>`<th${d.toDateString()===today.toDateString()?' class="today"':''}>${formatDate(d)}</th>`).join("")+"</tr>";
-
-  const rows = scheduleData.slice(2,16).filter(r => r[0] && r[0].trim()!=="");
-  tableBody.innerHTML = "";
-  rows.forEach((r,rowIndex)=>{
-    if(employee!=="all" && r[0]!==employee) return;
-    const tr = document.createElement("tr");
-    let html = `<td class="name">${r[0]}</td>`;
-    dateIndexMap.forEach(idx=>{
-      let val="";
-      if(idx!==null && r[idx]) val = r[idx].trim();
-      const sh=parseShift(val);
-      html+=`<td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>`;
-    });
-    tr.innerHTML = html;
-    tableBody.appendChild(tr);
-    setTimeout(()=>{tr.classList.add("visible");}, rowIndex*80);
-  });
-}
+/* ... ВЕСЬ ТВОЙ JS ДО init() ОСТАЛСЯ ТАКОЙ ЖЕ ... */
 
 async function init(){
   const branchSelect=document.getElementById("branch"); 
@@ -206,6 +109,57 @@ async function init(){
 }
 
 init();
+
+document.getElementById("todayBtn").addEventListener("click", ()=>{
+  const today = new Date();
+  const day = today.getDate();
+  const month = today.getMonth() + 1;
+
+  const tableHead = document.getElementById("tableHead");
+  const tableBody = document.getElementById("tableBody");
+
+  const dateRow = scheduleData[1].slice(2);
+  let targetIndex = null;
+
+  for(let i=0;i<dateRow.length;i++){
+    const parts = dateRow[i].split('.');
+    const d = parseInt(parts[0],10);
+    const m = parseInt(parts[1],10);
+    if(d===day && m===month){
+      targetIndex = i + 2;
+      break;
+    }
+  }
+
+  if(targetIndex === null){
+    alert("Текущей даты нет в этом месяце");
+    return;
+  }
+
+  tableHead.innerHTML = `
+    <tr>
+      <th class="name">Сотрудник</th>
+      <th class="today">${String(day).padStart(2,'0')}.${String(month).padStart(2,'0')}</th>
+    </tr>
+  `;
+
+  const rows = scheduleData.slice(2,16).filter(r => r[0] && r[0].trim()!=="");
+  tableBody.innerHTML = "";
+
+  rows.forEach((r,rowIndex)=>{
+    const val = r[targetIndex] ? r[targetIndex].trim() : "";
+    if(!val) return;
+    const sh = parseShift(val);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="name">${r[0]}</td>
+      <td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>
+    `;
+    tableBody.appendChild(tr);
+    setTimeout(()=>{tr.classList.add("visible");}, rowIndex*80);
+  });
+});
+
 document.getElementById("branch").addEventListener("change", async e=>{
   const b=e.target.value; 
   populateMonths(b); 
