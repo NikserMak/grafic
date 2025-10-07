@@ -11,7 +11,9 @@
 <meta name="theme-color" content="#00c853">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="График">
 <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
 <style>
 :root {
   --bg-gradient: linear-gradient(135deg, #0f0f0f, #1a1a1a);
@@ -691,6 +693,15 @@ tbody td:hover::after {
   .admin-form {
     grid-template-columns: 1fr;
   }
+  
+  /* Скрываем админ-панель и кнопку на мобильных */
+  .admin-panel {
+    display: none !important;
+  }
+  
+  #adminToggle {
+    display: none !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -817,7 +828,7 @@ tbody td:hover::after {
     </div>
   </header>
 
-  <!-- Admin Panel (Hidden by default) -->
+  <!-- Admin Panel (Hidden by default and on mobile) -->
   <section class="admin-panel" id="adminPanel">
     <div class="admin-header">
       <div class="admin-title">
@@ -941,7 +952,7 @@ tbody td:hover::after {
 </div>
 
 <script>
-// PWA Manifest
+// PWA Manifest с красивыми иконками
 const manifest = {
   "name": "График сотрудников",
   "short_name": "График",
@@ -950,23 +961,72 @@ const manifest = {
   "display": "standalone",
   "background_color": "#0f0f0f",
   "theme_color": "#00c853",
+  "orientation": "portrait",
+  "scope": "/",
   "icons": [
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMwMGM4NTMiLz4KPHBhdGggZD0iTTk2IDQ4QzcxLjIgNDggNTEuMiA2OCA1MS4yIDkyLjggNTEuMiAxMTcuNiA3MS4yIDEzNy42IDk2IDEzNy42IDEyMC44IDEzNy42IDE0MC44IDExNy42IDE0MC44IDkyLjggMTQwLjggNjggMTIwLjggNDggOTYgNDhaTTc2LjggMTA2LjRINzEuMlY5MS4ySDc2LjhWMTA2LjRaTTk2IDEwNi40SDkwLjRWOTEuMkg5NlYxMDYuNFpNMTE1LjIgMTA2LjRIMTA5LjZWOTEuMkgxMTUuMlYxMDYuNFoiIGZpbGw9IndoaXRlIi8+CjxyZWN0IHg9IjY0IiB5PSIxNDQiIHdpZHRoPSI2NCIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzYiIGZpbGw9IiMwMGM4NTMiLz4KPHBhdGggZD0iTTk2IDU2QzcwLjIgNTYgNTQgNzIuMiA1NCA5OFM3MC4yIDE0MCA5NiAxNDAgMTM4IDEyMy44IDEzOCA5OCAxMjEuOCA1NiA5NiA1NlpNNzYgMTA0Vjg4SDgwVjEwNEg3NlpNOTYgMTA0Vjg4SDEwMFYxMDRIOTZaTTExNiAxMDRWODhIMTIwVjEwNEgxMTZaIiBmaWxsPSJ3aGl0ZSIvPgo8cmVjdCB4PSI3MiIgeT0iMTQ0IiB3aWR0aD0iNDgiIGhlaWdodD0iOCIgcng9IjQiIGZpbGw9IndoaXRlIi8+CjxyZWN0IHg9IjY0IiB5PSIxNjAiIHdpZHRoPSI2NCIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iOTYiIGZpbGw9IiMwMGM4NTMiLz4KPHBhdGggZD0iTTI1NiAxNDhDMTg0LjYgMTQ4IDEyOCAyMDQuNiAxMjggMjc2UzE4NC42IDQwNCAyNTYgNDA0IDM4NCAzNDcuNCAzODQgMjc2IDMyNy40IDE0OCAyNTYgMTQ4Wk0xOTIgMjcyVjIzMkgyMDBWMjcySDE5MlpNMjU2IDI3MlYyMzJIMjY0VjI3MkgyNTZaTTMyMCAyNzJWMjMySDMyOFYyNzJIMzIwWiIgZmlsbD0id2hpdGUiLz4KPHJlY3QgeD0iMTkyIiB5PSIzODQiIHdpZHRoPSIxMjgiIGhlaWdodD0iMTYiIHJ4PSI4IiBmaWxsPSJ3aGl0ZSIvPgo8cmVjdCB4PSIxNzAiIHk9IjQyNCIgd2lkdGg9IjE3MiIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI2MDAiIHZpZXdCb3g9IjAgMCAxMjAwIDYwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iNjAwIiBmaWxsPSIjMDBjODUzIi8+CjxyZWN0IHg9IjI0IiB5PSIyNCIgd2lkdGg9IjExNTIiIGhlaWdodD0iNTUyIiByeD0iMjQiIGZpbGw9IiMwZjBmMGYiLz4KPHJlY3QgeD0iNDgiIHk9IjQ4IiB3aWR0aD0iMTEwNCIgaGVpZ2h0PSI4MCIgcng9IjEyIiBmaWxsPSIjMmQyZDJkIi8+Cjx0ZXh0IHg9IjYwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0id2hpdGUiPuCflLjRg9C/0YDQsNCy0LvQtdC90L4g0YHQvtC+0LHRidC10L3QuNC1PC90ZXh0Pgo8cmVjdCB4PSI0OCIgeT0iMTQwIiB3aWR0aD0iMTEwNCIgaGVpZ2h0PSI0MCIgcng9IjgiIGZpbGw9IiMzNjM2MzYiLz4KPHJlY3QgeD0iNDgiIHk9IjIwMCIgd2lkdGg9IjM1MCIgaGVpZ2h0PSIzMDAiIHJ4PSIxNiIgZmlsbD0iIzJkMmQyZCIvPgo8cmVjdCB4PSI0MjAiIHk9IjIwMCIgd2lkdGg9IjczMiIgaGVpZ2h0PSIzMDAiIHJ4PSIxNiIgZmlsbD0iIzJkMmQyZCIvPgo8L3N2Zz4=",
+      "sizes": "1200x600",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Главный экран приложения График сотрудников"
     }
   ]
 };
 
+// Регистрируем манифест
+const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+const manifestURL = URL.createObjectURL(blob);
+const link = document.createElement('link');
+link.rel = 'manifest';
+link.href = manifestURL;
+document.head.appendChild(link);
+
 // Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js').then(function(registration) {
-      console.log('SW registered: ', registration);
-    }).catch(function(registrationError) {
-      console.log('SW registration failed: ', registrationError);
-    });
+    // Регистрируем простой Service Worker для PWA
+    const swCode = `
+      self.addEventListener('install', (event) => {
+        self.skipWaiting();
+      });
+      
+      self.addEventListener('fetch', (event) => {
+        event.respondWith(
+          fetch(event.request).catch(() => {
+            return new Response('Оффлайн режим', {
+              status: 503,
+              statusText: 'Service Unavailable'
+            });
+          })
+        );
+      });
+    `;
+    
+    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+    const swURL = URL.createObjectURL(swBlob);
+    
+    navigator.serviceWorker.register(swURL)
+      .then(function(registration) {
+        console.log('SW registered: ', registration);
+      })
+      .catch(function(registrationError) {
+        console.log('SW registration failed: ', registrationError);
+      });
   });
 }
 
@@ -1098,6 +1158,12 @@ function showNotification(message, type = 'success', duration = 4000) {
 
 // ========== АДМИН ПАНЕЛЬ ==========
 function toggleAdminPanel() {
+  // На мобильных устройствах админ-панель недоступна
+  if (window.innerWidth <= 768) {
+    showNotification('Админ-панель недоступна на мобильных устройствах', 'info', 3000);
+    return;
+  }
+  
   const adminPanel = document.getElementById('adminPanel');
   const adminToggle = document.getElementById('adminToggle');
   
