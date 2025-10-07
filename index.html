@@ -3,58 +3,361 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>График</title>
+<title>График сотрудников</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg-gradient: linear-gradient(135deg,#1e1e1e,#2c2c2c);
   --card:#2a2a2a; --muted:#aaaaaa;
   --accent:#4caf50; --accent-hover:#45a049; --today:#00bcd4;
-  --thin-border:#444; --morning:#264f6b; --evening:#665500;
-  --fullday:#b3571e; --training:#28a745; --empty:#2a2a2a;
+  --thin-border:#444; --morning:#1e4a63; --evening:#7a5c00;
+  --fullday:#a34e1a; --training:#21963a; --empty:#2a2a2a;
   --font-sans:'Inter', sans-serif; --shadow:0 6px 18px rgba(0,0,0,0.5);
   --text-color:#ffffff;
+  --error:#f44336; --warning:#ff9800; --success:#4caf50;
 }
-body{margin:0;font-family:var(--font-sans);background:var(--bg-gradient);color:var(--text-color);}
-.container{max-width:1100px;margin:28px auto;padding:18px;}
-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
-h1{font-size:36px;font-weight:700;color:#fff;background:linear-gradient(135deg,#4caf50,#00bcd4);padding:10px 20px;border-radius:12px;display:inline-block;box-shadow:0 6px 18px rgba(0,0,0,0.5);}
-.small{color:var(--muted);}
-.controls{display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin-top:12px;}
-.control{display:flex;flex-direction:column;font-size:13px;color:var(--text-color);}
-select,input[type="date"],button{padding:8px 12px;font-size:14px;border-radius:10px;border:1px solid #555;background:#3a3a3a;color:#fff;transition:all 0.3s;}
-select:focus,input[type="date"]:focus{border-color:#3b82f6;outline:none;}
-button{background:var(--accent);color:#fff;border:none;cursor:pointer;transition:all 0.3s;}
-button:hover{background:var(--accent-hover);}
-.table-wrap{margin-top:18px;background:var(--card);border-radius:14px;padding:12px;box-shadow:var(--shadow);overflow-x:auto;-webkit-overflow-scrolling:touch;}
-table{width:max-content;min-width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed;}
-thead th{background:#3a3a3a;color:#fff;border:1px solid var(--thin-border);text-align:center;font-weight:600;}
-thead th.today{background:var(--today);color:#fff;}
-td,th{border:1px solid var(--thin-border);}
-td.name,th.name{min-width:140px;max-width:160px;text-align:left;padding-left:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;background:var(--card);}
-td.empty{background:var(--empty);}td.morning{background:var(--morning);}td.evening{background:var(--evening);}td.fullday{background:var(--fullday);}td.training{background:var(--training);}
-tbody td{padding:8px;text-align:center;border-radius:6px;word-break:break-word;opacity:0;transform:translateY(10px);transition:all 0.4s ease,background 0.5s ease;position:relative;}
-tbody tr.visible td{opacity:1;transform:translateY(0);}
-tbody td::after{content:attr(data-tooltip);position:absolute;background:rgba(0,0,0,0.75);color:#fff;padding:2px 6px;font-size:11px;border-radius:4px;white-space:nowrap;top:-28px;left:50%;transform:translateX(-50%);display:none;pointer-events:none;z-index:10;}
-tbody td:hover::after{display:block;}
-.legend{display:flex;gap:12px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);}
-.legend .item{display:inline-flex;gap:6px;align-items:center;}
-.chip{width:20px;height:14px;border-radius:4px;display:inline-block;border:1px solid #555;}
-@media (max-width:760px){td.name,th.name{min-width:120px;max-width:140px;font-size:13px}.controls{gap:8px}thead th,tbody td{font-size:13px;padding:6px}}
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  background:var(--bg-gradient);
+  color:var(--text-color);
+  min-height:100vh;
+}
+.container{
+  max-width:1100px;
+  margin:28px auto;
+  padding:18px;
+}
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+}
+h1{
+  font-size:36px;
+  font-weight:700;
+  color:#fff;
+  background:linear-gradient(135deg,#4caf50,#00bcd4);
+  padding:10px 20px;
+  border-radius:12px;
+  display:inline-block;
+  box-shadow:var(--shadow);
+}
+.small{
+  color:var(--muted);
+  margin-top:8px;
+}
+.controls{
+  display:flex; 
+  gap:12px; 
+  align-items:end; 
+  flex-wrap:wrap; 
+  margin-top:20px;
+}
+.control{
+  display:flex;
+  flex-direction:column;
+  font-size:13px;
+  color:var(--text-color);
+  min-width:120px;
+}
+select, input[type="date"], button{
+  padding:10px 12px;
+  font-size:14px;
+  border-radius:10px;
+  border:1px solid #555;
+  background:#3a3a3a;
+  color:#fff;
+  transition:all 0.3s;
+  margin-top:4px;
+}
+select:focus, input[type="date"]:focus{
+  border-color:#3b82f6;
+  outline:none;
+  box-shadow:0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+button{
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  transition:all 0.3s;
+  font-weight:500;
+  min-width:100px;
+}
+button:hover{
+  background:var(--accent-hover);
+  transform:translateY(-1px);
+}
+button:active{
+  transform:translateY(0);
+}
+button:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+  transform:none;
+}
+.table-wrap{
+  margin-top:24px;
+  background:var(--card);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:var(--shadow);
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  position:relative;
+  min-height:200px;
+}
+table{
+  width:max-content;
+  min-width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+  table-layout:fixed;
+}
+thead th{
+  background:#3a3a3a;
+  color:#fff;
+  border:1px solid var(--thin-border);
+  text-align:center;
+  font-weight:600;
+  padding:12px 8px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+thead th.today{
+  background:var(--today);
+  color:#fff;
+}
+td, th{
+  border:1px solid var(--thin-border);
+  padding:10px 8px;
+}
+td.name, th.name{
+  min-width:140px;
+  max-width:160px;
+  text-align:left;
+  padding-left:12px;
+  font-weight:600;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  background:var(--card);
+  position:sticky;
+  left:0;
+  z-index:5;
+}
+td.empty{background:var(--empty);}
+td.morning{background:var(--morning);}
+td.evening{background:var(--evening);}
+td.fullday{background:var(--fullday);}
+td.training{background:var(--training);}
+tbody td{
+  text-align:center;
+  border-radius:6px;
+  word-break:break-word;
+  opacity:0;
+  transform:translateY(10px);
+  transition:all 0.4s ease,background 0.5s ease;
+  position:relative;
+}
+tbody tr.visible td{
+  opacity:1;
+  transform:translateY(0);
+}
+tbody td::after{
+  content:attr(data-tooltip);
+  position:absolute;
+  background:rgba(0,0,0,0.9);
+  color:#fff;
+  padding:6px 10px;
+  font-size:12px;
+  border-radius:6px;
+  white-space:nowrap;
+  top:-40px;
+  left:50%;
+  transform:translateX(-50%);
+  display:none;
+  pointer-events:none;
+  z-index:20;
+  box-shadow:0 4px 8px rgba(0,0,0,0.3);
+}
+tbody td:hover::after{
+  display:block;
+}
+.legend{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-top:10px;
+  font-size:13px;
+  color:var(--muted);
+  flex-wrap:wrap;
+}
+.legend .item{
+  display:inline-flex;
+  gap:6px;
+  align-items:center;
+}
+.chip{
+  width:20px;
+  height:14px;
+  border-radius:4px;
+  display:inline-block;
+  border:1px solid #555;
+}
+
+/* Индикатор загрузки */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Уведомления */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  z-index: 1000;
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.notification.show {
+  transform: translateX(0);
+}
+.notification.success {
+  background: var(--success);
+}
+.notification.error {
+  background: var(--error);
+}
+.notification.warning {
+  background: var(--warning);
+}
+
+/* Мобильная оптимизация */
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+    margin: 10px auto;
+  }
+  
+  h1 {
+    font-size: 24px;
+    padding: 8px 16px;
+    text-align: center;
+    width: 100%;
+  }
+  
+  header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .control {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .buttons-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .buttons-container button {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .table-wrap {
+    margin-top: 16px;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  td.name, th.name {
+    min-width: 100px;
+    max-width: 120px;
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  
+  thead th, tbody td {
+    font-size: 12px;
+    padding: 6px 4px;
+  }
+  
+  .legend {
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 20px;
+  }
+  
+  .buttons-container {
+    grid-template-columns: 1fr;
+  }
+  
+  td.name, th.name {
+    min-width: 80px;
+    max-width: 100px;
+    font-size: 11px;
+  }
+}
 </style>
 </head>
 <body>
+<!-- Уведомления -->
+<div id="notificationsContainer"></div>
+
 <div class="container">
 <header>
   <div>
     <h1>График сотрудников</h1>
-    <div class="small">Выберите точку, месяц и начало недели.</div>
+    <div class="small">Выберите точку, месяц и начало недели. Данные обновляются автоматически.</div>
   </div>
   <div class="legend">
-    <div class="item"><span class="chip" style="background:var(--morning)">☀️</span>Утро</div>
-    <div class="item"><span class="chip" style="background:var(--evening)">🌙</span>Вечер</div>
-    <div class="item"><span class="chip" style="background:var(--fullday)">🕒</span>Весь день</div>
-    <div class="item"><span class="chip" style="background:var(--training)">📚</span>Обучение</div>
+    <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
+    <div class="item"><span class="chip" style="background:var(--evening)"></span>Вечер</div>
+    <div class="item"><span class="chip" style="background:var(--fullday)"></span>Весь день</div>
+    <div class="item"><span class="chip" style="background:var(--training)"></span>Обучение</div>
   </div>
 </header>
 
@@ -65,29 +368,41 @@ tbody td:hover::after{display:block;}
       <option value="czm">ЦУМ</option>
     </select>
   </label>
+  
   <label class="control">Месяц:
     <select id="month"></select>
   </label>
+  
   <label class="control">Сотрудник:
-    <select id="employee"><option value="all">Все</option></select>
+    <select id="employee"><option value="all">Все сотрудники</option></select>
   </label>
+  
   <label class="control">Неделя с:
     <input id="startDate" type="date"/>
   </label>
-  <div style="display:flex;align-items:center;gap:8px">
-    <button id="showBtn">Показать график</button>
+  
+  <div class="buttons-container">
+    <button id="showBtn">
+      <span class="loading" id="loadingIndicator" style="display:none;"></span>
+      Показать график
+    </button>
     <button id="refreshBtn" style="background:#3b82f6">Обновить</button>
     <button id="todayBtn" style="background:var(--today)">Сегодня</button>
   </div>
 </div>
 
 <div class="table-wrap">
+  <div id="tableLoading" style="display:none; text-align:center; padding:40px;">
+    <div class="loading" style="margin:0 auto;"></div>
+    <div style="margin-top:10px;">Загрузка данных...</div>
+  </div>
   <table id="scheduleTable">
     <thead id="tableHead"></thead>
     <tbody id="tableBody"></tbody>
   </table>
 </div>
 </div>
+
 <script>
 // Конфигурация таблиц
 const tableIDs = { 
@@ -107,9 +422,90 @@ const cachedCSVs = {};
 let currentBranch = null;
 let currentMonth = null;
 let scheduleData = [];
+let allEmployees = [];
 
-// Функция загрузки CSV
-async function loadCSV(branch, month) {
+// ========== УВЕДОМЛЕНИЯ ==========
+function showNotification(message, type = 'success', duration = 4000) {
+  const container = document.getElementById('notificationsContainer');
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  
+  container.appendChild(notification);
+  
+  // Анимация появления
+  setTimeout(() => notification.classList.add('show'), 100);
+  
+  // Автоматическое скрытие
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  }, duration);
+}
+
+// ========== ИНДИКАТОР ЗАГРУЗКИ ==========
+function setLoading(isLoading, element = 'table') {
+  if (element === 'table') {
+    const loadingEl = document.getElementById('tableLoading');
+    const tableEl = document.getElementById('scheduleTable');
+    if (isLoading) {
+      loadingEl.style.display = 'block';
+      tableEl.style.display = 'none';
+    } else {
+      loadingEl.style.display = 'none';
+      tableEl.style.display = 'table';
+    }
+  } else if (element === 'button') {
+    const indicator = document.getElementById('loadingIndicator');
+    const showBtn = document.getElementById('showBtn');
+    if (isLoading) {
+      indicator.style.display = 'inline-block';
+      showBtn.disabled = true;
+    } else {
+      indicator.style.display = 'none';
+      showBtn.disabled = false;
+    }
+  }
+}
+
+// ========== LOCALSTORAGE ==========
+function saveState() {
+  const state = {
+    branch: document.getElementById('branch').value,
+    month: document.getElementById('month').value,
+    employee: document.getElementById('employee').value,
+    startDate: document.getElementById('startDate').value
+  };
+  try {
+    localStorage.setItem('scheduleState', JSON.stringify(state));
+  } catch (e) {
+    console.warn('Не удалось сохранить состояние:', e);
+  }
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('scheduleState');
+    if (saved) {
+      const state = JSON.parse(saved);
+      if (state.branch) document.getElementById('branch').value = state.branch;
+      if (state.month) document.getElementById('month').value = state.month;
+      if (state.employee) document.getElementById('employee').value = state.employee;
+      if (state.startDate) document.getElementById('startDate').value = state.startDate;
+      return true;
+    }
+  } catch (e) {
+    console.warn('Не удалось загрузить состояние:', e);
+  }
+  return false;
+}
+
+// ========== ОСНОВНЫЕ ФУНКЦИИ ==========
+async function loadCSV(branch, month, retryCount = 3) {
   const cacheKey = `${branch}_${month}`;
   
   // Проверяем кэш
@@ -120,26 +516,36 @@ async function loadCSV(branch, month) {
   const gid = monthsGIDs[branch][month];
   const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
   
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Ошибка загрузки: ${res.status}`);
-    
-    const text = await res.text();
-    const parsed = text.split("\n").map(r => r.split(","));
-    
-    // Сохраняем в кэш
-    cachedCSVs[cacheKey] = parsed;
-    return parsed;
-  } catch (error) {
-    console.error('Ошибка загрузки данных:', error);
-    alert('Не удалось загрузить данные. Проверьте подключение к интернету.');
-    return [];
+  for (let attempt = 1; attempt <= retryCount; attempt++) {
+    try {
+      setLoading(true, 'button');
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Ошибка загрузки: ${res.status}`);
+      
+      const text = await res.text();
+      const parsed = text.split("\n").map(r => r.split(","));
+      
+      // Сохраняем в кэш
+      cachedCSVs[cacheKey] = parsed;
+      showNotification(`Данные для ${month} загружены`, 'success');
+      return parsed;
+    } catch (error) {
+      console.error(`Попытка ${attempt} не удалась:`, error);
+      if (attempt === retryCount) {
+        showNotification('Не удалось загрузить данные. Проверьте подключение к интернету.', 'error', 6000);
+        throw error;
+      }
+      // Ждем перед повторной попыткой
+      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+    } finally {
+      setLoading(false, 'button');
+    }
   }
 }
 
-// Заполнение месяцев в зависимости от выбранной точки
 function populateMonths(branch) {
   const monthSelect = document.getElementById("month");
+  const currentValue = monthSelect.value;
   monthSelect.innerHTML = "";
   
   Object.keys(monthsGIDs[branch]).forEach(m => {
@@ -148,11 +554,16 @@ function populateMonths(branch) {
     opt.textContent = m;
     monthSelect.appendChild(opt);
   });
+  
+  // Восстанавливаем значение если возможно
+  if (currentValue && [...monthSelect.options].some(opt => opt.value === currentValue)) {
+    monthSelect.value = currentValue;
+  }
 }
 
-// Загрузка списка сотрудников
 async function populateEmployees(branch, month) {
   try {
+    setLoading(true, 'table');
     scheduleData = await loadCSV(branch, month);
     
     // Обновляем состояние
@@ -168,20 +579,29 @@ async function populateEmployees(branch, month) {
       }
     }
     
+    allEmployees = Array.from(employeesSet);
     const select = document.getElementById("employee");
-    select.innerHTML = '<option value="all">Все</option>';
+    const currentValue = select.value;
     
-    Array.from(employeesSet).forEach(name => {
+    select.innerHTML = '<option value="all">Все сотрудники</option>';
+    
+    allEmployees.forEach(name => {
       const opt = document.createElement("option");
       opt.value = name;
       opt.textContent = name;
       select.appendChild(opt);
     });
     
-    // Автоматически обновляем график после загрузки сотрудников
-    loadSchedule();
+    // Восстанавливаем предыдущее значение
+    if (currentValue && (currentValue === 'all' || allEmployees.includes(currentValue))) {
+      select.value = currentValue;
+    }
+    
   } catch (error) {
     console.error('Ошибка загрузки сотрудников:', error);
+    scheduleData = [];
+  } finally {
+    setLoading(false, 'table');
   }
 }
 
@@ -218,7 +638,6 @@ function parseShift(val) {
   return { type: "empty", label: "" };
 }
 
-// Получение начала недели
 function getWeekStart(date) {
   const d = new Date(date);
   const day = d.getDay() || 7;
@@ -226,18 +645,16 @@ function getWeekStart(date) {
   return d;
 }
 
-// Форматирование даты
 function formatDate(d) {
   return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
 }
 
-// Загрузка и отображение графика
 function loadSchedule() {
   const employee = document.getElementById("employee").value;
   const selectedDate = new Date(document.getElementById("startDate").value);
   
   if (!selectedDate.getTime()) {
-    alert("Выберите дату начала недели");
+    showNotification("Выберите дату начала недели", "error");
     return;
   }
   
@@ -250,6 +667,7 @@ function loadSchedule() {
   
   // Если нет данных, выходим
   if (!scheduleData.length) {
+    showNotification("Нет данных для отображения", "warning");
     return;
   }
   
@@ -285,6 +703,8 @@ function loadSchedule() {
   // Фильтруем строки с данными сотрудников
   const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
   
+  let visibleRows = 0;
+  
   // Создаем строки таблицы
   rows.forEach((r, rowIndex) => {
     if (employee !== "all" && r[0] !== employee) return;
@@ -307,119 +727,81 @@ function loadSchedule() {
     setTimeout(() => {
       tr.classList.add("visible");
     }, rowIndex * 80);
+    
+    visibleRows++;
   });
+  
+  if (visibleRows === 0) {
+    showNotification("Нет данных для выбранного сотрудника", "warning");
+  } else {
+    showNotification(`Показано: ${employee === "all" ? "все сотрудники" : employee}`, "success", 2000);
+  }
+  
+  saveState();
 }
 
-// Инициализация приложения
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
 async function init() {
+  // Загружаем сохраненное состояние
+  loadState();
+  
   const branchSelect = document.getElementById("branch");
   
   // Заполняем месяцы для текущей точки
   populateMonths(branchSelect.value);
   
-  // Загружаем сотрудников для первого месяца
-  const firstMonth = document.getElementById("month").options[0] ? document.getElementById("month").options[0].value : null;
-  if (firstMonth) {
-    await populateEmployees(branchSelect.value, firstMonth);
+  // Загружаем сотрудников для текущего месяца
+  const currentMonth = document.getElementById("month").value;
+  if (currentMonth) {
+    await populateEmployees(branchSelect.value, currentMonth);
   }
   
-  // Устанавливаем дату начала текущей недели
+  // Устанавливаем дату начала текущей недели если не установлена
+  if (!document.getElementById("startDate").value) {
+    const today = new Date();
+    const firstDay = getWeekStart(today);
+    document.getElementById("startDate").valueAsDate = firstDay;
+  }
+  
+  // Загружаем график
+  loadSchedule();
+}
+
+// ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
+document.getElementById("todayBtn").addEventListener("click", () => {
   const today = new Date();
   const firstDay = getWeekStart(today);
   document.getElementById("startDate").valueAsDate = firstDay;
-}
-
-// Инициализация при загрузке страницы
-init();
-
-// Обработчики событий
-document.getElementById("todayBtn").addEventListener("click", () => {
-  const today = new Date();
-  const day = today.getDate();
-  const month = today.getMonth() + 1;
-
-  const tableHead = document.getElementById("tableHead");
-  const tableBody = document.getElementById("tableBody");
-
-  // Очищаем таблицу
-  tableHead.innerHTML = "";
-  tableBody.innerHTML = "";
-
-  // Если нет данных, выходим
-  if (!scheduleData.length) {
-    return;
-  }
-
-  const dateRow = (scheduleData[1] || []).slice(2);
-  let targetIndex = null;
-
-  for (let i = 0; i < dateRow.length; i++) {
-    const parts = dateRow[i].split('.');
-    const d = parseInt(parts[0], 10);
-    const m = parseInt(parts[1], 10);
-    
-    if (d === day && m === month) {
-      targetIndex = i + 2;
-      break;
-    }
-  }
-
-  if (targetIndex === null) {
-    alert("Текущей даты нет в этом месяце");
-    return;
-  }
-
-  tableHead.innerHTML = `
-    <tr>
-      <th class="name">Сотрудник</th>
-      <th class="today">${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}</th>
-    </tr>
-  `;
-
-  const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
-  let visibleIndex = 0;
-  
-  rows.forEach((r) => {
-    const val = r[targetIndex] ? r[targetIndex].trim() : "";
-    if (!val) return;
-    
-    const sh = parseShift(val);
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="name">${r[0]}</td>
-      <td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>
-    `;
-    tableBody.appendChild(tr);
-    
-    setTimeout(() => {
-      tr.classList.add("visible");
-    }, visibleIndex * 80);
-    
-    visibleIndex++;
-  });
+  loadSchedule();
 });
 
-// Обработчик изменения точки
 document.getElementById("branch").addEventListener("change", async e => {
   const b = e.target.value;
-  
-  // Обновляем список месяцев
   populateMonths(b);
+  saveState();
   
-  // Загружаем сотрудников для первого месяца
-  const firstMonth = document.getElementById("month").options[0] ? document.getElementById("month").options[0].value : null;
+  const firstMonth = document.getElementById("month").value;
   if (firstMonth) {
     await populateEmployees(b, firstMonth);
   }
 });
 
-// Обработчик изменения месяца
 document.getElementById("month").addEventListener("change", async e => {
   const branch = document.getElementById("branch").value;
   await populateEmployees(branch, e.target.value);
+  saveState();
 });
 
-// Обработчики кнопок
+document.getElementById("employee").addEventListener("change", () => {
+  loadSchedule();
+  saveState();
+});
+
+document.getElementById("startDate").addEventListener("change", () => {
+  loadSchedule();
+  saveState();
+});
+
 document.getElementById("showBtn").addEventListener("click", loadSchedule);
 
 document.getElementById("refreshBtn").addEventListener("click", async () => {
@@ -430,9 +812,27 @@ document.getElementById("refreshBtn").addEventListener("click", async () => {
   const cacheKey = `${branch}_${month}`;
   delete cachedCSVs[cacheKey];
   
+  showNotification("Обновление данных...", "warning", 2000);
+  
   // Перезагружаем данные
   await populateEmployees(branch, month);
 });
+
+// Автоматическое обновление данных каждые 10 минут
+setInterval(async () => {
+  const branch = document.getElementById("branch").value;
+  const month = document.getElementById("month").value;
+  
+  if (branch && month) {
+    const cacheKey = `${branch}_${month}`;
+    delete cachedCSVs[cacheKey];
+    await populateEmployees(branch, month);
+    showNotification('Данные автоматически обновлены', 'success', 3000);
+  }
+}, 10 * 60 * 1000);
+
+// Инициализация при загрузке страницы
+window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
