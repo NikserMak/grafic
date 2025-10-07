@@ -6,6 +6,12 @@
 <title>График сотрудников</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00c853">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
 <style>
 :root {
   --bg-gradient: linear-gradient(135deg, #0f0f0f, #1a1a1a);
@@ -151,7 +157,7 @@ body {
   text-align: center;
 }
 
-select, input[type="date"], button {
+select, input[type="date"], input[type="text"], button {
   padding: 14px 16px;
   font-size: 15px;
   border-radius: var(--radius-sm);
@@ -165,19 +171,19 @@ select, input[type="date"], button {
   width: 100%;
 }
 
-select, input[type="date"] {
+select, input[type="date"], input[type="text"] {
   background: var(--card);
   cursor: pointer;
 }
 
-select:focus, input[type="date"]:focus {
+select:focus, input[type="date"]:focus, input[type="text"]:focus {
   border-color: var(--accent);
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
   background: var(--card-hover);
 }
 
-select:hover, input[type="date"]:hover {
+select:hover, input[type="date"]:hover, input[type="text"]:hover {
   background: var(--card-hover);
   border-color: #555;
 }
@@ -238,6 +244,55 @@ button.today:hover {
   gap: 12px;
   grid-column: 1 / -1;
   margin-top: 8px;
+}
+
+/* Admin Panel */
+.admin-panel {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 2px dashed var(--warning);
+  display: none;
+}
+
+.admin-panel.visible {
+  display: block;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.admin-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--warning);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr;
+  gap: 12px;
+  align-items: end;
+}
+
+.admin-button {
+  background: var(--warning);
+  color: #333;
+  font-size: 13px;
+  padding: 10px;
+  height: auto;
+}
+
+.admin-button:hover {
+  background: #ffca28;
 }
 
 /* Table */
@@ -535,8 +590,38 @@ tbody td:hover::after {
   color: #333;
 }
 
+.notification.info {
+  background: var(--today);
+  border-left: 4px solid #00b8d4;
+}
+
 .notification i {
   font-size: 18px;
+}
+
+/* Offline Indicator */
+.offline-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--error);
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1001;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.offline-indicator.show {
+  transform: translateY(0);
+}
+
+.offline-indicator i {
+  margin-right: 8px;
 }
 
 /* Mobile Optimization */
@@ -548,6 +633,10 @@ tbody td:hover::after {
   
   .buttons-container {
     grid-template-columns: 1fr;
+  }
+  
+  .admin-form {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -598,6 +687,10 @@ tbody td:hover::after {
     left: 16px;
     max-width: none;
   }
+  
+  .admin-form {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {
@@ -613,10 +706,33 @@ tbody td:hover::after {
     padding: 6px 10px;
   }
   
-  select, input[type="date"], button {
+  select, input[type="date"], input[type="text"], button {
     padding: 12px 14px;
     font-size: 14px;
     height: 48px;
+  }
+  
+  .header, .controls {
+    padding: 16px;
+  }
+  
+  .table-container {
+    border-radius: 12px;
+  }
+}
+
+/* Touch optimizations */
+@media (hover: none) and (pointer: coarse) {
+  tbody td::after {
+    display: none !important;
+  }
+  
+  button:active {
+    transform: scale(0.98);
+  }
+  
+  .legend-item:active {
+    transform: scale(0.98);
   }
 }
 
@@ -657,6 +773,12 @@ tbody td:hover::after {
 </style>
 </head>
 <body>
+<!-- Offline Indicator -->
+<div class="offline-indicator" id="offlineIndicator">
+  <i class="fas fa-wifi-slash"></i>
+  Работа в оффлайн-режиме. Данные могут быть устаревшими.
+</div>
+
 <!-- Notifications -->
 <div id="notificationsContainer"></div>
 
@@ -694,6 +816,41 @@ tbody td:hover::after {
       </div>
     </div>
   </header>
+
+  <!-- Admin Panel (Hidden by default) -->
+  <section class="admin-panel" id="adminPanel">
+    <div class="admin-header">
+      <div class="admin-title">
+        <i class="fas fa-cog"></i>
+        Панель администратора
+      </div>
+      <button onclick="toggleAdminPanel()" class="secondary" style="height: 40px; font-size: 13px;">
+        <i class="fas fa-times"></i>
+        Скрыть
+      </button>
+    </div>
+    <div class="admin-form">
+      <div class="control-group">
+        <label class="control-label">Название месяца</label>
+        <input type="text" id="newMonthName" placeholder="Например: Январь 2024">
+      </div>
+      <div class="control-group">
+        <label class="control-label">ID листа (GID)</label>
+        <input type="text" id="newMonthGID" placeholder="Например: 1234567890">
+      </div>
+      <div class="control-group">
+        <label class="control-label">Точка</label>
+        <select id="adminBranch">
+          <option value="jp">Жар-Птица</option>
+          <option value="czm">ЦУМ</option>
+        </select>
+      </div>
+      <button class="admin-button" onclick="addNewMonth()">
+        <i class="fas fa-plus"></i>
+        Добавить месяц
+      </button>
+    </div>
+  </section>
 
   <!-- Controls -->
   <section class="controls fade-in">
@@ -753,6 +910,10 @@ tbody td:hover::after {
           <i class="fas fa-calendar-day"></i>
           Текущая неделя
         </button>
+        <button onclick="toggleAdminPanel()" class="secondary" id="adminToggle">
+          <i class="fas fa-cog"></i>
+          Админ
+        </button>
       </div>
     </div>
   </section>
@@ -780,16 +941,60 @@ tbody td:hover::after {
 </div>
 
 <script>
-// Конфигурация таблиц
-const tableIDs = { 
+// PWA Manifest
+const manifest = {
+  "name": "График сотрудников",
+  "short_name": "График",
+  "description": "Управление рабочим временем команды",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#00c853",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMwMGM4NTMiLz4KPHBhdGggZD0iTTk2IDQ4QzcxLjIgNDggNTEuMiA2OCA1MS4yIDkyLjggNTEuMiAxMTcuNiA3MS4yIDEzNy42IDk2IDEzNy42IDEyMC44IDEzNy42IDE0MC44IDExNy42IDE0MC44IDkyLjggMTQwLjggNjggMTIwLjggNDggOTYgNDhaTTc2LjggMTA2LjRINzEuMlY5MS4ySDc2LjhWMTA2LjRaTTk2IDEwNi40SDkwLjRWOTEuMkg5NlYxMDYuNFpNMTE1LjIgMTA2LjRIMTA5LjZWOTEuMkgxMTUuMlYxMDYuNFoiIGZpbGw9IndoaXRlIi8+CjxyZWN0IHg9IjY0IiB5PSIxNDQiIHdpZHRoPSI2NCIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+};
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+      console.log('SW registered: ', registration);
+    }).catch(function(registrationError) {
+      console.log('SW registration failed: ', registrationError);
+    });
+  });
+}
+
+// Конфигурация таблиц (загружается из localStorage или используется по умолчанию)
+let tableIDs = { 
   jp: "1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", 
   czm: "1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" 
 };
 
-const monthsGIDs = { 
+let monthsGIDs = { 
   jp: {"Октябрь": 0, "Ноябрь": 1956542531, "Декабрь": 987654321}, 
   czm: {"Октябрь": 0, "Ноябрь": 1078468054, "Декабрь": 987654321} 
 };
+
+// Загрузка конфигурации из localStorage
+function loadConfig() {
+  const savedTableIDs = localStorage.getItem('scheduleTableIDs');
+  const savedMonthsGIDs = localStorage.getItem('scheduleMonthsGIDs');
+  
+  if (savedTableIDs) tableIDs = JSON.parse(savedTableIDs);
+  if (savedMonthsGIDs) monthsGIDs = JSON.parse(savedMonthsGIDs);
+}
+
+// Сохранение конфигурации в localStorage
+function saveConfig() {
+  localStorage.setItem('scheduleTableIDs', JSON.stringify(tableIDs));
+  localStorage.setItem('scheduleMonthsGIDs', JSON.stringify(monthsGIDs));
+}
 
 // Названия дней недели
 const dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
@@ -797,12 +1002,65 @@ const dayNamesShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
 
 // Кэш данных
 const cachedCSVs = {};
+const CACHE_VERSION = 'v1';
+const CACHE_NAME = `schedule-cache-${CACHE_VERSION}`;
 
 // Переменные состояния
 let currentBranch = null;
 let currentMonth = null;
 let scheduleData = [];
 let allEmployees = [];
+let isOnline = navigator.onLine;
+
+// ========== PWA И ОФФЛАЙН РЕЖИМ ==========
+function initOfflineSupport() {
+  // Отслеживание статуса сети
+  window.addEventListener('online', () => {
+    isOnline = true;
+    document.getElementById('offlineIndicator').classList.remove('show');
+    showNotification('Соединение восстановлено', 'success');
+  });
+
+  window.addEventListener('offline', () => {
+    isOnline = false;
+    document.getElementById('offlineIndicator').classList.add('show');
+    showNotification('Отсутствует интернет-соединение', 'warning', 0);
+  });
+
+  // Инициализация кэша
+  initCache();
+}
+
+async function initCache() {
+  if ('caches' in window) {
+    try {
+      const cache = await caches.open(CACHE_NAME);
+      // Кэшируем основные данные при первой загрузке
+      await cacheDefaultData(cache);
+    } catch (error) {
+      console.warn('Не удалось инициализировать кэш:', error);
+    }
+  }
+}
+
+async function cacheDefaultData(cache) {
+  // Кэшируем данные по умолчанию
+  const urlsToCache = [];
+  
+  for (const branch in monthsGIDs) {
+    for (const month in monthsGIDs[branch]) {
+      const gid = monthsGIDs[branch][month];
+      const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
+      urlsToCache.push(url);
+    }
+  }
+  
+  try {
+    await cache.addAll(urlsToCache);
+  } catch (error) {
+    console.warn('Не удалось закэшировать данные:', error);
+  }
+}
 
 // ========== УВЕДОМЛЕНИЯ ==========
 function showNotification(message, type = 'success', duration = 4000) {
@@ -812,7 +1070,8 @@ function showNotification(message, type = 'success', duration = 4000) {
   
   const icon = type === 'success' ? 'fas fa-check-circle' : 
                type === 'error' ? 'fas fa-exclamation-circle' : 
-               'fas fa-exclamation-triangle';
+               type === 'warning' ? 'fas fa-exclamation-triangle' :
+               'fas fa-info-circle';
   
   notification.innerHTML = `
     <i class="${icon}"></i>
@@ -824,15 +1083,138 @@ function showNotification(message, type = 'success', duration = 4000) {
   // Анимация появления
   setTimeout(() => notification.classList.add('show'), 100);
   
-  // Автоматическое скрытие
-  setTimeout(() => {
-    notification.classList.remove('show');
+  // Автоматическое скрытие (если duration > 0)
+  if (duration > 0) {
     setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
+      notification.classList.remove('show');
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 300);
+    }, duration);
+  }
+}
+
+// ========== АДМИН ПАНЕЛЬ ==========
+function toggleAdminPanel() {
+  const adminPanel = document.getElementById('adminPanel');
+  const adminToggle = document.getElementById('adminToggle');
+  
+  if (adminPanel.classList.contains('visible')) {
+    adminPanel.classList.remove('visible');
+    adminToggle.innerHTML = '<i class="fas fa-cog"></i> Админ';
+  } else {
+    adminPanel.classList.add('visible');
+    adminToggle.innerHTML = '<i class="fas fa-times"></i> Скрыть';
+  }
+}
+
+function addNewMonth() {
+  const monthName = document.getElementById('newMonthName').value.trim();
+  const gid = document.getElementById('newMonthGID').value.trim();
+  const branch = document.getElementById('adminBranch').value;
+  
+  if (!monthName || !gid) {
+    showNotification('Заполните все поля', 'error');
+    return;
+  }
+  
+  if (!/^\d+$/.test(gid)) {
+    showNotification('GID должен содержать только цифры', 'error');
+    return;
+  }
+  
+  // Добавляем месяц в конфигурацию
+  if (!monthsGIDs[branch]) {
+    monthsGIDs[branch] = {};
+  }
+  
+  monthsGIDs[branch][monthName] = parseInt(gid);
+  
+  // Сохраняем конфигурацию
+  saveConfig();
+  
+  // Обновляем список месяцев
+  populateMonths(branch);
+  
+  // Очищаем поля
+  document.getElementById('newMonthName').value = '';
+  document.getElementById('newMonthGID').value = '';
+  
+  showNotification(`Месяц "${monthName}" успешно добавлен`, 'success');
+}
+
+// ========== ОБРАБОТКА ОШИБОК СЕТИ ==========
+async function loadWithFallback(url, retryCount = 3) {
+  // Пытаемся загрузить из сети
+  for (let attempt = 1; attempt <= retryCount; attempt++) {
+    try {
+      if (!isOnline) throw new Error('Offline');
+      
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      
+      const data = await response.text();
+      
+      // Сохраняем в кэш
+      if ('caches' in window) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(url, new Response(data));
       }
-    }, 300);
-  }, duration);
+      
+      return data;
+      
+    } catch (error) {
+      console.warn(`Попытка ${attempt} не удалась:`, error);
+      
+      if (attempt === retryCount) {
+        // Пробуем загрузить из кэша
+        if ('caches' in window) {
+          try {
+            const cache = await caches.open(CACHE_NAME);
+            const cachedResponse = await cache.match(url);
+            
+            if (cachedResponse) {
+              const cachedData = await cachedResponse.text();
+              showNotification('Данные загружены из кэша', 'info', 3000);
+              return cachedData;
+            }
+          } catch (cacheError) {
+            console.warn('Ошибка при загрузке из кэша:', cacheError);
+          }
+        }
+        
+        throw error;
+      }
+      
+      // Ждем перед повторной попыткой
+      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+    }
+  }
+}
+
+// ========== ВАЛИДАЦИЯ ДАННЫХ ==========
+function validateCSVData(parsedData) {
+  if (!Array.isArray(parsedData) || parsedData.length < 3) {
+    throw new Error('Некорректный формат данных');
+  }
+  
+  // Проверяем заголовки дат
+  const dateRow = parsedData[1];
+  if (!dateRow || dateRow.length < 3) {
+    throw new Error('Отсутствуют данные о датах');
+  }
+  
+  // Проверяем данные сотрудников
+  const employeeRows = parsedData.slice(2, 16);
+  const hasEmployees = employeeRows.some(row => row && row[0] && row[0].trim());
+  
+  if (!hasEmployees) {
+    throw new Error('Не найдены данные сотрудников');
+  }
+  
+  return true;
 }
 
 // ========== ИНДИКАТОР ЗАГРУЗКИ ==========
@@ -883,7 +1265,7 @@ function loadState() {
 async function loadCSV(branch, month, retryCount = 3) {
   const cacheKey = `${branch}_${month}`;
   
-  // Проверяем кэш
+  // Проверяем кэш в памяти
   if (cachedCSVs[cacheKey]) {
     return cachedCSVs[cacheKey];
   }
@@ -891,30 +1273,33 @@ async function loadCSV(branch, month, retryCount = 3) {
   const gid = monthsGIDs[branch][month];
   const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
   
-  for (let attempt = 1; attempt <= retryCount; attempt++) {
-    try {
-      setLoading(true);
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Ошибка загрузки: ${res.status}`);
-      
-      const text = await res.text();
-      const parsed = text.split("\n").map(r => r.split(","));
-      
-      // Сохраняем в кэш
-      cachedCSVs[cacheKey] = parsed;
-      showNotification(`Данные для ${month} загружены`, 'success');
-      return parsed;
-    } catch (error) {
-      console.error(`Попытка ${attempt} не удалась:`, error);
-      if (attempt === retryCount) {
-        showNotification('Не удалось загрузить данные. Проверьте подключение к интернету.', 'error', 6000);
-        throw error;
-      }
-      // Ждем перед повторной попыткой
-      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    const text = await loadWithFallback(url, retryCount);
+    const parsed = text.split("\n").map(r => r.split(","));
+    
+    // Валидация данных
+    validateCSVData(parsed);
+    
+    // Сохраняем в кэш памяти
+    cachedCSVs[cacheKey] = parsed;
+    showNotification(`Данные для ${month} загружены`, 'success');
+    return parsed;
+    
+  } catch (error) {
+    console.error('Ошибка загрузки данных:', error);
+    
+    if (error.message.includes('Offline')) {
+      showNotification('Режим оффлайн. Используются кэшированные данные.', 'warning', 5000);
+    } else if (error.message.includes('Некорректный формат')) {
+      showNotification('Ошибка в формате данных таблицы', 'error', 6000);
+    } else {
+      showNotification('Не удалось загрузить данные', 'error', 6000);
     }
+    
+    throw error;
+  } finally {
+    setLoading(false);
   }
 }
 
@@ -1133,6 +1518,12 @@ function loadSchedule() {
 
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
 async function init() {
+  // Загружаем конфигурацию
+  loadConfig();
+  
+  // Инициализируем оффлайн поддержку
+  initOfflineSupport();
+  
   // Загружаем сохраненное состояние
   loadState();
   
@@ -1203,14 +1594,25 @@ document.getElementById("refreshBtn").addEventListener("click", async () => {
   const cacheKey = `${branch}_${month}`;
   delete cachedCSVs[cacheKey];
   
+  if ('caches' in window) {
+    try {
+      const cache = await caches.open(CACHE_NAME);
+      const gid = monthsGIDs[branch][month];
+      const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
+      await cache.delete(url);
+    } catch (error) {
+      console.warn('Не удалось очистить кэш:', error);
+    }
+  }
+  
   showNotification("Обновление данных...", "warning", 2000);
   
   // Перезагружаем данные
   await populateEmployees(branch, month);
 });
 
-// Автоматическое обновление данных каждые 10 минут
-setInterval(async () => {
+// Автоматическое обновление данных при возвращении онлайн
+window.addEventListener('online', async () => {
   const branch = document.getElementById("branch").value;
   const month = document.getElementById("month").value;
   
@@ -1218,9 +1620,8 @@ setInterval(async () => {
     const cacheKey = `${branch}_${month}`;
     delete cachedCSVs[cacheKey];
     await populateEmployees(branch, month);
-    showNotification('Данные автоматически обновлены', 'success', 3000);
   }
-}, 10 * 60 * 1000);
+});
 
 // Инициализация при загрузке страницы
 window.addEventListener('DOMContentLoaded', init);
