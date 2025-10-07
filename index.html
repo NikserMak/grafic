@@ -89,155 +89,231 @@ tbody td:hover::after{display:block;}
 </div>
 </div>
 <script>
-const tableIDs = { jp:"1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", czm:"1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" };
-const monthsGIDs = { jp:{"Октябрь":0,"Ноябрь":1956542531,"Декабрь":987654321}, czm:{"Октябрь":0,"Ноябрь":1078468054,"Декабрь":987654321} };
+// Конфигурация таблиц
+const tableIDs = { 
+  jp: "1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", 
+  czm: "1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" 
+};
 
-// ✅ КЭШ
+const monthsGIDs = { 
+  jp: {"Октябрь": 0, "Ноябрь": 1956542531, "Декабрь": 987654321}, 
+  czm: {"Октябрь": 0, "Ноябрь": 1078468054, "Декабрь": 987654321} 
+};
+
+// Кэш данных
 const cachedCSVs = {};
 
-let scheduleData=[];
+// Переменные состояния
+let currentBranch = null;
+let currentMonth = null;
+let scheduleData = [];
 
-async function loadCSV(branch, month){
+// Функция загрузки CSV
+async function loadCSV(branch, month) {
   const cacheKey = `${branch}_${month}`;
+  
+  // Проверяем кэш
   if (cachedCSVs[cacheKey]) {
     return cachedCSVs[cacheKey];
   }
+  
   const gid = monthsGIDs[branch][month];
   const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
-  const res = await fetch(url);
-  const text = await res.text();
-  const parsed = text.split("\n").map(r => r.split(","));
-  cachedCSVs[cacheKey] = parsed;
-  return parsed;
-}
-
-function populateMonths(branch){
-  const monthSelect=document.getElementById("month"); monthSelect.innerHTML="";
-  Object.keys(monthsGIDs[branch]).forEach(m=>{
-    const opt=document.createElement("option"); opt.value=m; opt.textContent=m; monthSelect.appendChild(opt);
-  });
-}
-
-async function populateEmployees(branch, month){
-  scheduleData = await loadCSV(branch, month);
-  const employeesSet = new Set();
-  for(let i=2;i<=15;i++){
-    if(scheduleData[i] && scheduleData[i][0] && scheduleData[i][0].trim() !== "")
-      employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/,""));
+  
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Ошибка загрузки: ${res.status}`);
+    
+    const text = await res.text();
+    const parsed = text.split("\n").map(r => r.split(","));
+    
+    // Сохраняем в кэш
+    cachedCSVs[cacheKey] = parsed;
+    return parsed;
+  } catch (error) {
+    console.error('Ошибка загрузки данных:', error);
+    alert('Не удалось загрузить данные. Проверьте подключение к интернету.');
+    return [];
   }
-  const select = document.getElementById("employee");
-  select.innerHTML = '<option value="all">Все</option>';
-  Array.from(employeesSet).forEach(name=>{
+}
+
+// Заполнение месяцев в зависимости от выбранной точки
+function populateMonths(branch) {
+  const monthSelect = document.getElementById("month");
+  monthSelect.innerHTML = "";
+  
+  Object.keys(monthsGIDs[branch]).forEach(m => {
     const opt = document.createElement("option");
-    opt.value = name;
-    opt.textContent = name;
-    select.appendChild(opt);
+    opt.value = m;
+    opt.textContent = m;
+    monthSelect.appendChild(opt);
   });
 }
 
-function parseShift(val){
-  if(!val) return {type:"empty",label:""};
-  const s=String(val).trim().toLowerCase();
-  
-  // Обработка дробных чисел (3,5у, 2.5в и т.д.)
-  const hourMatch = s.match(/^(\d+[,.]\d+)([ув])$/);
-  if (hourMatch) {
-    const hours = hourMatch[1].replace(',', '.');
-    const shiftType = hourMatch[2];
-    const type = shiftType === 'у' ? 'morning' : 'evening';
-    return {type: type, label: `${hours}ч`};
+// Загрузка списка сотрудников
+async function populateEmployees(branch, month) {
+  try {
+    scheduleData = await loadCSV(branch, month);
+    
+    // Обновляем состояние
+    currentBranch = branch;
+    currentMonth = month;
+    
+    const employeesSet = new Set();
+    
+    // Извлекаем имена сотрудников из данных
+    for (let i = 2; i <= 15; i++) {
+      if (scheduleData[i] && scheduleData[i][0] && scheduleData[i][0].trim() !== "") {
+        employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/, ""));
+      }
+    }
+    
+    const select = document.getElementById("employee");
+    select.innerHTML = '<option value="all">Все</option>';
+    
+    Array.from(employeesSet).forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+    
+    // Автоматически обновляем график после загрузки сотрудников
+    loadSchedule();
+  } catch (error) {
+    console.error('Ошибка загрузки сотрудников:', error);
   }
-  
-  // Обработка целых чисел с часами (3у, 2в и т.д.)
-  const intHourMatch = s.match(/^(\d+)([ув])$/);
-  if (intHourMatch) {
-    const hours = intHourMatch[1];
-    const shiftType = intHourMatch[2];
-    const type = shiftType === 'у' ? 'morning' : 'evening';
-    return {type: type, label: `${hours}ч`};
-  }
-  
-  // Стандартные проверки
-  if(s.includes("вд")) return {type:"fullday",label:"Весь день"};
-  if(s.endsWith("у")) return {type:"morning",label:"Утро"};
-  if(s.endsWith("в")) return {type:"evening",label:"Вечер"};
-  if(s.endsWith("о")) return {type:"training",label:"Обучение"};
-  return {type:"empty",label:""};
 }
 
-function getWeekStart(date){
+// Парсинг смены
+function parseShift(val) {
+  if (!val) return { type: "empty", label: "" };
+  
+  const s = String(val).trim().toLowerCase();
+  if (s.includes("вд")) return { type: "fullday", label: "Весь день" };
+  if (s.endsWith("у")) return { type: "morning", label: "Утро" };
+  if (s.endsWith("в")) return { type: "evening", label: "Вечер" };
+  if (s.endsWith("о")) return { type: "training", label: "Обучение" };
+  
+  return { type: "empty", label: "" };
+}
+
+// Получение начала недели
+function getWeekStart(date) {
   const d = new Date(date);
   const day = d.getDay() || 7;
   d.setDate(d.getDate() - day + 1);
   return d;
 }
 
-function formatDate(d){
-  return `${d.getDate().toString().padStart(2,'0')}.${(d.getMonth()+1).toString().padStart(2,'0')}`;
+// Форматирование даты
+function formatDate(d) {
+  return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
 }
 
-function loadSchedule(){
+// Загрузка и отображение графика
+function loadSchedule() {
   const employee = document.getElementById("employee").value;
   const selectedDate = new Date(document.getElementById("startDate").value);
-  if(!selectedDate.getTime()){ alert("Выберите дату начала недели"); return;}
-
+  
+  if (!selectedDate.getTime()) {
+    alert("Выберите дату начала недели");
+    return;
+  }
+  
   const tableHead = document.getElementById("tableHead");
   const tableBody = document.getElementById("tableBody");
-
+  
+  // Очищаем таблицу
+  tableHead.innerHTML = "";
+  tableBody.innerHTML = "";
+  
+  // Если нет данных, выходим
+  if (!scheduleData.length) {
+    return;
+  }
+  
   const weekStart = getWeekStart(selectedDate);
   const weekDates = [];
-  for(let i=0;i<7;i++){
+  
+  for (let i = 0; i < 7; i++) {
     const d = new Date(weekStart);
-    d.setDate(weekStart.getDate()+i);
+    d.setDate(weekStart.getDate() + i);
     weekDates.push(d);
   }
-
+  
   const dateRow = (scheduleData[1] || []).slice(2);
-  const dateIndexMap = weekDates.map(d=>{
-    for(let i=0;i<dateRow.length;i++){
+  const dateIndexMap = weekDates.map(d => {
+    for (let i = 0; i < dateRow.length; i++) {
       const parts = dateRow[i].split('.');
-      const day = parseInt(parts[0],10);
-      const month = parseInt(parts[1],10);
-      if(day===d.getDate() && month===d.getMonth()+1) return i+2;
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      
+      if (day === d.getDate() && month === d.getMonth() + 1) {
+        return i + 2;
+      }
     }
     return null;
   });
-
+  
   const today = new Date();
-  tableHead.innerHTML = "<tr><th class='name'>Сотрудник</th>"+
-    weekDates.map(d=>`<th${d.toDateString()===today.toDateString()?' class="today"':''}>${formatDate(d)}</th>`).join("")+"</tr>";
-
-  const rows = (scheduleData.slice(2,16) || []).filter(r => r[0] && r[0].trim()!=="");
-  tableBody.innerHTML = "";
-  rows.forEach((r,rowIndex)=>{
-    if(employee!=="all" && r[0]!==employee) return;
+  
+  // Создаем заголовок таблицы
+  tableHead.innerHTML = "<tr><th class='name'>Сотрудник</th>" +
+    weekDates.map(d => `<th${d.toDateString() === today.toDateString() ? ' class="today"' : ''}>${formatDate(d)}</th>`).join("") + "</tr>";
+  
+  // Фильтруем строки с данными сотрудников
+  const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
+  
+  // Создаем строки таблицы
+  rows.forEach((r, rowIndex) => {
+    if (employee !== "all" && r[0] !== employee) return;
+    
     const tr = document.createElement("tr");
     let html = `<td class="name">${r[0]}</td>`;
-    dateIndexMap.forEach(idx=>{
-      let val="";
-      if(idx!==null && r[idx]) val = r[idx].trim();
-      const sh=parseShift(val);
-      html+=`<td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>`;
+    
+    dateIndexMap.forEach(idx => {
+      let val = "";
+      if (idx !== null && r[idx]) val = r[idx].trim();
+      
+      const sh = parseShift(val);
+      html += `<td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>`;
     });
+    
     tr.innerHTML = html;
     tableBody.appendChild(tr);
-    setTimeout(()=>{tr.classList.add("visible");}, rowIndex*80);
+    
+    // Анимация появления строки
+    setTimeout(() => {
+      tr.classList.add("visible");
+    }, rowIndex * 80);
   });
 }
 
-async function init(){
-  const branchSelect=document.getElementById("branch");
+// Инициализация приложения
+async function init() {
+  const branchSelect = document.getElementById("branch");
+  
+  // Заполняем месяцы для текущей точки
   populateMonths(branchSelect.value);
+  
+  // Загружаем сотрудников для первого месяца
   const firstMonth = document.getElementById("month").options[0] ? document.getElementById("month").options[0].value : null;
-  if(firstMonth) await populateEmployees(branchSelect.value, firstMonth);
-  const today=new Date();
-  const firstDay=getWeekStart(today);
-  document.getElementById("startDate").valueAsDate=firstDay;
+  if (firstMonth) {
+    await populateEmployees(branchSelect.value, firstMonth);
+  }
+  
+  // Устанавливаем дату начала текущей недели
+  const today = new Date();
+  const firstDay = getWeekStart(today);
+  document.getElementById("startDate").valueAsDate = firstDay;
 }
 
+// Инициализация при загрузке страницы
 init();
 
-document.getElementById("todayBtn").addEventListener("click", ()=>{
+// Обработчики событий
+document.getElementById("todayBtn").addEventListener("click", () => {
   const today = new Date();
   const day = today.getDate();
   const month = today.getMonth() + 1;
@@ -245,20 +321,30 @@ document.getElementById("todayBtn").addEventListener("click", ()=>{
   const tableHead = document.getElementById("tableHead");
   const tableBody = document.getElementById("tableBody");
 
+  // Очищаем таблицу
+  tableHead.innerHTML = "";
+  tableBody.innerHTML = "";
+
+  // Если нет данных, выходим
+  if (!scheduleData.length) {
+    return;
+  }
+
   const dateRow = (scheduleData[1] || []).slice(2);
   let targetIndex = null;
 
-  for(let i=0;i<dateRow.length;i++){
+  for (let i = 0; i < dateRow.length; i++) {
     const parts = dateRow[i].split('.');
-    const d = parseInt(parts[0],10);
-    const m = parseInt(parts[1],10);
-    if(d===day && m===month){
+    const d = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    
+    if (d === day && m === month) {
       targetIndex = i + 2;
       break;
     }
   }
 
-  if(targetIndex === null){
+  if (targetIndex === null) {
     alert("Текущей даты нет в этом месяце");
     return;
   }
@@ -266,17 +352,17 @@ document.getElementById("todayBtn").addEventListener("click", ()=>{
   tableHead.innerHTML = `
     <tr>
       <th class="name">Сотрудник</th>
-      <th class="today">${String(day).padStart(2,'0')}.${String(month).padStart(2,'0')}</th>
+      <th class="today">${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}</th>
     </tr>
   `;
 
-  const rows = (scheduleData.slice(2,16) || []).filter(r => r[0] && r[0].trim()!=="");
-  tableBody.innerHTML = "";
-
+  const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
   let visibleIndex = 0;
-  rows.forEach((r)=>{
+  
+  rows.forEach((r) => {
     const val = r[targetIndex] ? r[targetIndex].trim() : "";
-    if(!val) return;
+    if (!val) return;
+    
     const sh = parseShift(val);
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -284,24 +370,48 @@ document.getElementById("todayBtn").addEventListener("click", ()=>{
       <td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>
     `;
     tableBody.appendChild(tr);
-    setTimeout(()=>{tr.classList.add("visible");}, visibleIndex*80);
+    
+    setTimeout(() => {
+      tr.classList.add("visible");
+    }, visibleIndex * 80);
+    
     visibleIndex++;
   });
 });
 
-document.getElementById("branch").addEventListener("change", async e=>{
-  const b=e.target.value;
+// Обработчик изменения точки
+document.getElementById("branch").addEventListener("change", async e => {
+  const b = e.target.value;
+  
+  // Обновляем список месяцев
   populateMonths(b);
-  const firstMonth=document.getElementById("month").options[0] ? document.getElementById("month").options[0].value : null;
-  if(firstMonth) await populateEmployees(b, firstMonth);
+  
+  // Загружаем сотрудников для первого месяца
+  const firstMonth = document.getElementById("month").options[0] ? document.getElementById("month").options[0].value : null;
+  if (firstMonth) {
+    await populateEmployees(b, firstMonth);
+  }
 });
-document.getElementById("month").addEventListener("change", async e=>{
-  populateEmployees(document.getElementById("branch").value, e.target.value);
+
+// Обработчик изменения месяца
+document.getElementById("month").addEventListener("change", async e => {
+  const branch = document.getElementById("branch").value;
+  await populateEmployees(branch, e.target.value);
 });
+
+// Обработчики кнопок
 document.getElementById("showBtn").addEventListener("click", loadSchedule);
-document.getElementById("refreshBtn").addEventListener("click", async ()=>{
-  await populateEmployees(document.getElementById("branch").value, document.getElementById("month").value);
-  loadSchedule();
+
+document.getElementById("refreshBtn").addEventListener("click", async () => {
+  const branch = document.getElementById("branch").value;
+  const month = document.getElementById("month").value;
+  
+  // Очищаем кэш для текущей точки и месяца
+  const cacheKey = `${branch}_${month}`;
+  delete cachedCSVs[cacheKey];
+  
+  // Перезагружаем данные
+  await populateEmployees(branch, month);
 });
 </script>
 </body>
