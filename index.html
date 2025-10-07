@@ -4,403 +4,779 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>График сотрудников</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root{
-  --bg-gradient: linear-gradient(135deg,#1e1e1e,#2c2c2c);
-  --card:#2a2a2a; --muted:#aaaaaa;
-  --accent:#4caf50; --accent-hover:#45a049; --today:#00bcd4;
-  --thin-border:#444; --morning:#1e4a63; --evening:#7a5c00;
-  --fullday:#a34e1a; --training:#21963a; --empty:#2a2a2a;
-  --font-sans:'Inter', sans-serif; --shadow:0 6px 18px rgba(0,0,0,0.5);
-  --text-color:#ffffff;
-  --error:#f44336; --warning:#ff9800; --success:#4caf50;
-}
-body{
-  margin:0;
-  font-family:var(--font-sans);
-  background:var(--bg-gradient);
-  color:var(--text-color);
-  min-height:100vh;
-}
-.container{
-  max-width:1100px;
-  margin:28px auto;
-  padding:18px;
-}
-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-}
-h1{
-  font-size:36px;
-  font-weight:700;
-  color:#fff;
-  background:linear-gradient(135deg,#4caf50,#00bcd4);
-  padding:10px 20px;
-  border-radius:12px;
-  display:inline-block;
-  box-shadow:var(--shadow);
-}
-.small{
-  color:var(--muted);
-  margin-top:8px;
-}
-.controls{
-  display:flex; 
-  gap:12px; 
-  align-items:end; 
-  flex-wrap:wrap; 
-  margin-top:20px;
-}
-.control{
-  display:flex;
-  flex-direction:column;
-  font-size:13px;
-  color:var(--text-color);
-  min-width:120px;
-}
-select, input[type="date"], button{
-  padding:10px 12px;
-  font-size:14px;
-  border-radius:10px;
-  border:1px solid #555;
-  background:#3a3a3a;
-  color:#fff;
-  transition:all 0.3s;
-  margin-top:4px;
-}
-select:focus, input[type="date"]:focus{
-  border-color:#3b82f6;
-  outline:none;
-  box-shadow:0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-button{
-  background:var(--accent);
-  color:#fff;
-  border:none;
-  cursor:pointer;
-  transition:all 0.3s;
-  font-weight:500;
-  min-width:100px;
-}
-button:hover{
-  background:var(--accent-hover);
-  transform:translateY(-1px);
-}
-button:active{
-  transform:translateY(0);
-}
-button:disabled{
-  opacity:0.6;
-  cursor:not-allowed;
-  transform:none;
-}
-.table-wrap{
-  margin-top:24px;
-  background:var(--card);
-  border-radius:14px;
-  padding:16px;
-  box-shadow:var(--shadow);
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  position:relative;
-  min-height:200px;
-}
-table{
-  width:max-content;
-  min-width:100%;
-  border-collapse:collapse;
-  font-size:14px;
-  table-layout:fixed;
-}
-thead th{
-  background:#3a3a3a;
-  color:#fff;
-  border:1px solid var(--thin-border);
-  text-align:center;
-  font-weight:600;
-  padding:12px 8px;
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-thead th.today{
-  background:var(--today);
-  color:#fff;
-}
-td, th{
-  border:1px solid var(--thin-border);
-  padding:10px 8px;
-}
-td.name, th.name{
-  min-width:140px;
-  max-width:160px;
-  text-align:left;
-  padding-left:12px;
-  font-weight:600;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  background:var(--card);
-  position:sticky;
-  left:0;
-  z-index:5;
-}
-td.empty{background:var(--empty);}
-td.morning{background:var(--morning);}
-td.evening{background:var(--evening);}
-td.fullday{background:var(--fullday);}
-td.training{background:var(--training);}
-tbody td{
-  text-align:center;
-  border-radius:6px;
-  word-break:break-word;
-  opacity:0;
-  transform:translateY(10px);
-  transition:all 0.4s ease,background 0.5s ease;
-  position:relative;
-}
-tbody tr.visible td{
-  opacity:1;
-  transform:translateY(0);
-}
-tbody td::after{
-  content:attr(data-tooltip);
-  position:absolute;
-  background:rgba(0,0,0,0.9);
-  color:#fff;
-  padding:6px 10px;
-  font-size:12px;
-  border-radius:6px;
-  white-space:nowrap;
-  top:-40px;
-  left:50%;
-  transform:translateX(-50%);
-  display:none;
-  pointer-events:none;
-  z-index:20;
-  box-shadow:0 4px 8px rgba(0,0,0,0.3);
-}
-tbody td:hover::after{
-  display:block;
-}
-.legend{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  margin-top:10px;
-  font-size:13px;
-  color:var(--muted);
-  flex-wrap:wrap;
-}
-.legend .item{
-  display:inline-flex;
-  gap:6px;
-  align-items:center;
-}
-.chip{
-  width:20px;
-  height:14px;
-  border-radius:4px;
-  display:inline-block;
-  border:1px solid #555;
+:root {
+  --bg-gradient: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+  --card: #2d2d2d;
+  --card-hover: #363636;
+  --muted: #b0b0b0;
+  --accent: #00c853;
+  --accent-hover: #00e676;
+  --today: #00b8d4;
+  --today-hover: #00e5ff;
+  --thin-border: #404040;
+  --morning: #1a5276;
+  --morning-hover: #21618c;
+  --evening: #7d6608;
+  --evening-hover: #9c7e08;
+  --fullday: #b35a1a;
+  --fullday-hover: #d46a20;
+  --training: #27ae60;
+  --training-hover: #2ecc71;
+  --empty: #3d3d3d;
+  --font-sans: 'Inter', sans-serif;
+  --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --shadow-hover: 0 12px 40px rgba(0,0,0,0.4);
+  --text-color: #ffffff;
+  --text-secondary: #cccccc;
+  --error: #ff5252;
+  --warning: #ffb74d;
+  --success: #4caf50;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Индикатор загрузки */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg-gradient);
+  color: var(--text-color);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Header */
+.header {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--thin-border);
+  backdrop-filter: blur(10px);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--accent), var(--today));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.logo-text h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, var(--accent), var(--today));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-text .subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+/* Controls */
+.controls {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--thin-border);
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  align-items: end;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.control-label i {
+  font-size: 16px;
+  opacity: 0.7;
+  width: 16px;
+  text-align: center;
+}
+
+select, input[type="date"], button {
+  padding: 14px 16px;
+  font-size: 15px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--thin-border);
+  background: var(--card);
+  color: var(--text-color);
+  transition: var(--transition);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  height: 52px;
+  width: 100%;
+}
+
+select, input[type="date"] {
+  background: var(--card);
+  cursor: pointer;
+}
+
+select:focus, input[type="date"]:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
+  background: var(--card-hover);
+}
+
+select:hover, input[type="date"]:hover {
+  background: var(--card-hover);
+  border-color: #555;
+}
+
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  white-space: nowrap;
+}
+
+button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+button.secondary {
+  background: transparent;
+  border: 2px solid var(--thin-border);
+  color: var(--text-secondary);
+}
+
+button.secondary:hover {
+  background: var(--card-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+button.today {
+  background: var(--today);
+}
+
+button.today:hover {
+  background: var(--today-hover);
+}
+
+.buttons-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  grid-column: 1 / -1;
+  margin-top: 8px;
+}
+
+/* Table */
+.table-container {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 0;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--thin-border);
+  overflow: hidden;
+  position: relative;
+}
+
+.table-header {
+  padding: 24px 24px 0;
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.table-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 800px;
+}
+
+thead {
+  background: var(--card-hover);
+  position: sticky;
+  left: 0;
+}
+
+thead th {
+  padding: 16px 12px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--thin-border);
+  position: sticky;
+  top: 0;
+  background: var(--card-hover);
+  z-index: 20;
+}
+
+thead th.name-header {
+  position: sticky;
+  left: 0;
+  z-index: 30;
+  background: var(--card-hover);
+  border-right: 2px solid var(--thin-border);
+}
+
+thead th.today {
+  background: var(--today);
+  color: white;
+  position: relative;
+}
+
+thead th.today::after {
+  content: '●';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 8px;
+  animation: pulse 2s infinite;
+}
+
+.day-name {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 4px;
+  text-transform: lowercase;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+td, th {
+  border: 1px solid var(--thin-border);
+  padding: 14px 12px;
+}
+
+td.name, th.name {
+  min-width: 160px;
+  text-align: left;
+  padding-left: 20px;
+  font-weight: 600;
+  background: var(--card);
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  border-right: 2px solid var(--thin-border);
+}
+
+/* Shift cells */
+td.empty { background: var(--empty); }
+td.morning { background: var(--morning); }
+td.evening { background: var(--evening); }
+td.fullday { background: var(--fullday); }
+td.training { background: var(--training); }
+
+td.morning:hover { background: var(--morning-hover); }
+td.evening:hover { background: var(--evening-hover); }
+td.fullday:hover { background: var(--fullday-hover); }
+td.training:hover { background: var(--training-hover); }
+
+tbody td {
+  text-align: center;
+  transition: var(--transition);
+  position: relative;
+  cursor: pointer;
+}
+
+tbody tr {
+  transition: var(--transition);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+tbody td::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  background: rgba(0, 0, 0, 0.95);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  pointer-events: none;
+  z-index: 20;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--thin-border);
+}
+
+tbody td:hover::after {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--card-hover);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--thin-border);
+  transition: var(--transition);
+}
+
+.legend-item:hover {
+  background: var(--card);
+  transform: translateY(-1px);
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.legend-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Loading */
 .loading {
   display: inline-block;
   width: 20px;
   height: 20px;
-  border: 3px solid rgba(255,255,255,.3);
+  border: 2px solid rgba(255,255,255,.3);
   border-radius: 50%;
   border-top-color: #fff;
   animation: spin 1s ease-in-out infinite;
-  margin-right: 8px;
 }
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Уведомления */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(45, 45, 45, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+
+.loading-text {
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Notifications */
 .notification {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 15px 20px;
-  border-radius: 8px;
+  top: 24px;
+  right: 24px;
+  padding: 16px 20px;
+  border-radius: var(--radius);
   color: white;
   font-weight: 500;
   z-index: 1000;
   transform: translateX(400px);
-  transition: transform 0.3s ease;
+  transition: var(--transition);
   max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--thin-border);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
+
 .notification.show {
   transform: translateX(0);
 }
+
 .notification.success {
   background: var(--success);
-}
-.notification.error {
-  background: var(--error);
-}
-.notification.warning {
-  background: var(--warning);
+  border-left: 4px solid var(--accent);
 }
 
-/* Мобильная оптимизация */
-@media (max-width: 768px) {
-  .container {
-    padding: 12px;
-    margin: 10px auto;
-  }
-  
-  h1 {
-    font-size: 24px;
-    padding: 8px 16px;
-    text-align: center;
-    width: 100%;
-  }
-  
-  header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  
-  .controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  
-  .control {
-    min-width: auto;
-    width: 100%;
+.notification.error {
+  background: var(--error);
+  border-left: 4px solid #ff1744;
+}
+
+.notification.warning {
+  background: var(--warning);
+  border-left: 4px solid #ff9100;
+  color: #333;
+}
+
+.notification i {
+  font-size: 18px;
+}
+
+/* Mobile Optimization */
+@media (max-width: 1024px) {
+  .controls-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
   
   .buttons-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    width: 100%;
-  }
-  
-  .buttons-container button {
-    min-width: auto;
-    width: 100%;
-  }
-  
-  .table-wrap {
-    margin-top: 16px;
-    padding: 10px;
-    border-radius: 10px;
-  }
-  
-  td.name, th.name {
-    min-width: 100px;
-    max-width: 120px;
-    font-size: 12px;
-    padding: 6px 8px;
-  }
-  
-  thead th, tbody td {
-    font-size: 12px;
-    padding: 6px 4px;
-  }
-  
-  .legend {
-    justify-content: center;
-    gap: 8px;
-  }
-  
-  .notification {
-    top: 10px;
-    right: 10px;
-    left: 10px;
-    max-width: none;
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 480px) {
-  h1 {
-    font-size: 20px;
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .controls-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   
   .buttons-container {
     grid-template-columns: 1fr;
   }
   
-  td.name, th.name {
-    min-width: 80px;
-    max-width: 100px;
-    font-size: 11px;
+  .table-header {
+    padding: 16px 16px 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
   }
+  
+  .legend {
+    justify-content: center;
+  }
+  
+  td.name, th.name {
+    min-width: 120px;
+    padding: 12px 16px;
+  }
+  
+  thead th, tbody td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+  
+  .notification {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text h1 {
+    font-size: 24px;
+  }
+  
+  .legend {
+    gap: 8px;
+  }
+  
+  .legend-item {
+    padding: 6px 10px;
+  }
+  
+  select, input[type="date"], button {
+    padding: 12px 14px;
+    font-size: 14px;
+    height: 48px;
+  }
+}
+
+/* Smooth animations */
+.fade-in {
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--card);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--thin-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 </style>
 </head>
 <body>
-<!-- Уведомления -->
+<!-- Notifications -->
 <div id="notificationsContainer"></div>
 
 <div class="container">
-<header>
-  <div>
-    <h1>График сотрудников</h1>
-    <div class="small">Выберите точку, месяц и начало недели. Данные обновляются автоматически.</div>
-  </div>
-  <div class="legend">
-    <div class="item"><span class="chip" style="background:var(--morning)"></span>Утро</div>
-    <div class="item"><span class="chip" style="background:var(--evening)"></span>Вечер</div>
-    <div class="item"><span class="chip" style="background:var(--fullday)"></span>Весь день</div>
-    <div class="item"><span class="chip" style="background:var(--training)"></span>Обучение</div>
-  </div>
-</header>
+  <!-- Header -->
+  <header class="header fade-in">
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="logo-text">
+          <h1>График сотрудников</h1>
+          <div class="subtitle">Управление рабочим временем команды</div>
+        </div>
+      </div>
+      
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background: var(--morning)"></div>
+          <span class="legend-text">Утро</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: var(--evening)"></div>
+          <span class="legend-text">Вечер</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: var(--fullday)"></div>
+          <span class="legend-text">Весь день</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: var(--training)"></div>
+          <span class="legend-text">Обучение</span>
+        </div>
+      </div>
+    </div>
+  </header>
 
-<div class="controls">
-  <label class="control">Точка:
-    <select id="branch">
-      <option value="jp">Жар-Птица</option>
-      <option value="czm">ЦУМ</option>
-    </select>
-  </label>
-  
-  <label class="control">Месяц:
-    <select id="month"></select>
-  </label>
-  
-  <label class="control">Сотрудник:
-    <select id="employee"><option value="all">Все сотрудники</option></select>
-  </label>
-  
-  <label class="control">Неделя с:
-    <input id="startDate" type="date"/>
-  </label>
-  
-  <div class="buttons-container">
-    <button id="showBtn">
-      <span class="loading" id="loadingIndicator" style="display:none;"></span>
-      Показать график
-    </button>
-    <button id="refreshBtn" style="background:#3b82f6">Обновить</button>
-    <button id="todayBtn" style="background:var(--today)">Сегодня</button>
-  </div>
-</div>
+  <!-- Controls -->
+  <section class="controls fade-in">
+    <div class="controls-grid">
+      <!-- Торговая точка -->
+      <div class="control-group">
+        <label class="control-label">
+          <i class="fas fa-store"></i>
+          Торговая точка
+        </label>
+        <select id="branch">
+          <option value="jp">🏬 Жар-Птица</option>
+          <option value="czm">🏢 ЦУМ</option>
+        </select>
+      </div>
+      
+      <!-- Месяц -->
+      <div class="control-group">
+        <label class="control-label">
+          <i class="fas fa-calendar"></i>
+          Месяц
+        </label>
+        <select id="month"></select>
+      </div>
+      
+      <!-- Сотрудник -->
+      <div class="control-group">
+        <label class="control-label">
+          <i class="fas fa-users"></i>
+          Сотрудник
+        </label>
+        <select id="employee">
+          <option value="all">👥 Все сотрудники</option>
+        </select>
+      </div>
+      
+      <!-- Дата начала недели -->
+      <div class="control-group">
+        <label class="control-label">
+          <i class="fas fa-clock"></i>
+          Неделя с
+        </label>
+        <input id="startDate" type="date"/>
+      </div>
+      
+      <!-- Кнопки действий -->
+      <div class="buttons-container">
+        <button id="showBtn">
+          <i class="fas fa-eye"></i>
+          Показать график
+        </button>
+        <button id="refreshBtn" class="secondary">
+          <i class="fas fa-sync-alt"></i>
+          Обновить данные
+        </button>
+        <button id="todayBtn" class="today">
+          <i class="fas fa-calendar-day"></i>
+          Текущая неделя
+        </button>
+      </div>
+    </div>
+  </section>
 
-<div class="table-wrap">
-  <div id="tableLoading" style="display:none; text-align:center; padding:40px;">
-    <div class="loading" style="margin:0 auto;"></div>
-    <div style="margin-top:10px;">Загрузка данных...</div>
-  </div>
-  <table id="scheduleTable">
-    <thead id="tableHead"></thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-</div>
+  <!-- Table -->
+  <section class="table-container fade-in">
+    <div class="table-header">
+      <div class="table-title">
+        <i class="fas fa-table"></i>
+        График работы
+      </div>
+    </div>
+    
+    <div class="table-wrap">
+      <div id="tableLoading" class="loading-overlay" style="display: none;">
+        <div class="loading"></div>
+        <div class="loading-text">Загрузка данных...</div>
+      </div>
+      <table id="scheduleTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -414,6 +790,10 @@ const monthsGIDs = {
   jp: {"Октябрь": 0, "Ноябрь": 1956542531, "Декабрь": 987654321}, 
   czm: {"Октябрь": 0, "Ноябрь": 1078468054, "Декабрь": 987654321} 
 };
+
+// Названия дней недели
+const dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+const dayNamesShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
 
 // Кэш данных
 const cachedCSVs = {};
@@ -429,7 +809,15 @@ function showNotification(message, type = 'success', duration = 4000) {
   const container = document.getElementById('notificationsContainer');
   const notification = document.createElement('div');
   notification.className = `notification ${type}`;
-  notification.textContent = message;
+  
+  const icon = type === 'success' ? 'fas fa-check-circle' : 
+               type === 'error' ? 'fas fa-exclamation-circle' : 
+               'fas fa-exclamation-triangle';
+  
+  notification.innerHTML = `
+    <i class="${icon}"></i>
+    <span>${message}</span>
+  `;
   
   container.appendChild(notification);
   
@@ -451,23 +839,10 @@ function showNotification(message, type = 'success', duration = 4000) {
 function setLoading(isLoading, element = 'table') {
   if (element === 'table') {
     const loadingEl = document.getElementById('tableLoading');
-    const tableEl = document.getElementById('scheduleTable');
     if (isLoading) {
-      loadingEl.style.display = 'block';
-      tableEl.style.display = 'none';
+      loadingEl.style.display = 'flex';
     } else {
       loadingEl.style.display = 'none';
-      tableEl.style.display = 'table';
-    }
-  } else if (element === 'button') {
-    const indicator = document.getElementById('loadingIndicator');
-    const showBtn = document.getElementById('showBtn');
-    if (isLoading) {
-      indicator.style.display = 'inline-block';
-      showBtn.disabled = true;
-    } else {
-      indicator.style.display = 'none';
-      showBtn.disabled = false;
     }
   }
 }
@@ -518,7 +893,7 @@ async function loadCSV(branch, month, retryCount = 3) {
   
   for (let attempt = 1; attempt <= retryCount; attempt++) {
     try {
-      setLoading(true, 'button');
+      setLoading(true);
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Ошибка загрузки: ${res.status}`);
       
@@ -538,7 +913,7 @@ async function loadCSV(branch, month, retryCount = 3) {
       // Ждем перед повторной попыткой
       await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
     } finally {
-      setLoading(false, 'button');
+      setLoading(false);
     }
   }
 }
@@ -563,7 +938,7 @@ function populateMonths(branch) {
 
 async function populateEmployees(branch, month) {
   try {
-    setLoading(true, 'table');
+    setLoading(true);
     scheduleData = await loadCSV(branch, month);
     
     // Обновляем состояние
@@ -583,7 +958,7 @@ async function populateEmployees(branch, month) {
     const select = document.getElementById("employee");
     const currentValue = select.value;
     
-    select.innerHTML = '<option value="all">Все сотрудники</option>';
+    select.innerHTML = '<option value="all">👥 Все сотрудники</option>';
     
     allEmployees.forEach(name => {
       const opt = document.createElement("option");
@@ -601,7 +976,7 @@ async function populateEmployees(branch, month) {
     console.error('Ошибка загрузки сотрудников:', error);
     scheduleData = [];
   } finally {
-    setLoading(false, 'table');
+    setLoading(false);
   }
 }
 
@@ -647,6 +1022,14 @@ function getWeekStart(date) {
 
 function formatDate(d) {
   return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+}
+
+function getDayName(date) {
+  return dayNames[date.getDay() === 0 ? 6 : date.getDay() - 1];
+}
+
+function getDayNameShort(date) {
+  return dayNamesShort[date.getDay() === 0 ? 6 : date.getDay() - 1];
 }
 
 function loadSchedule() {
@@ -696,9 +1079,17 @@ function loadSchedule() {
   
   const today = new Date();
   
-  // Создаем заголовок таблицы
-  tableHead.innerHTML = "<tr><th class='name'>Сотрудник</th>" +
-    weekDates.map(d => `<th${d.toDateString() === today.toDateString() ? ' class="today"' : ''}>${formatDate(d)}</th>`).join("") + "</tr>";
+  // Создаем заголовок таблицы с днями недели
+  let headerHTML = "<tr><th class='name name-header'>Сотрудник</th>";
+  weekDates.forEach(d => {
+    const isToday = d.toDateString() === today.toDateString();
+    headerHTML += `<th${isToday ? ' class="today"' : ''}>
+      ${formatDate(d)}
+      <span class="day-name">${getDayNameShort(d)}</span>
+    </th>`;
+  });
+  headerHTML += "</tr>";
+  tableHead.innerHTML = headerHTML;
   
   // Фильтруем строки с данными сотрудников
   const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
@@ -723,10 +1114,10 @@ function loadSchedule() {
     tr.innerHTML = html;
     tableBody.appendChild(tr);
     
-    // Анимация появления строки
+    // Плавная анимация появления строк с задержкой
     setTimeout(() => {
-      tr.classList.add("visible");
-    }, rowIndex * 80);
+      tr.style.animationDelay = `${rowIndex * 0.1}s`;
+    }, 10);
     
     visibleRows++;
   });
