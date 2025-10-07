@@ -412,6 +412,26 @@ td.name, th.name {
   border-right: 2px solid var(--thin-border);
 }
 
+/* Стили для режима "Сегодня" - уменьшенные столбцы */
+.today-mode td.name, 
+.today-mode th.name {
+  min-width: 120px;
+  max-width: 120px;
+  padding: 12px 8px;
+  font-size: 13px;
+}
+
+.today-mode thead th:not(.name) {
+  min-width: 100px;
+  max-width: 100px;
+}
+
+.today-mode tbody td:not(.name) {
+  min-width: 100px;
+  max-width: 100px;
+  padding: 12px 8px;
+}
+
 /* Shift cells */
 td.empty { background: var(--empty); }
 td.morning { background: var(--morning); }
@@ -720,6 +740,27 @@ tbody td:hover::after {
   #adminToggle {
     display: none !important;
   }
+  
+  /* Мобильные стили для режима "Сегодня" */
+  .today-mode td.name, 
+  .today-mode th.name {
+    min-width: 80px;
+    max-width: 80px;
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  
+  .today-mode thead th:not(.name) {
+    min-width: 70px;
+    max-width: 70px;
+    padding: 10px 6px;
+  }
+  
+  .today-mode tbody td:not(.name) {
+    min-width: 70px;
+    max-width: 70px;
+    padding: 8px 6px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -770,6 +811,29 @@ tbody td:hover::after {
   thead th {
     padding: 10px 4px;
     font-size: 10px;
+  }
+  
+  /* Очень компактные стили для режима "Сегодня" на маленьких экранах */
+  .today-mode td.name, 
+  .today-mode th.name {
+    min-width: 60px;
+    max-width: 60px;
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+  
+  .today-mode thead th:not(.name) {
+    min-width: 50px;
+    max-width: 50px;
+    padding: 8px 4px;
+    font-size: 10px;
+  }
+  
+  .today-mode tbody td:not(.name) {
+    min-width: 50px;
+    max-width: 50px;
+    padding: 6px 4px;
+    font-size: 11px;
   }
 }
 
@@ -1456,7 +1520,7 @@ async function populateEmployees(branch, month) {
     setLoading(true);
     scheduleData = await loadCSV(branch, month);
     
-    // Обновляем состояние
+  // Обновляем состояние
     currentBranch = branch;
     currentMonth = month;
     
@@ -1564,6 +1628,9 @@ function showToday() {
   tableHead.innerHTML = "";
   tableBody.innerHTML = "";
   
+  // Добавляем класс для режима "Сегодня"
+  document.getElementById("scheduleTable").classList.add("today-mode");
+  
   const dateRow = (scheduleData[1] || []).slice(2);
   
   // Находим индекс колонки для сегодняшней даты
@@ -1581,6 +1648,8 @@ function showToday() {
   
   if (todayIndex === null) {
     showNotification("Нет данных на сегодня", "warning");
+    // Убираем класс режима "Сегодня" если данных нет
+    document.getElementById("scheduleTable").classList.remove("today-mode");
     return;
   }
   
@@ -1638,6 +1707,9 @@ function showToday() {
 }
 
 function loadSchedule() {
+  // Убираем класс режима "Сегодня" при обычной загрузке графика
+  document.getElementById("scheduleTable").classList.remove("today-mode");
+  
   const employee = document.getElementById("employee").value;
   const selectedDate = new Date(document.getElementById("startDate").value);
   
