@@ -191,22 +191,22 @@ function parseShift(val) {
   
   const s = String(val).trim().toLowerCase();
   
-  // Обработка дробных чисел (3,5у, 2.5в и т.д.)
+  // Обработка дробных чисел (3,5у, 2.5в и т.д.) - показываем как "Утро"/"Вечер"
   const hourMatch = s.match(/^(\d+[,.]\d+)([ув])$/);
   if (hourMatch) {
-    const hours = hourMatch[1].replace(',', '.');
     const shiftType = hourMatch[2];
     const type = shiftType === 'у' ? 'morning' : 'evening';
-    return { type: type, label: `${hours}ч` };
+    const label = shiftType === 'у' ? 'Утро' : 'Вечер';
+    return { type: type, label: label };
   }
   
-  // Обработка целых чисел с часами (3у, 2в и т.д.)
+  // Обработка целых чисел с часами (3у, 2в и т.д.) - показываем как "Утро"/"Вечер"
   const intHourMatch = s.match(/^(\d+)([ув])$/);
   if (intHourMatch) {
-    const hours = intHourMatch[1];
     const shiftType = intHourMatch[2];
     const type = shiftType === 'у' ? 'morning' : 'evening';
-    return { type: type, label: `${hours}ч` };
+    const label = shiftType === 'у' ? 'Утро' : 'Вечер';
+    return { type: type, label: label };
   }
   
   // Стандартные проверки
