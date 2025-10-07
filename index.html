@@ -399,6 +399,7 @@ td, th {
   padding: 14px 12px;
 }
 
+/* Десктопные стили для имен */
 td.name, th.name {
   min-width: 160px;
   text-align: left;
@@ -673,14 +674,31 @@ tbody td:hover::after {
     justify-content: center;
   }
   
+  /* Мобильные стили для таблицы */
+  table {
+    min-width: 600px; /* Уменьшили минимальную ширину */
+  }
+  
   td.name, th.name {
-    min-width: 120px;
-    padding: 12px 16px;
+    min-width: 80px; /* Сильно уменьшили ширину для фамилий */
+    max-width: 100px;
+    padding: 10px 8px;
+    font-size: 12px;
   }
   
   thead th, tbody td {
-    padding: 12px 8px;
-    font-size: 13px;
+    padding: 10px 6px;
+    font-size: 12px;
+    min-width: 45px; /* Уменьшили минимальную ширину ячеек с датами */
+  }
+  
+  thead th {
+    padding: 12px 6px;
+    font-size: 11px;
+  }
+  
+  .day-name {
+    font-size: 9px;
   }
   
   .notification {
@@ -729,6 +747,29 @@ tbody td:hover::after {
   
   .table-container {
     border-radius: 12px;
+  }
+  
+  /* Еще более компактная таблица для очень маленьких экранов */
+  table {
+    min-width: 500px;
+  }
+  
+  td.name, th.name {
+    min-width: 70px;
+    max-width: 80px;
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+  
+  thead th, tbody td {
+    padding: 8px 4px;
+    font-size: 11px;
+    min-width: 40px;
+  }
+  
+  thead th {
+    padding: 10px 4px;
+    font-size: 10px;
   }
 }
 
@@ -1071,6 +1112,29 @@ let currentMonth = null;
 let scheduleData = [];
 let allEmployees = [];
 let isOnline = navigator.onLine;
+
+// ========== ФУНКЦИЯ ДЛЯ СОКРАЩЕНИЯ ИМЕН ==========
+function shortenName(fullName) {
+  if (!fullName) return '';
+  
+  // Убираем лишние пробелы
+  const cleanName = fullName.trim();
+  
+  // Разбиваем на части
+  const parts = cleanName.split(' ');
+  
+  if (parts.length === 0) return '';
+  
+  // Берем только фамилию (первую часть)
+  const surname = parts[0];
+  
+  // Если фамилия слишком длинная, обрезаем ее
+  if (surname.length > 12) {
+    return surname.substring(0, 10) + '..';
+  }
+  
+  return surname;
+}
 
 // ========== PWA И ОФФЛАЙН РЕЖИМ ==========
 function initOfflineSupport() {
@@ -1552,7 +1616,11 @@ function loadSchedule() {
     if (employee !== "all" && r[0] !== employee) return;
     
     const tr = document.createElement("tr");
-    let html = `<td class="name">${r[0]}</td>`;
+    
+    // Определяем отображаемое имя в зависимости от устройства
+    const displayName = window.innerWidth <= 768 ? shortenName(r[0]) : r[0];
+    
+    let html = `<td class="name" title="${r[0]}">${displayName}</td>`;
     
     dateIndexMap.forEach(idx => {
       let val = "";
