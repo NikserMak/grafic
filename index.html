@@ -960,7 +960,7 @@ tbody td:hover::after {
         </button>
         <button id="todayBtn" class="today">
           <i class="fas fa-calendar-day"></i>
-          Текущая неделя
+          Сегодня
         </button>
         <button onclick="toggleAdminPanel()" class="secondary" id="adminToggle">
           <i class="fas fa-cog"></i>
@@ -1547,6 +1547,96 @@ function getDayNameShort(date) {
   return dayNamesShort[date.getDay() === 0 ? 6 : date.getDay() - 1];
 }
 
+// ========== НОВАЯ ФУНКЦИЯ: ПОКАЗАТЬ СЕГОДНЯ ==========
+function showToday() {
+  const today = new Date();
+  
+  // Если нет данных, выходим
+  if (!scheduleData.length) {
+    showNotification("Нет данных для отображения", "warning");
+    return;
+  }
+  
+  const tableHead = document.getElementById("tableHead");
+  const tableBody = document.getElementById("tableBody");
+  
+  // Очищаем таблицу
+  tableHead.innerHTML = "";
+  tableBody.innerHTML = "";
+  
+  const dateRow = (scheduleData[1] || []).slice(2);
+  
+  // Находим индекс колонки для сегодняшней даты
+  let todayIndex = null;
+  for (let i = 0; i < dateRow.length; i++) {
+    const parts = dateRow[i].split('.');
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    
+    if (day === today.getDate() && month === today.getMonth() + 1) {
+      todayIndex = i + 2;
+      break;
+    }
+  }
+  
+  if (todayIndex === null) {
+    showNotification("Нет данных на сегодня", "warning");
+    return;
+  }
+  
+  // Создаем заголовок таблицы только для сегодняшнего дня
+  tableHead.innerHTML = `
+    <tr>
+      <th class='name name-header'>Сотрудник</th>
+      <th class="today">
+        ${formatDate(today)}
+        <span class="day-name">${getDayNameShort(today)}</span>
+      </th>
+    </tr>
+  `;
+  
+  // Фильтруем строки с данными сотрудников
+  const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
+  
+  let visibleRows = 0;
+  
+  // Создаем строки таблицы только для сотрудников, которые работают сегодня
+  rows.forEach((r, rowIndex) => {
+    const shiftValue = r[todayIndex] ? r[todayIndex].trim() : "";
+    const shift = parseShift(shiftValue);
+    
+    // Показываем только сотрудников с рабочей сменой сегодня
+    if (shift.type !== "empty") {
+      const tr = document.createElement("tr");
+      
+      // Определяем отображаемое имя в зависимости от устройства
+      const displayName = window.innerWidth <= 768 ? shortenName(r[0]) : r[0];
+      
+      tr.innerHTML = `
+        <td class="name" title="${r[0]}">${displayName}</td>
+        <td class="${shift.type}" data-tooltip="${shiftValue}">${shift.label}</td>
+      `;
+      
+      tableBody.appendChild(tr);
+      
+      // Плавная анимация появления строк с задержкой
+      setTimeout(() => {
+        tr.style.animationDelay = `${rowIndex * 0.1}s`;
+      }, 10);
+      
+      visibleRows++;
+    }
+  });
+  
+  if (visibleRows === 0) {
+    showNotification("Сегодня никто не работает", "info");
+  } else {
+    showNotification(`Сегодня работают: ${visibleRows} сотрудников`, "success", 3000);
+  }
+  
+  saveState();
+}
+
 function loadSchedule() {
   const employee = document.getElementById("employee").value;
   const selectedDate = new Date(document.getElementById("startDate").value);
@@ -1684,12 +1774,8 @@ async function init() {
 }
 
 // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
-document.getElementById("todayBtn").addEventListener("click", () => {
-  const today = new Date();
-  const firstDay = getWeekStart(today);
-  document.getElementById("startDate").valueAsDate = firstDay;
-  loadSchedule();
-});
+// ЗАМЕНА: кнопка "Сегодня" теперь вызывает showToday()
+document.getElementById("todayBtn").addEventListener("click", showToday);
 
 document.getElementById("branch").addEventListener("change", async e => {
   const b = e.target.value;
