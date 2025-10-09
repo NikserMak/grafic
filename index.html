@@ -728,30 +728,186 @@ let monthsGIDs = {
   czm: {"Октябрь": 0, "Ноябрь": 1078468054, "Декабрь": 987654321} 
 };
 
-// Загрузка конфигурации из localStorage
-function loadConfig() {
-  const savedTableIDs = localStorage.getItem('scheduleTableIDs');
-  const savedMonthsGIDs = localStorage.getItem('scheduleMonthsGIDs');
-  
-  if (savedTableIDs) tableIDs = JSON.parse(savedTableIDs);
-  if (savedMonthsGIDs) monthsGIDs = JSON.parse(savedMonthsGIDs);
+// ========== КОНФИГУРАЦИЯ ОПТИМИЗАЦИЙ ==========
+const CACHE_CONFIG = {
+  VERSION: '1.2',
+  DURATION: 10 * 60 * 1000, // 10 минут
+  RETRY_ATTEMPTS: 3,
+  RETRY_DELAY: 1000,
+  TIMEOUT: 15000 // 15 секунд
+};
+
+// ========== УТИЛИТЫ ОПТИМИЗАЦИИ ==========
+// Дебаунс для частых вызовов
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
-// Сохранение конфигурации в localStorage
-function saveConfig() {
-  localStorage.setItem('scheduleTableIDs', JSON.stringify(tableIDs));
-  localStorage.setItem('scheduleMonthsGIDs', JSON.stringify(monthsGIDs));
+// Мемоизация для тяжелых вычислений
+function memoize(fn) {
+  const cache = new Map();
+  return function(...args) {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) return cache.get(key);
+    
+    const result = fn.apply(this, args);
+    cache.set(key, result);
+    return result;
+  };
 }
 
-// Названия дней недели
-const dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
-const dayNamesShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
+// Задержка для ретраев
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-// Кэш данных для ленивой загрузки
+// ========== КЭШИРОВАНИЕ С ВЕРСИОНИРОВАНИЕМ ==========
 const cachedCSVs = {};
 const cachedWeekData = {};
 
-// Переменные состояния
+function getCacheKey(branch, month) {
+  return `${branch}_${month}_${CACHE_CONFIG.VERSION}`;
+}
+
+function getWeekCacheKey(branch, month, weekStartDate) {
+  return `${branch}_${month}_${weekStartDate.getTime()}_${CACHE_CONFIG.VERSION}`;
+}
+
+function isCacheValid(cacheEntry) {
+  if (!cacheEntry) return false;
+  
+  const isExpired = (Date.now() - cacheEntry.timestamp) > CACHE_CONFIG.DURATION;
+  const isWrongVersion = cacheEntry.version !== CACHE_CONFIG.VERSION;
+  
+  return !isExpired && !isWrongVersion;
+}
+
+function saveToCache(cacheObject, key, data) {
+  cacheObject[key] = {
+    data: data,
+    timestamp: Date.now(),
+    version: CACHE_CONFIG.VERSION
+  };
+}
+
+function getFromCache(cacheObject, key) {
+  const cacheEntry = cacheObject[key];
+  return isCacheValid(cacheEntry) ? cacheEntry.data : null;
+}
+
+// ========== ОБРАБОТКА ОШИБОК СЕТИ ==========
+async function fetchWithRetry(url, options = {}) {
+  const { maxRetries = CACHE_CONFIG.RETRY_ATTEMPTS, timeout = CACHE_CONFIG.TIMEOUT } = options;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      
+      const response = await fetch(url, { 
+        signal: controller.signal,
+        cache: 'no-cache'
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      return response;
+      
+    } catch (error) {
+      const isLastAttempt = attempt === maxRetries;
+      
+      if (isLastAttempt) {
+        console.error(`Failed after ${maxRetries} attempts:`, error);
+        throw error;
+      }
+      
+      console.warn(`Attempt ${attempt} failed, retrying in ${attempt} second...`);
+      await delay(CACHE_CONFIG.RETRY_DELAY * attempt);
+    }
+  }
+}
+
+function handleNetworkError(error, branch, month) {
+  console.error('Network error:', error);
+  
+  if (error.name === 'AbortError') {
+    showNotification('Превышено время ожидания загрузки данных', 'error');
+  } else if (error.message.includes('HTTP 4')) {
+    showNotification('Ошибка доступа к данным. Проверьте настройки таблицы.', 'error');
+  } else if (error.message.includes('HTTP 5')) {
+    showNotification('Временная ошибка сервера. Попробуйте позже.', 'error');
+  } else if (error.message.includes('Failed to fetch')) {
+    showNotification('Проблемы с интернет-соединением. Проверьте подключение.', 'error');
+  } else {
+    showNotification('Не удалось загрузить данные', 'error');
+  }
+}
+
+// ========== ОПТИМИЗИРОВАННЫЕ ФУНКЦИИ ==========
+// Мемоизированный парсинг смен
+const memoizedParseShift = memoize(function(val) {
+  if (!val) return { type: "empty", label: "" };
+  
+  const s = String(val).trim().toLowerCase();
+  
+  if (s.includes("вд")) return { type: "fullday", label: "Весь день" };
+  if (s.endsWith("у")) return { type: "morning", label: "Утро" };
+  if (s.endsWith("в")) return { type: "evening", label: "Вечер" };
+  if (s.endsWith("о")) return { type: "training", label: "Обучение" };
+  
+  return { type: "empty", label: "" };
+});
+
+// Оптимизированный рендеринг таблицы
+function renderTableOptimized(weekData, employee) {
+  const { dateIndexMap, rows, weekDates } = weekData;
+  const tableBody = document.getElementById("tableBody");
+  const today = new Date();
+  
+  // Используем DocumentFragment для batch-рендеринга
+  const fragment = document.createDocumentFragment();
+  let visibleRows = 0;
+  
+  rows.forEach((r, rowIndex) => {
+    if (employee !== "all" && r[0] !== employee) return;
+    
+    const tr = document.createElement("tr");
+    
+    let html = `<td class="name" title="${r[0]}">${r[0]}</td>`;
+    
+    dateIndexMap.forEach(idx => {
+      let val = "";
+      if (idx !== null && r[idx]) val = r[idx].trim();
+      
+      const sh = memoizedParseShift(val);
+      html += `<td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>`;
+    });
+    
+    tr.innerHTML = html;
+    fragment.appendChild(tr);
+    visibleRows++;
+  });
+  
+  // Единоразовая вставка в DOM
+  tableBody.innerHTML = '';
+  tableBody.appendChild(fragment);
+  
+  return visibleRows;
+}
+
+// ========== ПЕРЕМЕННЫЕ СОСТОЯНИЯ ==========
 let currentBranch = null;
 let currentMonth = null;
 let scheduleData = [];
@@ -851,23 +1007,60 @@ function loadState() {
   return false;
 }
 
+// Загрузка конфигурации из localStorage
+function loadConfig() {
+  const savedTableIDs = localStorage.getItem('scheduleTableIDs');
+  const savedMonthsGIDs = localStorage.getItem('scheduleMonthsGIDs');
+  
+  if (savedTableIDs) {
+    try {
+      tableIDs = JSON.parse(savedTableIDs);
+    } catch (e) {
+      console.warn('Ошибка загрузки tableIDs:', e);
+    }
+  }
+  
+  if (savedMonthsGIDs) {
+    try {
+      monthsGIDs = JSON.parse(savedMonthsGIDs);
+    } catch (e) {
+      console.warn('Ошибка загрузки monthsGIDs:', e);
+    }
+  }
+}
+
+// Сохранение конфигурации в localStorage
+function saveConfig() {
+  try {
+    localStorage.setItem('scheduleTableIDs', JSON.stringify(tableIDs));
+    localStorage.setItem('scheduleMonthsGIDs', JSON.stringify(monthsGIDs));
+  } catch (e) {
+    console.warn('Не удалось сохранить конфигурацию:', e);
+  }
+}
+
+// Названия дней недели
+const dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+const dayNamesShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
+
 // ========== ЛЕНИВАЯ ЗАГРУЗКА ДАННЫХ ==========
 async function loadWeekData(branch, month, weekStartDate) {
-  const weekKey = `${branch}_${month}_${weekStartDate.getTime()}`;
+  const weekKey = getWeekCacheKey(branch, month, weekStartDate);
   
   // Проверяем кэш недельных данных
-  if (cachedWeekData[weekKey]) {
-    return cachedWeekData[weekKey];
+  const cachedWeek = getFromCache(cachedWeekData, weekKey);
+  if (cachedWeek) {
+    return cachedWeek;
   }
   
   // Загружаем полные данные месяца, если их нет
-  if (!cachedCSVs[`${branch}_${month}`]) {
+  if (!getFromCache(cachedCSVs, getCacheKey(branch, month))) {
     await loadCSV(branch, month);
   }
   
   // Извлекаем данные только для нужной недели
   const weekData = extractWeekData(weekStartDate);
-  cachedWeekData[weekKey] = weekData;
+  saveToCache(cachedWeekData, weekKey, weekData);
   
   return weekData;
 }
@@ -907,10 +1100,12 @@ function extractWeekData(weekStartDate) {
 
 // ========== ОСНОВНЫЕ ФУНКЦИИ ==========
 async function loadCSV(branch, month) {
-  const cacheKey = `${branch}_${month}`;
+  const cacheKey = getCacheKey(branch, month);
   
-  if (cachedCSVs[cacheKey]) {
-    scheduleData = cachedCSVs[cacheKey];
+  // Проверяем валидный кэш
+  const cachedData = getFromCache(cachedCSVs, cacheKey);
+  if (cachedData) {
+    scheduleData = cachedData;
     return scheduleData;
   }
   
@@ -919,19 +1114,19 @@ async function loadCSV(branch, month) {
   
   try {
     setLoading(true);
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Ошибка загрузки');
-    
+    const response = await fetchWithRetry(url);
     const text = await response.text();
     const parsed = text.split("\n").map(r => r.split(","));
     
-    cachedCSVs[cacheKey] = parsed;
+    // Сохраняем с метаданными
+    saveToCache(cachedCSVs, cacheKey, parsed);
     scheduleData = parsed;
+    
+    showNotification('Данные успешно загружены', 'success', 2000);
     return parsed;
     
   } catch (error) {
-    console.error('Ошибка загрузки данных:', error);
-    showNotification('Не удалось загрузить данные', 'error');
+    handleNetworkError(error, branch, month);
     throw error;
   } finally {
     setLoading(false);
@@ -996,20 +1191,6 @@ async function populateEmployees(branch, month) {
   }
 }
 
-// Парсинг смены
-function parseShift(val) {
-  if (!val) return { type: "empty", label: "" };
-  
-  const s = String(val).trim().toLowerCase();
-  
-  if (s.includes("вд")) return { type: "fullday", label: "Весь день" };
-  if (s.endsWith("у")) return { type: "morning", label: "Утро" };
-  if (s.endsWith("в")) return { type: "evening", label: "Вечер" };
-  if (s.endsWith("о")) return { type: "training", label: "Обучение" };
-  
-  return { type: "empty", label: "" };
-}
-
 function getWeekStart(date) {
   const d = new Date(date);
   const day = d.getDay() || 7;
@@ -1025,7 +1206,8 @@ function getDayNameShort(date) {
   return dayNamesShort[date.getDay() === 0 ? 6 : date.getDay() - 1];
 }
 
-async function loadSchedule() {
+// Дебаунсированная загрузка графика
+const debouncedLoadSchedule = debounce(async function loadSchedule() {
   const employee = document.getElementById("employee").value;
   const selectedDate = new Date(document.getElementById("startDate").value);
   
@@ -1053,7 +1235,7 @@ async function loadSchedule() {
   try {
     // Ленивая загрузка данных недели
     const weekData = await loadWeekData(currentBranch, currentMonth, weekStart);
-    const { dateIndexMap, rows, weekDates } = weekData;
+    const { weekDates } = weekData;
     
     const today = new Date();
     
@@ -1069,29 +1251,9 @@ async function loadSchedule() {
     headerHTML += "</tr>";
     tableHead.innerHTML = headerHTML;
     
-    // Обновляем тело таблицы
+    // Обновляем тело таблицы с оптимизацией
     hideSkeleton();
-    let visibleRows = 0;
-    
-    rows.forEach((r, rowIndex) => {
-      if (employee !== "all" && r[0] !== employee) return;
-      
-      const tr = document.createElement("tr");
-      
-      let html = `<td class="name" title="${r[0]}">${r[0]}</td>`;
-      
-      dateIndexMap.forEach(idx => {
-        let val = "";
-        if (idx !== null && r[idx]) val = r[idx].trim();
-        
-        const sh = parseShift(val);
-        html += `<td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>`;
-      });
-      
-      tr.innerHTML = html;
-      tableBody.appendChild(tr);
-      visibleRows++;
-    });
+    const visibleRows = renderTableOptimized(weekData, employee);
     
     if (visibleRows === 0) {
       showNotification("Нет данных для выбранного сотрудника", "warning");
@@ -1101,12 +1263,11 @@ async function loadSchedule() {
     
   } catch (error) {
     hideSkeleton();
-    showNotification("Ошибка при загрузке данных недели", "error");
     console.error('Ошибка загрузки недели:', error);
   }
   
   saveState();
-}
+}, 300);
 
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
 async function init() {
@@ -1130,7 +1291,7 @@ async function init() {
   // Показываем скелетон при первой загрузке
   showSkeleton(8);
   setTimeout(() => {
-    loadSchedule();
+    debouncedLoadSchedule();
   }, 50);
 }
 
@@ -1170,16 +1331,16 @@ document.getElementById("month").addEventListener("change", async e => {
 });
 
 document.getElementById("employee").addEventListener("change", () => {
-  loadSchedule();
+  debouncedLoadSchedule();
   saveState();
 });
 
 document.getElementById("startDate").addEventListener("change", () => {
-  loadSchedule();
+  debouncedLoadSchedule();
   saveState();
 });
 
-document.getElementById("showBtn").addEventListener("click", loadSchedule);
+document.getElementById("showBtn").addEventListener("click", debouncedLoadSchedule);
 
 document.getElementById("refreshBtn").addEventListener("click", async () => {
   const branch = document.getElementById("branch").value;
