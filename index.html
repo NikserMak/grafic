@@ -647,7 +647,7 @@ tbody td:hover::after {
   margin-right: 8px;
 }
 
-/* Mobile Optimization */
+/* Мобильная оптимизация для режима "Сегодня" */
 @media (max-width: 1024px) {
   .controls-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -665,7 +665,7 @@ tbody td:hover::after {
 
 @media (max-width: 768px) {
   .container {
-    padding: 16px;
+    padding: 12px;
   }
   
   .header-content {
@@ -692,15 +692,21 @@ tbody td:hover::after {
   
   .legend {
     justify-content: center;
+    gap: 8px;
   }
   
-  /* Мобильные стили для таблицы */
+  .legend-item {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  /* Мобильные стили для обычной таблицы */
   table {
-    min-width: 600px; /* Уменьшили минимальную ширину */
+    min-width: 500px;
   }
   
   td.name, th.name {
-    min-width: 80px; /* Сильно уменьшили ширину для фамилий */
+    min-width: 80px;
     max-width: 100px;
     padding: 10px 8px;
     font-size: 12px;
@@ -709,7 +715,7 @@ tbody td:hover::after {
   thead th, tbody td {
     padding: 10px 6px;
     font-size: 12px;
-    min-width: 45px; /* Уменьшили минимальную ширину ячеек с датами */
+    min-width: 45px;
   }
   
   thead th {
@@ -741,58 +747,91 @@ tbody td:hover::after {
     display: none !important;
   }
   
-  /* Мобильные стили для режима "Сегодня" */
+  /* ОПТИМИЗИРОВАННЫЕ СТИЛИ ДЛЯ РЕЖИМА "СЕГОДНЯ" НА МОБИЛЬНЫХ */
+  .today-mode table {
+    min-width: unset;
+    width: 100%;
+  }
+  
   .today-mode td.name, 
   .today-mode th.name {
-    min-width: 80px;
-    max-width: 80px;
-    padding: 8px 6px;
-    font-size: 12px;
+    min-width: 60px !important;
+    max-width: 70px !important;
+    padding: 8px 6px !important;
+    font-size: 11px !important;
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: var(--card);
   }
   
   .today-mode thead th:not(.name) {
-    min-width: 70px;
-    max-width: 70px;
-    padding: 10px 6px;
+    min-width: 50px !important;
+    max-width: 60px !important;
+    padding: 10px 4px !important;
+    font-size: 10px !important;
   }
   
   .today-mode tbody td:not(.name) {
-    min-width: 70px;
-    max-width: 70px;
-    padding: 8px 6px;
+    min-width: 50px !important;
+    max-width: 60px !important;
+    padding: 8px 4px !important;
+    font-size: 11px !important;
+    text-align: center;
+  }
+  
+  /* Уменьшаем отступы в таблице для мобильных */
+  .today-mode .table-container {
+    padding: 0;
+  }
+  
+  .today-mode .table-wrap {
+    padding: 0 8px;
+  }
+  
+  /* Компактные заголовки в режиме сегодня */
+  .today-mode .day-name {
+    font-size: 8px;
+  }
+  
+  /* Уменьшаем размер текста в ячейках */
+  .today-mode tbody td {
+    font-size: 10px;
+    font-weight: 500;
   }
 }
 
 @media (max-width: 480px) {
   .logo-text h1 {
-    font-size: 24px;
+    font-size: 22px;
   }
   
   .legend {
-    gap: 8px;
+    gap: 6px;
   }
   
   .legend-item {
-    padding: 6px 10px;
+    padding: 5px 8px;
+    font-size: 11px;
   }
   
   select, input[type="date"], input[type="text"], button {
-    padding: 12px 14px;
+    padding: 10px 12px;
     font-size: 14px;
-    height: 48px;
+    height: 44px;
   }
   
   .header, .controls {
-    padding: 16px;
+    padding: 12px;
   }
   
   .table-container {
-    border-radius: 12px;
+    border-radius: 10px;
   }
   
   /* Еще более компактная таблица для очень маленьких экранов */
   table {
-    min-width: 500px;
+    min-width: 400px;
   }
   
   td.name, th.name {
@@ -813,27 +852,64 @@ tbody td:hover::after {
     font-size: 10px;
   }
   
-  /* Очень компактные стили для режима "Сегодня" на маленьких экранах */
+  /* СУПЕР-КОМПАКТНЫЕ СТИЛИ ДЛЯ РЕЖИМА "СЕГОДНЯ" НА ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНАХ */
   .today-mode td.name, 
   .today-mode th.name {
-    min-width: 60px;
-    max-width: 60px;
-    padding: 6px 4px;
-    font-size: 11px;
+    min-width: 50px !important;
+    max-width: 55px !important;
+    padding: 6px 4px !important;
+    font-size: 10px !important;
   }
   
   .today-mode thead th:not(.name) {
-    min-width: 50px;
-    max-width: 50px;
-    padding: 8px 4px;
-    font-size: 10px;
+    min-width: 40px !important;
+    max-width: 45px !important;
+    padding: 8px 3px !important;
+    font-size: 9px !important;
   }
   
   .today-mode tbody td:not(.name) {
-    min-width: 50px;
-    max-width: 50px;
-    padding: 6px 4px;
-    font-size: 11px;
+    min-width: 40px !important;
+    max-width: 45px !important;
+    padding: 6px 3px !important;
+    font-size: 9px !important;
+  }
+  
+  .today-mode .day-name {
+    font-size: 7px;
+  }
+  
+  .today-mode tbody td {
+    font-size: 9px;
+  }
+}
+
+/* Специальные стили для очень узких экранов (менее 360px) */
+@media (max-width: 360px) {
+  .today-mode td.name, 
+  .today-mode th.name {
+    min-width: 45px !important;
+    max-width: 50px !important;
+    padding: 5px 3px !important;
+    font-size: 9px !important;
+  }
+  
+  .today-mode thead th:not(.name) {
+    min-width: 35px !important;
+    max-width: 40px !important;
+    padding: 6px 2px !important;
+    font-size: 8px !important;
+  }
+  
+  .today-mode tbody td:not(.name) {
+    min-width: 35px !important;
+    max-width: 40px !important;
+    padding: 5px 2px !important;
+    font-size: 8px !important;
+  }
+  
+  .today-mode .table-wrap {
+    padding: 0 4px;
   }
 }
 
@@ -1177,7 +1253,7 @@ let scheduleData = [];
 let allEmployees = [];
 let isOnline = navigator.onLine;
 
-// ========== ФУНКЦИЯ ДЛЯ СОКРАЩЕНИЯ ИМЕН ==========
+// ========== ОБНОВЛЕННАЯ ФУНКЦИЯ СОКРАЩЕНИЯ ИМЕН ==========
 function shortenName(fullName) {
   if (!fullName) return '';
   
@@ -1192,12 +1268,17 @@ function shortenName(fullName) {
   // Берем только фамилию (первую часть)
   const surname = parts[0];
   
-  // Если фамилия слишком длинная, обрезаем ее
-  if (surname.length > 12) {
-    return surname.substring(0, 10) + '..';
+  // Адаптивное сокращение в зависимости от ширины экрана
+  if (window.innerWidth <= 360) {
+    // Очень маленькие экраны - максимум 5 символов
+    return surname.length > 5 ? surname.substring(0, 4) + '.' : surname;
+  } else if (window.innerWidth <= 480) {
+    // Маленькие экраны - максимум 7 символов
+    return surname.length > 7 ? surname.substring(0, 6) + '.' : surname;
+  } else {
+    // Стандартные мобильные - максимум 9 символов
+    return surname.length > 9 ? surname.substring(0, 8) + '.' : surname;
   }
-  
-  return surname;
 }
 
 // ========== PWA И ОФФЛАЙН РЕЖИМ ==========
@@ -1611,7 +1692,7 @@ function getDayNameShort(date) {
   return dayNamesShort[date.getDay() === 0 ? 6 : date.getDay() - 1];
 }
 
-// ========== НОВАЯ ФУНКЦИЯ: ПОКАЗАТЬ СЕГОДНЯ ==========
+// ========== ОБНОВЛЕННАЯ ФУНКЦИЯ: ПОКАЗАТЬ СЕГОДНЯ ==========
 function showToday() {
   const today = new Date();
   
@@ -1629,7 +1710,8 @@ function showToday() {
   tableBody.innerHTML = "";
   
   // Добавляем класс для режима "Сегодня"
-  document.getElementById("scheduleTable").classList.add("today-mode");
+  const table = document.getElementById("scheduleTable");
+  table.classList.add("today-mode");
   
   const dateRow = (scheduleData[1] || []).slice(2);
   
@@ -1649,16 +1731,22 @@ function showToday() {
   if (todayIndex === null) {
     showNotification("Нет данных на сегодня", "warning");
     // Убираем класс режима "Сегодня" если данных нет
-    document.getElementById("scheduleTable").classList.remove("today-mode");
+    table.classList.remove("today-mode");
     return;
   }
+  
+  // Определяем компактный формат для мобильных
+  const isMobile = window.innerWidth <= 768;
+  const dateFormat = isMobile ? 
+    `${today.getDate()}` : 
+    `${today.getDate().toString().padStart(2, '0')}.${(today.getMonth() + 1).toString().padStart(2, '0')}`;
   
   // Создаем заголовок таблицы только для сегодняшнего дня
   tableHead.innerHTML = `
     <tr>
-      <th class='name name-header'>Сотрудник</th>
+      <th class='name name-header'>${isMobile ? 'Сотр.' : 'Сотрудник'}</th>
       <th class="today">
-        ${formatDate(today)}
+        ${dateFormat}
         <span class="day-name">${getDayNameShort(today)}</span>
       </th>
     </tr>
@@ -1679,11 +1767,31 @@ function showToday() {
       const tr = document.createElement("tr");
       
       // Определяем отображаемое имя в зависимости от устройства
-      const displayName = window.innerWidth <= 768 ? shortenName(r[0]) : r[0];
+      let displayName;
+      if (window.innerWidth <= 480) {
+        // На очень маленьких экранах используем первые 6 символов фамилии
+        const surname = r[0].split(' ')[0];
+        displayName = surname.length > 6 ? surname.substring(0, 5) + '.' : surname;
+      } else if (window.innerWidth <= 768) {
+        // На мобильных используем укороченную фамилию
+        displayName = shortenName(r[0]);
+      } else {
+        // На десктопе полное имя
+        displayName = r[0];
+      }
+      
+      // Для мобильных сокращаем названия смен
+      let shiftLabel = shift.label;
+      if (isMobile) {
+        if (shiftLabel === 'Утро') shiftLabel = 'У';
+        else if (shiftLabel === 'Вечер') shiftLabel = 'В';
+        else if (shiftLabel === 'Весь день') shiftLabel = 'ВД';
+        else if (shiftLabel === 'Обучение') shiftLabel = 'О';
+      }
       
       tr.innerHTML = `
         <td class="name" title="${r[0]}">${displayName}</td>
-        <td class="${shift.type}" data-tooltip="${shiftValue}">${shift.label}</td>
+        <td class="${shift.type}" data-tooltip="${r[0]}: ${shiftValue}">${shiftLabel}</td>
       `;
       
       tableBody.appendChild(tr);
@@ -1699,6 +1807,7 @@ function showToday() {
   
   if (visibleRows === 0) {
     showNotification("Сегодня никто не работает", "info");
+    table.classList.remove("today-mode");
   } else {
     showNotification(`Сегодня работают: ${visibleRows} сотрудников`, "success", 3000);
   }
