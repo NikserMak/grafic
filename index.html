@@ -63,15 +63,15 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 16px;
 }
 
 /* Header */
 .header {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
+  padding: 20px;
+  margin-bottom: 16px;
   box-shadow: var(--shadow);
   border: 1px solid var(--thin-border);
   backdrop-filter: blur(10px);
@@ -81,29 +81,29 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .logo-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, var(--accent), var(--today));
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .logo-text h1 {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   margin: 0;
   background: linear-gradient(135deg, var(--accent), var(--today));
@@ -114,8 +114,8 @@ body {
 
 .logo-text .subtitle {
   color: var(--muted);
-  font-size: 14px;
-  margin-top: 4px;
+  font-size: 12px;
+  margin-top: 2px;
   font-weight: 400;
 }
 
@@ -123,8 +123,8 @@ body {
 .controls {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
+  padding: 20px;
+  margin-bottom: 16px;
   box-shadow: var(--shadow);
   border: 1px solid var(--thin-border);
 }
@@ -132,36 +132,36 @@ body {
 .controls-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 16px;
   align-items: end;
 }
 
 .control-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .control-label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 6px;
+  margin-bottom: 2px;
 }
 
 .control-label i {
-  font-size: 16px;
+  font-size: 14px;
   opacity: 0.7;
-  width: 16px;
+  width: 14px;
   text-align: center;
 }
 
 select, input[type="date"], input[type="text"], button {
-  padding: 14px 16px;
-  font-size: 15px;
+  padding: 12px 14px;
+  font-size: 14px;
   border-radius: var(--radius-sm);
   border: 2px solid var(--thin-border);
   background: var(--card);
@@ -169,7 +169,7 @@ select, input[type="date"], input[type="text"], button {
   transition: var(--transition);
   font-family: var(--font-sans);
   font-weight: 500;
-  height: 52px;
+  height: 48px;
   width: 100%;
 }
 
@@ -199,8 +199,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  min-height: 52px;
+  gap: 8px;
+  min-height: 48px;
   white-space: nowrap;
 }
 
@@ -243,17 +243,17 @@ button.today:hover {
 .buttons-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
   grid-column: 1 / -1;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 /* Admin Panel */
 .admin-panel {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 24px;
+  padding: 16px;
+  margin-bottom: 16px;
   border: 2px dashed var(--warning);
   display: none;
 }
@@ -266,30 +266,30 @@ button.today:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .admin-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--warning);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .admin-form {
   display: grid;
   grid-template-columns: 2fr 2fr 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
   align-items: end;
 }
 
 .admin-button {
   background: var(--warning);
   color: #333;
-  font-size: 13px;
-  padding: 10px;
+  font-size: 12px;
+  padding: 8px;
   height: auto;
 }
 
@@ -309,21 +309,21 @@ button.today:hover {
 }
 
 .table-header {
-  padding: 24px 24px 0;
+  padding: 16px 16px 0;
   display: flex;
   justify-content: between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
 }
 
 .table-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-color);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .table-wrap {
@@ -336,7 +336,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  min-width: 800px;
+  min-width: 600px;
 }
 
 thead {
@@ -346,7 +346,7 @@ thead {
 }
 
 thead th {
-  padding: 16px 12px;
+  padding: 14px 8px;
   text-align: center;
   font-weight: 600;
   color: var(--text-secondary);
@@ -374,18 +374,18 @@ thead th.today {
 thead th.today::after {
   content: '●';
   position: absolute;
-  top: 6px;
-  right: 6px;
-  font-size: 8px;
+  top: 4px;
+  right: 4px;
+  font-size: 6px;
   animation: pulse 2s infinite;
 }
 
 .day-name {
   display: block;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 400;
   color: var(--muted);
-  margin-top: 4px;
+  margin-top: 2px;
   text-transform: lowercase;
 }
 
@@ -396,14 +396,14 @@ thead th.today::after {
 
 td, th {
   border: 1px solid var(--thin-border);
-  padding: 14px 12px;
+  padding: 12px 8px;
 }
 
 /* Десктопные стили для имен */
 td.name, th.name {
-  min-width: 160px;
+  min-width: 140px;
   text-align: left;
-  padding-left: 20px;
+  padding-left: 16px;
   font-weight: 600;
   background: var(--card);
   position: sticky;
@@ -415,21 +415,21 @@ td.name, th.name {
 /* Стили для режима "Сегодня" - уменьшенные столбцы */
 .today-mode td.name, 
 .today-mode th.name {
-  min-width: 120px;
-  max-width: 120px;
-  padding: 12px 8px;
-  font-size: 13px;
+  min-width: 100px;
+  max-width: 100px;
+  padding: 10px 6px;
+  font-size: 12px;
 }
 
 .today-mode thead th:not(.name) {
-  min-width: 100px;
-  max-width: 100px;
+  min-width: 80px;
+  max-width: 80px;
 }
 
 .today-mode tbody td:not(.name) {
-  min-width: 100px;
-  max-width: 100px;
-  padding: 12px 8px;
+  min-width: 80px;
+  max-width: 80px;
+  padding: 10px 6px;
 }
 
 /* Shift cells */
@@ -474,11 +474,11 @@ tbody td::after {
   position: absolute;
   background: rgba(0, 0, 0, 0.95);
   color: #fff;
-  padding: 8px 12px;
-  font-size: 12px;
-  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  border-radius: 6px;
   white-space: nowrap;
-  top: -45px;
+  top: -40px;
   left: 50%;
   transform: translateX(-50%);
   display: none;
@@ -501,7 +501,7 @@ tbody td:hover::after {
 /* Legend */
 .legend {
   display: flex;
-  gap: 20px;
+  gap: 12px;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -509,8 +509,8 @@ tbody td:hover::after {
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 6px;
+  padding: 6px 10px;
   background: var(--card-hover);
   border-radius: var(--radius-sm);
   border: 1px solid var(--thin-border);
@@ -523,14 +523,14 @@ tbody td:hover::after {
 }
 
 .legend-color {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
   border: 1px solid rgba(255,255,255,0.2);
 }
 
 .legend-text {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -538,8 +538,8 @@ tbody td:hover::after {
 /* Loading */
 .loading {
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border: 2px solid rgba(255,255,255,.3);
   border-radius: 50%;
   border-top-color: #fff;
@@ -561,36 +561,36 @@ tbody td:hover::after {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
   z-index: 100;
   backdrop-filter: blur(4px);
 }
 
 .loading-text {
   color: var(--text-secondary);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
 }
 
 /* Notifications */
 .notification {
   position: fixed;
-  top: 24px;
-  right: 24px;
-  padding: 16px 20px;
+  top: 16px;
+  right: 16px;
+  padding: 14px 16px;
   border-radius: var(--radius);
   color: white;
   font-weight: 500;
   z-index: 1000;
   transform: translateX(400px);
   transition: var(--transition);
-  max-width: 400px;
+  max-width: 350px;
   box-shadow: var(--shadow);
   border: 1px solid var(--thin-border);
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .notification.show {
@@ -619,7 +619,7 @@ tbody td:hover::after {
 }
 
 .notification i {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 /* Offline Indicator */
@@ -631,8 +631,8 @@ tbody td:hover::after {
   background: var(--error);
   color: white;
   text-align: center;
-  padding: 8px;
-  font-size: 14px;
+  padding: 6px;
+  font-size: 12px;
   font-weight: 500;
   z-index: 1001;
   transform: translateY(-100%);
@@ -644,14 +644,14 @@ tbody td:hover::after {
 }
 
 .offline-indicator i {
-  margin-right: 8px;
+  margin-right: 6px;
 }
 
 /* Мобильная оптимизация */
 @media (max-width: 1024px) {
   .controls-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 12px;
   }
   
   .buttons-container {
@@ -665,69 +665,102 @@ tbody td:hover::after {
 
 @media (max-width: 768px) {
   .container {
+    padding: 12px;
+  }
+  
+  .header {
     padding: 16px;
+    margin-bottom: 12px;
   }
   
   .header-content {
     flex-direction: column;
     align-items: stretch;
-    gap: 16px;
+    gap: 12px;
+  }
+  
+  .logo {
+    gap: 10px;
+  }
+  
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  
+  .logo-text h1 {
+    font-size: 20px;
+  }
+  
+  .controls {
+    padding: 16px;
+    margin-bottom: 12px;
   }
   
   .controls-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 12px;
   }
   
   .buttons-container {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
   
   .table-header {
-    padding: 16px 16px 0;
+    padding: 12px 12px 0;
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
+    gap: 10px;
   }
   
   .legend {
     justify-content: center;
+    gap: 8px;
   }
   
-  /* Увеличенный масштаб таблицы на мобильных */
-  table {
-    min-width: 600px;
-    font-size: 15px; /* Увеличили размер шрифта */
-  }
-  
-  /* УМЕНЬШИЛИ ширину столбца с именами */
-  td.name, th.name {
-    min-width: 70px; /* УМЕНЬШИЛИ ширину */
-    max-width: 80px;
-    padding: 12px 6px;
-    font-size: 13px; /* Немного уменьшили шрифт для компактности */
-  }
-  
-  thead th, tbody td {
-    padding: 12px 6px;
-    font-size: 14px; /* Увеличили размер шрифта */
-    min-width: 60px; /* Увеличили минимальную ширину ячеек */
-  }
-  
-  thead th {
-    padding: 14px 6px;
-    font-size: 13px;
-  }
-  
-  .day-name {
+  .legend-item {
+    padding: 5px 8px;
     font-size: 11px;
   }
   
+  /* Компактная таблица для мобильных */
+  table {
+    min-width: 500px;
+    font-size: 13px;
+  }
+  
+  /* Узкий столбец с именами */
+  td.name, th.name {
+    min-width: 80px;
+    max-width: 90px;
+    padding: 10px 6px;
+    font-size: 12px;
+    padding-left: 8px;
+  }
+  
+  thead th, tbody td {
+    padding: 10px 4px;
+    font-size: 12px;
+    min-width: 50px;
+  }
+  
+  thead th {
+    padding: 12px 4px;
+    font-size: 11px;
+  }
+  
+  .day-name {
+    font-size: 9px;
+  }
+  
   .notification {
-    top: 16px;
-    right: 16px;
-    left: 16px;
+    top: 12px;
+    right: 12px;
+    left: 12px;
     max-width: none;
+    font-size: 14px;
   }
   
   .admin-form {
@@ -743,119 +776,246 @@ tbody td:hover::after {
     display: none !important;
   }
   
-  /* Улучшенные стили для режима "Сегодня" на мобильных */
+  /* Оптимизированный режим "Сегодня" для мобильных */
   .today-mode table {
     min-width: unset;
     width: 100%;
-    font-size: 16px; /* Еще больше увеличили шрифт */
+    font-size: 14px;
   }
   
   .today-mode td.name, 
   .today-mode th.name {
-    min-width: 70px !important; /* УМЕНЬШИЛИ ширину */
+    min-width: 70px !important;
     max-width: 80px !important;
-    padding: 12px 6px !important;
-    font-size: 13px !important; /* Немного уменьшили шрифт */
+    padding: 8px 4px !important;
+    font-size: 11px !important;
   }
   
   .today-mode thead th:not(.name) {
-    min-width: 80px !important; /* Увеличили ширину для лучшей читаемости */
-    max-width: 90px !important;
-    padding: 14px 8px !important;
-    font-size: 14px !important;
-  }
-  
-  .today-mode tbody td:not(.name) {
-    min-width: 80px !important; /* Увеличили ширину */
-    max-width: 90px !important;
-    padding: 12px 8px !important;
-    font-size: 15px !important; /* Увеличили шрифт */
-    font-weight: 600; /* Сделали текст жирнее */
-  }
-  
-  /* Увеличили отступы для лучшего тапа */
-  .today-mode .table-wrap {
-    padding: 0 12px;
-  }
-  
-  /* Увеличили размер текста в заголовках дней */
-  .today-mode .day-name {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .logo-text h1 {
-    font-size: 24px;
-  }
-  
-  .legend {
-    gap: 8px;
-  }
-  
-  .legend-item {
-    padding: 6px 10px;
-  }
-  
-  select, input[type="date"], input[type="text"], button {
-    padding: 12px 14px;
-    font-size: 14px;
-    height: 48px;
-  }
-  
-  .header, .controls {
-    padding: 16px;
-  }
-  
-  .table-container {
-    border-radius: 12px;
-  }
-  
-  /* Еще более увеличенный масштаб для очень маленьких экранов */
-  table {
-    min-width: 500px;
-    font-size: 14px;
-  }
-  
-  td.name, th.name {
-    min-width: 65px; /* Еще немного уменьшили ширину имен */
-    max-width: 75px;
-    padding: 10px 4px;
-    font-size: 12px;
-  }
-  
-  thead th, tbody td {
-    padding: 10px 4px;
-    font-size: 13px;
-    min-width: 55px;
-  }
-  
-  thead th {
-    padding: 12px 4px;
-    font-size: 12px;
-  }
-  
-  /* Оптимизация режима "Сегодня" для очень маленьких экранов */
-  .today-mode td.name, 
-  .today-mode th.name {
-    min-width: 60px !important; /* УМЕНЬШИЛИ ширину */
+    min-width: 60px !important;
     max-width: 70px !important;
     padding: 10px 4px !important;
     font-size: 12px !important;
   }
   
-  .today-mode thead th:not(.name) {
-    min-width: 70px !important;
-    max-width: 80px !important;
-    padding: 12px 6px !important;
+  .today-mode tbody td:not(.name) {
+    min-width: 60px !important;
+    max-width: 70px !important;
+    padding: 8px 4px !important;
     font-size: 13px !important;
+    font-weight: 600;
+  }
+  
+  /* Улучшенные отступы для мобильных */
+  .today-mode .table-wrap {
+    padding: 0 8px;
+  }
+  
+  .today-mode .day-name {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+  
+  .header, .controls {
+    padding: 12px;
+  }
+  
+  .logo-text h1 {
+    font-size: 18px;
+  }
+  
+  .logo-text .subtitle {
+    font-size: 11px;
+  }
+  
+  .legend {
+    gap: 6px;
+  }
+  
+  .legend-item {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+  
+  select, input[type="date"], input[type="text"], button {
+    padding: 10px 12px;
+    font-size: 13px;
+    height: 44px;
+  }
+  
+  .table-container {
+    border-radius: 10px;
+  }
+  
+  /* Супер-компактная таблица для очень маленьких экранов */
+  table {
+    min-width: 400px;
+    font-size: 12px;
+  }
+  
+  td.name, th.name {
+    min-width: 70px;
+    max-width: 80px;
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+  
+  thead th, tbody td {
+    padding: 8px 3px;
+    font-size: 11px;
+    min-width: 45px;
+  }
+  
+  thead th {
+    padding: 10px 3px;
+    font-size: 10px;
+  }
+  
+  /* Оптимизация режима "Сегодня" для очень маленьких экранов */
+  .today-mode td.name, 
+  .today-mode th.name {
+    min-width: 60px !important;
+    max-width: 70px !important;
+    padding: 6px 3px !important;
+    font-size: 10px !important;
+  }
+  
+  .today-mode thead th:not(.name) {
+    min-width: 50px !important;
+    max-width: 60px !important;
+    padding: 8px 3px !important;
+    font-size: 11px !important;
   }
   
   .today-mode tbody td:not(.name) {
-    min-width: 70px !important;
-    max-width: 80px !important;
-    padding: 10px 6px !important;
-    font-size: 14px !important;
+    min-width: 50px !important;
+    max-width: 60px !important;
+    padding: 6px 3px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* Специальные стили для очень узких экранов (менее 360px) */
+@media (max-width: 360px) {
+  .container {
+    padding: 6px;
+  }
+  
+  .header, .controls {
+    padding: 10px;
+  }
+  
+  .today-mode td.name, 
+  .today-mode th.name {
+    min-width: 55px !important;
+    max-width: 65px !important;
+    padding: 5px 2px !important;
+    font-size: 9px !important;
+  }
+  
+  .today-mode thead th:not(.name) {
+    min-width: 45px !important;
+    max-width: 55px !important;
+    padding: 7px 2px !important;
+    font-size: 10px !important;
+  }
+  
+  .today-mode tbody td:not(.name) {
+    min-width: 45px !important;
+    max-width: 55px !important;
+    padding: 5px 2px !important;
+    font-size: 11px !important;
+  }
+  
+  .today-mode .table-wrap {
+    padding: 0 4px;
+  }
+}
+
+/* Улучшенная навигация для мобильных */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--thin-border);
+  padding: 8px;
+  z-index: 100;
+}
+
+.mobile-nav-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.mobile-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 11px;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.mobile-nav-btn.active {
+  background: var(--accent);
+  color: white;
+}
+
+.mobile-nav-btn i {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: block;
+  }
+  
+  /* Добавляем отступ снизу для мобильной навигации */
+  .container {
+    padding-bottom: 70px;
+  }
+}
+
+/* Улучшенный скроллбар для мобильных */
+.table-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.table-wrap::-webkit-scrollbar-track {
+  background: var(--card);
+}
+
+/* Адаптивные сокращения для длинных имен */
+.mobile-name {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-name {
+    display: none;
+  }
+  
+  .mobile-name {
+    display: inline;
   }
 }
 
@@ -866,11 +1026,25 @@ tbody td:hover::after {
   }
   
   button:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
   }
   
   .legend-item:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
+  }
+  
+  /* Увеличиваем область тапа для мобильных */
+  tbody td {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  td.name {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -892,8 +1066,8 @@ tbody td:hover::after {
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -902,7 +1076,7 @@ tbody td:hover::after {
 
 ::-webkit-scrollbar-thumb {
   background: var(--thin-border);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -962,7 +1136,7 @@ tbody td:hover::after {
         <i class="fas fa-cog"></i>
         Панель администратора
       </div>
-      <button onclick="toggleAdminPanel()" class="secondary" style="height: 40px; font-size: 13px;">
+      <button onclick="toggleAdminPanel()" class="secondary" style="height: 36px; font-size: 12px;">
         <i class="fas fa-times"></i>
         Скрыть
       </button>
@@ -1077,6 +1251,20 @@ tbody td:hover::after {
     </div>
   </section>
 </div>
+
+<!-- Мобильная навигация -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-buttons">
+    <button class="mobile-nav-btn active" onclick="loadSchedule()">
+      <i class="fas fa-calendar-week"></i>
+      <span>Неделя</span>
+    </button>
+    <button class="mobile-nav-btn" onclick="showToday()">
+      <i class="fas fa-calendar-day"></i>
+      <span>Сегодня</span>
+    </button>
+  </div>
+</nav>
 
 <script>
 // PWA Manifest с красивыми иконками
@@ -1199,27 +1387,25 @@ let scheduleData = [];
 let allEmployees = [];
 let isOnline = navigator.onLine;
 
-// ========== ФУНКЦИЯ ДЛЯ СОКРАЩЕНИЯ ИМЕН ==========
-function shortenName(fullName) {
+// ========== ФУНКЦИЯ ДЛЯ АДАПТИВНОГО СОКРАЩЕНИЯ ИМЕН ==========
+function getDisplayName(fullName) {
   if (!fullName) return '';
   
-  // Убираем лишние пробелы
-  const cleanName = fullName.trim();
-  
-  // Разбиваем на части
-  const parts = cleanName.split(' ');
-  
-  if (parts.length === 0) return '';
-  
-  // Берем только фамилию (первую часть)
-  const surname = parts[0];
-  
-  // Если фамилия слишком длинная, обрезаем ее
-  if (surname.length > 12) {
-    return surname.substring(0, 10) + '..';
+  if (window.innerWidth <= 480) {
+    // На очень маленьких экранах показываем только фамилию
+    const parts = fullName.trim().split(' ');
+    return parts[0];
+  } else if (window.innerWidth <= 768) {
+    // На мобильных показываем фамилию и инициалы
+    const parts = fullName.trim().split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0]} ${parts[1].charAt(0)}.`;
+    }
+    return parts[0];
+  } else {
+    // На десктопе полное имя
+    return fullName;
   }
-  
-  return surname;
 }
 
 // ========== PWA И ОФФЛАЙН РЕЖИМ ==========
@@ -1701,8 +1887,8 @@ function showToday() {
     if (shift.type !== "empty") {
       const tr = document.createElement("tr");
       
-      // На мобильных устройствах показываем полные имена (без сокращений)
-      const displayName = r[0];
+      // Адаптивное отображение имени
+      const displayName = getDisplayName(r[0]);
       
       tr.innerHTML = `
         <td class="name" title="${r[0]}">${displayName}</td>
@@ -1719,6 +1905,9 @@ function showToday() {
       visibleRows++;
     }
   });
+  
+  // Обновляем мобильную навигацию
+  updateMobileNav('today');
   
   if (visibleRows === 0) {
     showNotification("Сегодня никто не работает", "info");
@@ -1803,8 +1992,8 @@ function loadSchedule() {
     
     const tr = document.createElement("tr");
     
-    // На мобильных устройствах показываем полные имена (без сокращений)
-    const displayName = r[0];
+    // Адаптивное отображение имени
+    const displayName = getDisplayName(r[0]);
     
     let html = `<td class="name" title="${r[0]}">${displayName}</td>`;
     
@@ -1827,6 +2016,9 @@ function loadSchedule() {
     visibleRows++;
   });
   
+  // Обновляем мобильную навигацию
+  updateMobileNav('week');
+  
   if (visibleRows === 0) {
     showNotification("Нет данных для выбранного сотрудника", "warning");
   } else {
@@ -1834,6 +2026,23 @@ function loadSchedule() {
   }
   
   saveState();
+}
+
+// ========== МОБИЛЬНАЯ НАВИГАЦИЯ ==========
+function updateMobileNav(activeView) {
+  if (window.innerWidth <= 768) {
+    const weekBtn = document.querySelector('.mobile-nav-btn:nth-child(1)');
+    const todayBtn = document.querySelector('.mobile-nav-btn:nth-child(2)');
+    
+    weekBtn.classList.remove('active');
+    todayBtn.classList.remove('active');
+    
+    if (activeView === 'week') {
+      weekBtn.classList.add('active');
+    } else {
+      todayBtn.classList.add('active');
+    }
+  }
 }
 
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
@@ -1870,7 +2079,6 @@ async function init() {
 }
 
 // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
-// ЗАМЕНА: кнопка "Сегодня" теперь вызывает showToday()
 document.getElementById("todayBtn").addEventListener("click", showToday);
 
 document.getElementById("branch").addEventListener("change", async e => {
