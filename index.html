@@ -4,11 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>График сотрудников</title>
-<meta name="theme-color" content="#00c853">
-<meta name="description" content="Управление рабочим временем команды">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="manifest" href="manifest.json">
 <style>
 :root {
   --bg-gradient: linear-gradient(135deg, #0f0f0f, #1a1a1a);
@@ -53,24 +50,20 @@ body {
   color: var(--text-color);
   min-height: 100vh;
   line-height: 1.6;
-  /* Предотвращение выделения текста для лучшего свайпа */
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 16px;
 }
 
 /* Header */
 .header {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
   box-shadow: var(--shadow);
   border: 1px solid var(--thin-border);
 }
@@ -79,29 +72,29 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   background: linear-gradient(135deg, var(--accent), var(--today));
-  border-radius: 10px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .logo-text h1 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   margin: 0;
   background: linear-gradient(135deg, var(--accent), var(--today));
@@ -112,7 +105,7 @@ body {
 
 .logo-text .subtitle {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   margin-top: 2px;
 }
 
@@ -120,16 +113,16 @@ body {
 .controls {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
   box-shadow: var(--shadow);
   border: 1px solid var(--thin-border);
 }
 
 .controls-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-items: end;
 }
 
@@ -140,7 +133,7 @@ body {
 }
 
 .control-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
   display: flex;
@@ -149,12 +142,12 @@ body {
 }
 
 .control-label i {
-  font-size: 14px;
+  font-size: 13px;
   opacity: 0.7;
 }
 
 select, input[type="date"], input[type="text"], button {
-  padding: 12px 14px;
+  padding: 10px 12px;
   font-size: 14px;
   border-radius: var(--radius-sm);
   border: 2px solid var(--thin-border);
@@ -163,7 +156,7 @@ select, input[type="date"], input[type="text"], button {
   transition: var(--transition);
   font-family: var(--font-sans);
   font-weight: 500;
-  height: 46px;
+  height: 44px;
   width: 100%;
 }
 
@@ -204,9 +197,8 @@ button.secondary:hover {
 
 .buttons-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  grid-column: 1 / -1;
+  grid-template-columns: 1fr;
+  gap: 8px;
   margin-top: 8px;
 }
 
@@ -219,12 +211,10 @@ button.secondary:hover {
   border: 1px solid var(--thin-border);
   overflow: hidden;
   position: relative;
-  /* Для свайп-навигации */
-  touch-action: pan-y;
 }
 
 .table-header {
-  padding: 16px 20px 0;
+  padding: 12px 16px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -233,12 +223,12 @@ button.secondary:hover {
 }
 
 .table-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-color);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .table-wrap {
@@ -249,8 +239,8 @@ button.secondary:hover {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
-  min-width: 700px;
+  font-size: 13px;
+  min-width: 500px;
 }
 
 thead {
@@ -260,7 +250,7 @@ thead {
 }
 
 thead th {
-  padding: 14px 10px;
+  padding: 10px 6px;
   text-align: center;
   font-weight: 600;
   color: var(--text-secondary);
@@ -296,7 +286,7 @@ thead th.today::after {
 
 .day-name {
   display: block;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 400;
   color: var(--muted);
   margin-top: 2px;
@@ -309,20 +299,22 @@ thead th.today::after {
 
 td, th {
   border: 1px solid var(--thin-border);
-  padding: 12px 8px;
+  padding: 8px 4px;
 }
 
 /* Десктопные стили для имен */
 td.name, th.name {
-  min-width: 140px;
+  min-width: 90px;
+  max-width: 120px;
   text-align: left;
-  padding-left: 16px;
+  padding-left: 12px;
   font-weight: 600;
   background: var(--card);
   position: sticky;
   left: 0;
   z-index: 10;
   border-right: 2px solid var(--thin-border);
+  font-size: 12px;
 }
 
 /* Shift cells */
@@ -342,6 +334,8 @@ tbody td {
   transition: var(--transition);
   position: relative;
   cursor: pointer;
+  font-size: 11px;
+  min-width: 40px;
 }
 
 tbody tr {
@@ -377,30 +371,31 @@ tbody td:hover::after {
 /* Legend */
 .legend {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  gap: 4px;
+  padding: 4px 8px;
   background: var(--card-hover);
   border-radius: var(--radius-sm);
   border: 1px solid var(--thin-border);
 }
 
 .legend-color {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
   border: 1px solid rgba(255,255,255,0.2);
 }
 
 .legend-text {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -408,8 +403,8 @@ tbody td:hover::after {
 /* Loading */
 .loading {
   display: inline-block;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border: 2px solid rgba(255,255,255,.3);
   border-radius: 50%;
   border-top-color: #fff;
@@ -437,32 +432,32 @@ tbody td:hover::after {
 
 .loading-text {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
 
 /* Notifications */
 .notification {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 14px 16px;
+  top: 16px;
+  right: 16px;
+  left: 16px;
+  padding: 12px 14px;
   border-radius: var(--radius);
   color: white;
   font-weight: 500;
   z-index: 1000;
-  transform: translateX(400px);
+  transform: translateY(-100px);
   transition: var(--transition);
-  max-width: 350px;
   box-shadow: var(--shadow);
   border: 1px solid var(--thin-border);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .notification.show {
-  transform: translateX(0);
+  transform: translateY(0);
 }
 
 .notification.success {
@@ -487,7 +482,7 @@ tbody td:hover::after {
 }
 
 .notification i {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 /* Скелетон-загрузка */
@@ -500,12 +495,12 @@ tbody td:hover::after {
   background-size: 200% 100%;
   animation: skeleton-shine 1.5s infinite;
   border-radius: 4px;
-  height: 20px;
+  height: 16px;
   margin: 2px 0;
 }
 
 .skeleton-name .skeleton-cell {
-  height: 16px;
+  height: 14px;
   width: 80%;
 }
 
@@ -519,301 +514,92 @@ tbody td:hover::after {
   100% { background-position: -200% 0; }
 }
 
-/* Навигация неделями */
-.week-navigation {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 12px;
-  padding: 0 20px 16px;
-}
-
-.week-nav-btn {
-  background: transparent;
-  border: 2px solid var(--thin-border);
-  color: var(--text-secondary);
-  width: auto;
-  padding: 8px 16px;
-  font-size: 13px;
-}
-
-.week-nav-btn:hover {
-  background: var(--card-hover);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.week-current {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  min-width: 120px;
-  text-align: center;
-}
-
-/* Индикатор свайпа */
-.swipe-indicator {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 200, 83, 0.9);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  z-index: 1000;
-  display: none;
-  align-items: center;
-  gap: 8px;
-  animation: swipe-indicator-pulse 2s infinite;
-}
-
-@keyframes swipe-indicator-pulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-
-/* PWA Install Prompt */
-.install-prompt {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--card);
-  border: 1px solid var(--thin-border);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow);
-  z-index: 1000;
-  max-width: 300px;
-  display: none;
-}
-
-.install-prompt.show {
-  display: block;
-  animation: slideUp 0.3s ease-out;
-}
-
-.install-prompt-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.install-prompt-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-}
-
-.install-prompt-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.install-prompt-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 4px;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Мобильная оптимизация */
-@media (max-width: 1024px) {
-  .controls-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 16px;
-  }
-  
-  .header-content {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-  }
-  
-  .controls-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .buttons-container {
-    grid-template-columns: 1fr;
-  }
-  
-  .table-header {
-    padding: 16px 16px 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  
-  .legend {
-    justify-content: center;
-  }
-  
-  /* Компактная таблица для мобильных */
-  table {
-    min-width: 600px;
-    font-size: 13px;
-  }
-  
-  td.name, th.name {
-    min-width: 100px;
-    max-width: 120px;
-    padding: 10px 8px;
-    font-size: 12px;
-  }
-  
-  thead th, tbody td {
-    padding: 10px 6px;
-    font-size: 12px;
-    min-width: 50px;
-  }
-  
-  thead th {
-    padding: 12px 6px;
-  }
-  
-  .notification {
-    top: 16px;
-    right: 16px;
-    left: 16px;
-    max-width: none;
-  }
-  
-  .install-prompt {
-    right: 16px;
-    left: 16px;
-    max-width: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 12px;
-  }
-  
-  .header, .controls {
-    padding: 16px;
-  }
-  
-  .logo-text h1 {
-    font-size: 20px;
-  }
-  
-  select, input[type="date"], input[type="text"], button {
-    padding: 10px 12px;
-    font-size: 13px;
-    height: 44px;
-  }
-  
-  table {
-    min-width: 500px;
-  }
-  
-  td.name, th.name {
-    min-width: 90px;
-    padding: 8px 6px;
-  }
-  
-  .week-navigation {
-    flex-direction: column;
-    gap: 8px;
-  }
-}
-
 /* Улучшенный скроллбар */
 .table-wrap::-webkit-scrollbar {
-  height: 6px;
+  height: 4px;
 }
 
 .table-wrap::-webkit-scrollbar-thumb {
   background: var(--accent);
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 .table-wrap::-webkit-scrollbar-track {
   background: var(--card);
 }
 
-/* Оффлайн стили */
-.offline-indicator {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: var(--warning);
-  color: #333;
-  padding: 8px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 500;
-  z-index: 1001;
-  display: none;
+/* Десктопные стили */
+@media (min-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+  
+  .header, .controls {
+    padding: 20px;
+  }
+  
+  .controls-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  
+  .buttons-container {
+    grid-template-columns: 1fr 1fr;
+    grid-column: 1 / -1;
+  }
+  
+  .logo-text h1 {
+    font-size: 24px;
+  }
+  
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  select, input[type="date"], input[type="text"], button {
+    padding: 12px 14px;
+    height: 46px;
+  }
+  
+  table {
+    min-width: 700px;
+    font-size: 14px;
+  }
+  
+  td.name, th.name {
+    min-width: 140px;
+    padding-left: 16px;
+    font-size: 14px;
+  }
+  
+  thead th, tbody td {
+    padding: 12px 8px;
+  }
+  
+  tbody td {
+    font-size: 13px;
+    min-width: 50px;
+  }
+  
+  .notification {
+    right: 20px;
+    left: auto;
+    max-width: 350px;
+  }
 }
 
-.offline .offline-indicator {
-  display: block;
+@media (min-width: 1024px) {
+  .controls-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 </style>
 </head>
 <body>
-<!-- Оффлайн индикатор -->
-<div class="offline-indicator">
-  <i class="fas fa-wifi"></i> Работа в оффлайн режиме
-</div>
-
 <!-- Notifications -->
 <div id="notificationsContainer"></div>
-
-<!-- PWA Install Prompt -->
-<div class="install-prompt" id="installPrompt">
-  <button class="install-prompt-close" id="installPromptClose">
-    <i class="fas fa-times"></i>
-  </button>
-  <div class="install-prompt-content">
-    <div class="install-prompt-header">
-      <i class="fas fa-download"></i>
-      Установить приложение
-    </div>
-    <p style="margin: 0; font-size: 14px; color: var(--text-secondary);">
-      Установите приложение для быстрого доступа и работы оффлайн
-    </p>
-    <div class="install-prompt-buttons">
-      <button class="secondary" id="installLater">Позже</button>
-      <button id="installApp">Установить</button>
-    </div>
-  </div>
-</div>
-
-<!-- Swipe Indicator -->
-<div class="swipe-indicator" id="swipeIndicator">
-  <i class="fas fa-arrows-left-right"></i>
-  Свайп для навигации
-</div>
 
 <div class="container">
   <!-- Header -->
@@ -917,19 +703,6 @@ tbody td:hover::after {
       </div>
     </div>
     
-    <!-- Навигация неделями -->
-    <div class="week-navigation">
-      <button class="week-nav-btn secondary" id="prevWeek">
-        <i class="fas fa-chevron-left"></i>
-        Предыдущая
-      </button>
-      <div class="week-current" id="weekRange"></div>
-      <button class="week-nav-btn secondary" id="nextWeek">
-        Следующая
-        <i class="fas fa-chevron-right"></i>
-      </button>
-    </div>
-    
     <div class="table-wrap">
       <div id="tableLoading" class="loading-overlay" style="display: none;">
         <div class="loading"></div>
@@ -984,171 +757,6 @@ let currentMonth = null;
 let scheduleData = [];
 let allEmployees = [];
 
-// PWA переменные
-let deferredPrompt = null;
-let isAppInstalled = false;
-
-// ========== PWA ФУНКЦИОНАЛ ==========
-// Регистрация Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('SW registered: ', registration);
-      })
-      .catch(registrationError => {
-        console.log('SW registration failed: ', registrationError);
-      });
-  });
-}
-
-// Обработчик установки PWA
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  
-  // Показываем промпт установки через 5 секунд
-  setTimeout(() => {
-    showInstallPrompt();
-  }, 5000);
-});
-
-// Проверка установлено ли приложение
-window.addEventListener('appinstalled', () => {
-  isAppInstalled = true;
-  hideInstallPrompt();
-  showNotification('Приложение успешно установлено!', 'success');
-});
-
-function showInstallPrompt() {
-  // Не показываем если приложение уже установлено или промпт уже был отклонен
-  if (isAppInstalled || localStorage.getItem('installPromptDismissed')) {
-    return;
-  }
-  
-  const installPrompt = document.getElementById('installPrompt');
-  installPrompt.classList.add('show');
-}
-
-function hideInstallPrompt() {
-  const installPrompt = document.getElementById('installPrompt');
-  installPrompt.classList.remove('show');
-}
-
-async function installPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('Пользователь принял установку');
-    } else {
-      console.log('Пользователь отклонил установку');
-    }
-    
-    deferredPrompt = null;
-    hideInstallPrompt();
-  }
-}
-
-// ========== СВАЙП-НАВИГАЦИЯ ==========
-function initSwipeNavigation() {
-  const tableContainer = document.querySelector('.table-container');
-  let touchStartX = 0;
-  let touchEndX = 0;
-  let isSwiping = false;
-
-  tableContainer.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    isSwiping = true;
-  }, { passive: true });
-
-  tableContainer.addEventListener('touchmove', (e) => {
-    if (!isSwiping) return;
-    
-    // Показываем индикатор свайпа на мобильных
-    if (window.innerWidth <= 768) {
-      showSwipeIndicator();
-    }
-  }, { passive: true });
-
-  tableContainer.addEventListener('touchend', (e) => {
-    if (!isSwiping) return;
-    
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-    isSwiping = false;
-  }, { passive: true });
-
-  function handleSwipe() {
-    const diff = touchStartX - touchEndX;
-    const minSwipeDistance = 60;
-    
-    if (Math.abs(diff) > minSwipeDistance) {
-      if (diff > 0) {
-        nextWeek();
-        showNotification('Следующая неделя', 'info', 1000);
-      } else {
-        prevWeek();
-        showNotification('Предыдущая неделя', 'info', 1000);
-      }
-    }
-  }
-}
-
-function showSwipeIndicator() {
-  const indicator = document.getElementById('swipeIndicator');
-  indicator.style.display = 'flex';
-  
-  setTimeout(() => {
-    indicator.style.display = 'none';
-  }, 3000);
-}
-
-// ========== НАВИГАЦИЯ НЕДЕЛЯМИ ==========
-function nextWeek() {
-  const currentDate = new Date(document.getElementById("startDate").value);
-  currentDate.setDate(currentDate.getDate() + 7);
-  document.getElementById("startDate").valueAsDate = currentDate;
-  updateWeekRange();
-  loadSchedule();
-}
-
-function prevWeek() {
-  const currentDate = new Date(document.getElementById("startDate").value);
-  currentDate.setDate(currentDate.getDate() - 7);
-  document.getElementById("startDate").valueAsDate = currentDate;
-  updateWeekRange();
-  loadSchedule();
-}
-
-function updateWeekRange() {
-  const startDate = new Date(document.getElementById("startDate").value);
-  const endDate = new Date(startDate);
-  endDate.setDate(startDate.getDate() + 6);
-  
-  const weekRange = document.getElementById("weekRange");
-  weekRange.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
-}
-
-// ========== ОФФЛАЙН РЕЖИМ ==========
-function initOfflineDetection() {
-  window.addEventListener('online', () => {
-    document.body.classList.remove('offline');
-    showNotification('Соединение восстановлено', 'success', 2000);
-  });
-
-  window.addEventListener('offline', () => {
-    document.body.classList.add('offline');
-    showNotification('Работа в оффлайн режиме', 'warning', 3000);
-  });
-
-  // Проверяем начальный статус
-  if (!navigator.onLine) {
-    document.body.classList.add('offline');
-  }
-}
-
 // ========== УВЕДОМЛЕНИЯ ==========
 function showNotification(message, type = 'success', duration = 4000) {
   const container = document.getElementById('notificationsContainer');
@@ -1192,7 +800,7 @@ function setLoading(isLoading) {
 }
 
 // ========== СКЕЛЕТОН-ЗАГРУЗКА ==========
-function showSkeleton(rows = 10) {
+function showSkeleton(rows = 8) {
   const tableBody = document.getElementById("tableBody");
   let html = '';
   
@@ -1519,18 +1127,11 @@ async function init() {
     document.getElementById("startDate").valueAsDate = firstDay;
   }
   
-  // Обновляем отображение диапазона недели
-  updateWeekRange();
-  
-  // Инициализируем дополнительные функции
-  initSwipeNavigation();
-  initOfflineDetection();
-  
   // Показываем скелетон при первой загрузке
   showSkeleton(8);
   setTimeout(() => {
     loadSchedule();
-  }, 100);
+  }, 50);
 }
 
 // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
@@ -1574,7 +1175,6 @@ document.getElementById("employee").addEventListener("change", () => {
 });
 
 document.getElementById("startDate").addEventListener("change", () => {
-  updateWeekRange();
   loadSchedule();
   saveState();
 });
@@ -1591,21 +1191,6 @@ document.getElementById("refreshBtn").addEventListener("click", async () => {
   
   showNotification("Обновление данных...", "warning", 2000);
   await populateEmployees(branch, month);
-});
-
-// Навигация неделями
-document.getElementById("prevWeek").addEventListener("click", prevWeek);
-document.getElementById("nextWeek").addEventListener("click", nextWeek);
-
-// PWA установка
-document.getElementById("installApp").addEventListener("click", installPWA);
-document.getElementById("installLater").addEventListener("click", () => {
-  localStorage.setItem('installPromptDismissed', 'true');
-  hideInstallPrompt();
-});
-document.getElementById("installPromptClose").addEventListener("click", () => {
-  localStorage.setItem('installPromptDismissed', 'true');
-  hideInstallPrompt();
 });
 
 // Инициализация при загрузке страницы
