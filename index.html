@@ -647,7 +647,7 @@ tbody td:hover::after {
   margin-right: 8px;
 }
 
-/* Мобильная оптимизация для режима "Сегодня" */
+/* Мобильная оптимизация */
 @media (max-width: 1024px) {
   .controls-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -665,7 +665,7 @@ tbody td:hover::after {
 
 @media (max-width: 768px) {
   .container {
-    padding: 12px;
+    padding: 16px;
   }
   
   .header-content {
@@ -692,39 +692,35 @@ tbody td:hover::after {
   
   .legend {
     justify-content: center;
-    gap: 8px;
   }
   
-  .legend-item {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-  
-  /* Мобильные стили для обычной таблицы */
+  /* Увеличенный масштаб таблицы на мобильных */
   table {
-    min-width: 500px;
+    min-width: 600px;
+    font-size: 15px; /* Увеличили размер шрифта */
   }
   
+  /* Уменьшили ширину столбца с именами */
   td.name, th.name {
-    min-width: 80px;
-    max-width: 100px;
-    padding: 10px 8px;
-    font-size: 12px;
+    min-width: 100px; /* Уменьшили ширину */
+    max-width: 120px;
+    padding: 12px 8px;
+    font-size: 14px; /* Увеличили размер шрифта */
   }
   
   thead th, tbody td {
-    padding: 10px 6px;
-    font-size: 12px;
-    min-width: 45px;
+    padding: 12px 8px;
+    font-size: 14px; /* Увеличили размер шрифта */
+    min-width: 60px; /* Увеличили минимальную ширину ячеек */
   }
   
   thead th {
-    padding: 12px 6px;
-    font-size: 11px;
+    padding: 14px 8px;
+    font-size: 13px;
   }
   
   .day-name {
-    font-size: 9px;
+    font-size: 11px;
   }
   
   .notification {
@@ -747,169 +743,119 @@ tbody td:hover::after {
     display: none !important;
   }
   
-  /* ОПТИМИЗИРОВАННЫЕ СТИЛИ ДЛЯ РЕЖИМА "СЕГОДНЯ" НА МОБИЛЬНЫХ */
+  /* Улучшенные стили для режима "Сегодня" на мобильных */
   .today-mode table {
     min-width: unset;
     width: 100%;
+    font-size: 16px; /* Еще больше увеличили шрифт */
   }
   
   .today-mode td.name, 
   .today-mode th.name {
-    min-width: 60px !important;
-    max-width: 70px !important;
-    padding: 8px 6px !important;
-    font-size: 11px !important;
-    position: sticky;
-    left: 0;
-    z-index: 10;
-    background: var(--card);
+    min-width: 100px !important; /* Уменьшили ширину */
+    max-width: 110px !important;
+    padding: 12px 8px !important;
+    font-size: 14px !important; /* Увеличили шрифт */
   }
   
   .today-mode thead th:not(.name) {
-    min-width: 50px !important;
-    max-width: 60px !important;
-    padding: 10px 4px !important;
-    font-size: 10px !important;
+    min-width: 80px !important; /* Увеличили ширину для лучшей читаемости */
+    max-width: 90px !important;
+    padding: 14px 8px !important;
+    font-size: 14px !important;
   }
   
   .today-mode tbody td:not(.name) {
-    min-width: 50px !important;
-    max-width: 60px !important;
-    padding: 8px 4px !important;
-    font-size: 11px !important;
-    text-align: center;
+    min-width: 80px !important; /* Увеличили ширину */
+    max-width: 90px !important;
+    padding: 12px 8px !important;
+    font-size: 15px !important; /* Увеличили шрифт */
+    font-weight: 600; /* Сделали текст жирнее */
   }
   
-  /* Уменьшаем отступы в таблице для мобильных */
-  .today-mode .table-container {
-    padding: 0;
-  }
-  
+  /* Увеличили отступы для лучшего тапа */
   .today-mode .table-wrap {
-    padding: 0 8px;
+    padding: 0 12px;
   }
   
-  /* Компактные заголовки в режиме сегодня */
+  /* Увеличили размер текста в заголовках дней */
   .today-mode .day-name {
-    font-size: 8px;
-  }
-  
-  /* Уменьшаем размер текста в ячейках */
-  .today-mode tbody td {
-    font-size: 10px;
-    font-weight: 500;
+    font-size: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .logo-text h1 {
-    font-size: 22px;
+    font-size: 24px;
   }
   
   .legend {
-    gap: 6px;
+    gap: 8px;
   }
   
   .legend-item {
-    padding: 5px 8px;
-    font-size: 11px;
+    padding: 6px 10px;
   }
   
   select, input[type="date"], input[type="text"], button {
-    padding: 10px 12px;
+    padding: 12px 14px;
     font-size: 14px;
-    height: 44px;
+    height: 48px;
   }
   
   .header, .controls {
-    padding: 12px;
+    padding: 16px;
   }
   
   .table-container {
-    border-radius: 10px;
+    border-radius: 12px;
   }
   
-  /* Еще более компактная таблица для очень маленьких экранов */
+  /* Еще более увеличенный масштаб для очень маленьких экранов */
   table {
-    min-width: 400px;
+    min-width: 500px;
+    font-size: 14px;
   }
   
   td.name, th.name {
-    min-width: 70px;
-    max-width: 80px;
-    padding: 8px 6px;
-    font-size: 11px;
+    min-width: 90px; /* Еще немного уменьшили ширину имен */
+    max-width: 100px;
+    padding: 10px 6px;
+    font-size: 13px;
   }
   
   thead th, tbody td {
-    padding: 8px 4px;
-    font-size: 11px;
-    min-width: 40px;
+    padding: 10px 6px;
+    font-size: 13px;
+    min-width: 55px;
   }
   
   thead th {
-    padding: 10px 4px;
-    font-size: 10px;
+    padding: 12px 6px;
+    font-size: 12px;
   }
   
-  /* СУПЕР-КОМПАКТНЫЕ СТИЛИ ДЛЯ РЕЖИМА "СЕГОДНЯ" НА ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНАХ */
+  /* Оптимизация режима "Сегодня" для очень маленьких экранов */
   .today-mode td.name, 
   .today-mode th.name {
-    min-width: 50px !important;
-    max-width: 55px !important;
-    padding: 6px 4px !important;
-    font-size: 10px !important;
+    min-width: 85px !important;
+    max-width: 95px !important;
+    padding: 10px 6px !important;
+    font-size: 13px !important;
   }
   
   .today-mode thead th:not(.name) {
-    min-width: 40px !important;
-    max-width: 45px !important;
-    padding: 8px 3px !important;
-    font-size: 9px !important;
+    min-width: 70px !important;
+    max-width: 80px !important;
+    padding: 12px 6px !important;
+    font-size: 13px !important;
   }
   
   .today-mode tbody td:not(.name) {
-    min-width: 40px !important;
-    max-width: 45px !important;
-    padding: 6px 3px !important;
-    font-size: 9px !important;
-  }
-  
-  .today-mode .day-name {
-    font-size: 7px;
-  }
-  
-  .today-mode tbody td {
-    font-size: 9px;
-  }
-}
-
-/* Специальные стили для очень узких экранов (менее 360px) */
-@media (max-width: 360px) {
-  .today-mode td.name, 
-  .today-mode th.name {
-    min-width: 45px !important;
-    max-width: 50px !important;
-    padding: 5px 3px !important;
-    font-size: 9px !important;
-  }
-  
-  .today-mode thead th:not(.name) {
-    min-width: 35px !important;
-    max-width: 40px !important;
-    padding: 6px 2px !important;
-    font-size: 8px !important;
-  }
-  
-  .today-mode tbody td:not(.name) {
-    min-width: 35px !important;
-    max-width: 40px !important;
-    padding: 5px 2px !important;
-    font-size: 8px !important;
-  }
-  
-  .today-mode .table-wrap {
-    padding: 0 4px;
+    min-width: 70px !important;
+    max-width: 80px !important;
+    padding: 10px 6px !important;
+    font-size: 14px !important;
   }
 }
 
@@ -1253,7 +1199,7 @@ let scheduleData = [];
 let allEmployees = [];
 let isOnline = navigator.onLine;
 
-// ========== ОБНОВЛЕННАЯ ФУНКЦИЯ СОКРАЩЕНИЯ ИМЕН ==========
+// ========== ФУНКЦИЯ ДЛЯ СОКРАЩЕНИЯ ИМЕН ==========
 function shortenName(fullName) {
   if (!fullName) return '';
   
@@ -1268,17 +1214,12 @@ function shortenName(fullName) {
   // Берем только фамилию (первую часть)
   const surname = parts[0];
   
-  // Адаптивное сокращение в зависимости от ширины экрана
-  if (window.innerWidth <= 360) {
-    // Очень маленькие экраны - максимум 5 символов
-    return surname.length > 5 ? surname.substring(0, 4) + '.' : surname;
-  } else if (window.innerWidth <= 480) {
-    // Маленькие экраны - максимум 7 символов
-    return surname.length > 7 ? surname.substring(0, 6) + '.' : surname;
-  } else {
-    // Стандартные мобильные - максимум 9 символов
-    return surname.length > 9 ? surname.substring(0, 8) + '.' : surname;
+  // Если фамилия слишком длинная, обрезаем ее
+  if (surname.length > 12) {
+    return surname.substring(0, 10) + '..';
   }
+  
+  return surname;
 }
 
 // ========== PWA И ОФФЛАЙН РЕЖИМ ==========
@@ -1692,7 +1633,7 @@ function getDayNameShort(date) {
   return dayNamesShort[date.getDay() === 0 ? 6 : date.getDay() - 1];
 }
 
-// ========== ОБНОВЛЕННАЯ ФУНКЦИЯ: ПОКАЗАТЬ СЕГОДНЯ ==========
+// ========== ФУНКЦИЯ: ПОКАЗАТЬ СЕГОДНЯ ==========
 function showToday() {
   const today = new Date();
   
@@ -1735,18 +1676,12 @@ function showToday() {
     return;
   }
   
-  // Определяем компактный формат для мобильных
-  const isMobile = window.innerWidth <= 768;
-  const dateFormat = isMobile ? 
-    `${today.getDate()}` : 
-    `${today.getDate().toString().padStart(2, '0')}.${(today.getMonth() + 1).toString().padStart(2, '0')}`;
-  
   // Создаем заголовок таблицы только для сегодняшнего дня
   tableHead.innerHTML = `
     <tr>
-      <th class='name name-header'>${isMobile ? 'Сотр.' : 'Сотрудник'}</th>
+      <th class='name name-header'>Сотрудник</th>
       <th class="today">
-        ${dateFormat}
+        ${formatDate(today)}
         <span class="day-name">${getDayNameShort(today)}</span>
       </th>
     </tr>
@@ -1766,32 +1701,12 @@ function showToday() {
     if (shift.type !== "empty") {
       const tr = document.createElement("tr");
       
-      // Определяем отображаемое имя в зависимости от устройства
-      let displayName;
-      if (window.innerWidth <= 480) {
-        // На очень маленьких экранах используем первые 6 символов фамилии
-        const surname = r[0].split(' ')[0];
-        displayName = surname.length > 6 ? surname.substring(0, 5) + '.' : surname;
-      } else if (window.innerWidth <= 768) {
-        // На мобильных используем укороченную фамилию
-        displayName = shortenName(r[0]);
-      } else {
-        // На десктопе полное имя
-        displayName = r[0];
-      }
-      
-      // Для мобильных сокращаем названия смен
-      let shiftLabel = shift.label;
-      if (isMobile) {
-        if (shiftLabel === 'Утро') shiftLabel = 'У';
-        else if (shiftLabel === 'Вечер') shiftLabel = 'В';
-        else if (shiftLabel === 'Весь день') shiftLabel = 'ВД';
-        else if (shiftLabel === 'Обучение') shiftLabel = 'О';
-      }
+      // На мобильных устройствах показываем полные имена (без сокращений)
+      const displayName = r[0];
       
       tr.innerHTML = `
         <td class="name" title="${r[0]}">${displayName}</td>
-        <td class="${shift.type}" data-tooltip="${r[0]}: ${shiftValue}">${shiftLabel}</td>
+        <td class="${shift.type}" data-tooltip="${shiftValue}">${shift.label}</td>
       `;
       
       tableBody.appendChild(tr);
@@ -1888,8 +1803,8 @@ function loadSchedule() {
     
     const tr = document.createElement("tr");
     
-    // Определяем отображаемое имя в зависимости от устройства
-    const displayName = window.innerWidth <= 768 ? shortenName(r[0]) : r[0];
+    // На мобильных устройствах показываем полные имена (без сокращений)
+    const displayName = r[0];
     
     let html = `<td class="name" title="${r[0]}">${displayName}</td>`;
     
