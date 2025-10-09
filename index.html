@@ -4,8 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>График сотрудников</title>
+<meta name="theme-color" content="#00c853">
+<meta name="description" content="Управление рабочим временем команды">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="manifest" href="manifest.json">
 <style>
 :root {
   --bg-gradient: linear-gradient(135deg, #0f0f0f, #1a1a1a);
@@ -50,6 +53,10 @@ body {
   color: var(--text-color);
   min-height: 100vh;
   line-height: 1.6;
+  /* Предотвращение выделения текста для лучшего свайпа */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .container {
@@ -212,6 +219,8 @@ button.secondary:hover {
   border: 1px solid var(--thin-border);
   overflow: hidden;
   position: relative;
+  /* Для свайп-навигации */
+  touch-action: pan-y;
 }
 
 .table-header {
@@ -510,6 +519,123 @@ tbody td:hover::after {
   100% { background-position: -200% 0; }
 }
 
+/* Навигация неделями */
+.week-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 0 20px 16px;
+}
+
+.week-nav-btn {
+  background: transparent;
+  border: 2px solid var(--thin-border);
+  color: var(--text-secondary);
+  width: auto;
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.week-nav-btn:hover {
+  background: var(--card-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.week-current {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  min-width: 120px;
+  text-align: center;
+}
+
+/* Индикатор свайпа */
+.swipe-indicator {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 200, 83, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  animation: swipe-indicator-pulse 2s infinite;
+}
+
+@keyframes swipe-indicator-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* PWA Install Prompt */
+.install-prompt {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--card);
+  border: 1px solid var(--thin-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  max-width: 300px;
+  display: none;
+}
+
+.install-prompt.show {
+  display: block;
+  animation: slideUp 0.3s ease-out;
+}
+
+.install-prompt-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.install-prompt-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.install-prompt-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.install-prompt-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Мобильная оптимизация */
 @media (max-width: 1024px) {
   .controls-grid {
@@ -577,6 +703,12 @@ tbody td:hover::after {
     left: 16px;
     max-width: none;
   }
+  
+  .install-prompt {
+    right: 16px;
+    left: 16px;
+    max-width: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -606,6 +738,11 @@ tbody td:hover::after {
     min-width: 90px;
     padding: 8px 6px;
   }
+  
+  .week-navigation {
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 
 /* Улучшенный скроллбар */
@@ -621,11 +758,62 @@ tbody td:hover::after {
 .table-wrap::-webkit-scrollbar-track {
   background: var(--card);
 }
+
+/* Оффлайн стили */
+.offline-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--warning);
+  color: #333;
+  padding: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 1001;
+  display: none;
+}
+
+.offline .offline-indicator {
+  display: block;
+}
 </style>
 </head>
 <body>
+<!-- Оффлайн индикатор -->
+<div class="offline-indicator">
+  <i class="fas fa-wifi"></i> Работа в оффлайн режиме
+</div>
+
 <!-- Notifications -->
 <div id="notificationsContainer"></div>
+
+<!-- PWA Install Prompt -->
+<div class="install-prompt" id="installPrompt">
+  <button class="install-prompt-close" id="installPromptClose">
+    <i class="fas fa-times"></i>
+  </button>
+  <div class="install-prompt-content">
+    <div class="install-prompt-header">
+      <i class="fas fa-download"></i>
+      Установить приложение
+    </div>
+    <p style="margin: 0; font-size: 14px; color: var(--text-secondary);">
+      Установите приложение для быстрого доступа и работы оффлайн
+    </p>
+    <div class="install-prompt-buttons">
+      <button class="secondary" id="installLater">Позже</button>
+      <button id="installApp">Установить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Swipe Indicator -->
+<div class="swipe-indicator" id="swipeIndicator">
+  <i class="fas fa-arrows-left-right"></i>
+  Свайп для навигации
+</div>
 
 <div class="container">
   <!-- Header -->
@@ -729,6 +917,19 @@ tbody td:hover::after {
       </div>
     </div>
     
+    <!-- Навигация неделями -->
+    <div class="week-navigation">
+      <button class="week-nav-btn secondary" id="prevWeek">
+        <i class="fas fa-chevron-left"></i>
+        Предыдущая
+      </button>
+      <div class="week-current" id="weekRange"></div>
+      <button class="week-nav-btn secondary" id="nextWeek">
+        Следующая
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    
     <div class="table-wrap">
       <div id="tableLoading" class="loading-overlay" style="display: none;">
         <div class="loading"></div>
@@ -782,6 +983,171 @@ let currentBranch = null;
 let currentMonth = null;
 let scheduleData = [];
 let allEmployees = [];
+
+// PWA переменные
+let deferredPrompt = null;
+let isAppInstalled = false;
+
+// ========== PWA ФУНКЦИОНАЛ ==========
+// Регистрация Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('SW registered: ', registration);
+      })
+      .catch(registrationError => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+
+// Обработчик установки PWA
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Показываем промпт установки через 5 секунд
+  setTimeout(() => {
+    showInstallPrompt();
+  }, 5000);
+});
+
+// Проверка установлено ли приложение
+window.addEventListener('appinstalled', () => {
+  isAppInstalled = true;
+  hideInstallPrompt();
+  showNotification('Приложение успешно установлено!', 'success');
+});
+
+function showInstallPrompt() {
+  // Не показываем если приложение уже установлено или промпт уже был отклонен
+  if (isAppInstalled || localStorage.getItem('installPromptDismissed')) {
+    return;
+  }
+  
+  const installPrompt = document.getElementById('installPrompt');
+  installPrompt.classList.add('show');
+}
+
+function hideInstallPrompt() {
+  const installPrompt = document.getElementById('installPrompt');
+  installPrompt.classList.remove('show');
+}
+
+async function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      console.log('Пользователь принял установку');
+    } else {
+      console.log('Пользователь отклонил установку');
+    }
+    
+    deferredPrompt = null;
+    hideInstallPrompt();
+  }
+}
+
+// ========== СВАЙП-НАВИГАЦИЯ ==========
+function initSwipeNavigation() {
+  const tableContainer = document.querySelector('.table-container');
+  let touchStartX = 0;
+  let touchEndX = 0;
+  let isSwiping = false;
+
+  tableContainer.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    isSwiping = true;
+  }, { passive: true });
+
+  tableContainer.addEventListener('touchmove', (e) => {
+    if (!isSwiping) return;
+    
+    // Показываем индикатор свайпа на мобильных
+    if (window.innerWidth <= 768) {
+      showSwipeIndicator();
+    }
+  }, { passive: true });
+
+  tableContainer.addEventListener('touchend', (e) => {
+    if (!isSwiping) return;
+    
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+    isSwiping = false;
+  }, { passive: true });
+
+  function handleSwipe() {
+    const diff = touchStartX - touchEndX;
+    const minSwipeDistance = 60;
+    
+    if (Math.abs(diff) > minSwipeDistance) {
+      if (diff > 0) {
+        nextWeek();
+        showNotification('Следующая неделя', 'info', 1000);
+      } else {
+        prevWeek();
+        showNotification('Предыдущая неделя', 'info', 1000);
+      }
+    }
+  }
+}
+
+function showSwipeIndicator() {
+  const indicator = document.getElementById('swipeIndicator');
+  indicator.style.display = 'flex';
+  
+  setTimeout(() => {
+    indicator.style.display = 'none';
+  }, 3000);
+}
+
+// ========== НАВИГАЦИЯ НЕДЕЛЯМИ ==========
+function nextWeek() {
+  const currentDate = new Date(document.getElementById("startDate").value);
+  currentDate.setDate(currentDate.getDate() + 7);
+  document.getElementById("startDate").valueAsDate = currentDate;
+  updateWeekRange();
+  loadSchedule();
+}
+
+function prevWeek() {
+  const currentDate = new Date(document.getElementById("startDate").value);
+  currentDate.setDate(currentDate.getDate() - 7);
+  document.getElementById("startDate").valueAsDate = currentDate;
+  updateWeekRange();
+  loadSchedule();
+}
+
+function updateWeekRange() {
+  const startDate = new Date(document.getElementById("startDate").value);
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+  
+  const weekRange = document.getElementById("weekRange");
+  weekRange.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+}
+
+// ========== ОФФЛАЙН РЕЖИМ ==========
+function initOfflineDetection() {
+  window.addEventListener('online', () => {
+    document.body.classList.remove('offline');
+    showNotification('Соединение восстановлено', 'success', 2000);
+  });
+
+  window.addEventListener('offline', () => {
+    document.body.classList.add('offline');
+    showNotification('Работа в оффлайн режиме', 'warning', 3000);
+  });
+
+  // Проверяем начальный статус
+  if (!navigator.onLine) {
+    document.body.classList.add('offline');
+  }
+}
 
 // ========== УВЕДОМЛЕНИЯ ==========
 function showNotification(message, type = 'success', duration = 4000) {
@@ -1153,6 +1519,13 @@ async function init() {
     document.getElementById("startDate").valueAsDate = firstDay;
   }
   
+  // Обновляем отображение диапазона недели
+  updateWeekRange();
+  
+  // Инициализируем дополнительные функции
+  initSwipeNavigation();
+  initOfflineDetection();
+  
   // Показываем скелетон при первой загрузке
   showSkeleton(8);
   setTimeout(() => {
@@ -1201,6 +1574,7 @@ document.getElementById("employee").addEventListener("change", () => {
 });
 
 document.getElementById("startDate").addEventListener("change", () => {
+  updateWeekRange();
   loadSchedule();
   saveState();
 });
@@ -1217,6 +1591,21 @@ document.getElementById("refreshBtn").addEventListener("click", async () => {
   
   showNotification("Обновление данных...", "warning", 2000);
   await populateEmployees(branch, month);
+});
+
+// Навигация неделями
+document.getElementById("prevWeek").addEventListener("click", prevWeek);
+document.getElementById("nextWeek").addEventListener("click", nextWeek);
+
+// PWA установка
+document.getElementById("installApp").addEventListener("click", installPWA);
+document.getElementById("installLater").addEventListener("click", () => {
+  localStorage.setItem('installPromptDismissed', 'true');
+  hideInstallPrompt();
+});
+document.getElementById("installPromptClose").addEventListener("click", () => {
+  localStorage.setItem('installPromptDismissed', 'true');
+  hideInstallPrompt();
 });
 
 // Инициализация при загрузке страницы
