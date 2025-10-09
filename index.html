@@ -481,6 +481,35 @@ tbody td:hover::after {
   font-size: 16px;
 }
 
+/* Скелетон-загрузка */
+.skeleton-row {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-cell {
+  background: linear-gradient(90deg, #3d3d3d 25%, #4a4a4a 50%, #3d3d3d 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shine 1.5s infinite;
+  border-radius: 4px;
+  height: 20px;
+  margin: 2px 0;
+}
+
+.skeleton-name .skeleton-cell {
+  height: 16px;
+  width: 80%;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes skeleton-shine {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* Мобильная оптимизация */
 @media (max-width: 1024px) {
   .controls-grid {
@@ -744,8 +773,9 @@ function saveConfig() {
 const dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
 const dayNamesShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
 
-// Кэш данных
+// Кэш данных для ленивой загрузки
 const cachedCSVs = {};
+const cachedWeekData = {};
 
 // Переменные состояния
 let currentBranch = null;
@@ -795,6 +825,26 @@ function setLoading(isLoading) {
   }
 }
 
+// ========== СКЕЛЕТОН-ЗАГРУЗКА ==========
+function showSkeleton(rows = 10) {
+  const tableBody = document.getElementById("tableBody");
+  let html = '';
+  
+  for (let i = 0; i < rows; i++) {
+    html += `<tr class="skeleton-row">
+      <td class="name skeleton-name"><div class="skeleton-cell"></div></td>
+      ${'<td><div class="skeleton-cell"></div></td>'.repeat(7)}
+    </tr>`;
+  }
+  
+  tableBody.innerHTML = html;
+}
+
+function hideSkeleton() {
+  const tableBody = document.getElementById("tableBody");
+  tableBody.innerHTML = '';
+}
+
 // ========== LOCALSTORAGE ==========
 function saveState() {
   const state = {
@@ -827,12 +877,67 @@ function loadState() {
   return false;
 }
 
+// ========== ЛЕНИВАЯ ЗАГРУЗКА ДАННЫХ ==========
+async function loadWeekData(branch, month, weekStartDate) {
+  const weekKey = `${branch}_${month}_${weekStartDate.getTime()}`;
+  
+  // Проверяем кэш недельных данных
+  if (cachedWeekData[weekKey]) {
+    return cachedWeekData[weekKey];
+  }
+  
+  // Загружаем полные данные месяца, если их нет
+  if (!cachedCSVs[`${branch}_${month}`]) {
+    await loadCSV(branch, month);
+  }
+  
+  // Извлекаем данные только для нужной недели
+  const weekData = extractWeekData(weekStartDate);
+  cachedWeekData[weekKey] = weekData;
+  
+  return weekData;
+}
+
+function extractWeekData(weekStartDate) {
+  if (!scheduleData.length) return [];
+  
+  const weekDates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStartDate);
+    d.setDate(weekStartDate.getDate() + i);
+    weekDates.push(d);
+  }
+  
+  const dateRow = (scheduleData[1] || []).slice(2);
+  const dateIndexMap = weekDates.map(d => {
+    for (let i = 0; i < dateRow.length; i++) {
+      const parts = dateRow[i].split('.');
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      
+      if (day === d.getDate() && month === d.getMonth() + 1) {
+        return i + 2;
+      }
+    }
+    return null;
+  });
+  
+  const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
+  
+  return {
+    dateIndexMap,
+    rows,
+    weekDates
+  };
+}
+
 // ========== ОСНОВНЫЕ ФУНКЦИИ ==========
 async function loadCSV(branch, month) {
   const cacheKey = `${branch}_${month}`;
   
   if (cachedCSVs[cacheKey]) {
-    return cachedCSVs[cacheKey];
+    scheduleData = cachedCSVs[cacheKey];
+    return scheduleData;
   }
   
   const gid = monthsGIDs[branch][month];
@@ -847,6 +952,7 @@ async function loadCSV(branch, month) {
     const parsed = text.split("\n").map(r => r.split(","));
     
     cachedCSVs[cacheKey] = parsed;
+    scheduleData = parsed;
     return parsed;
     
   } catch (error) {
@@ -878,7 +984,7 @@ function populateMonths(branch) {
 async function populateEmployees(branch, month) {
   try {
     setLoading(true);
-    scheduleData = await loadCSV(branch, month);
+    await loadCSV(branch, month);
     
     currentBranch = branch;
     currentMonth = month;
@@ -945,7 +1051,7 @@ function getDayNameShort(date) {
   return dayNamesShort[date.getDay() === 0 ? 6 : date.getDay() - 1];
 }
 
-function loadSchedule() {
+async function loadSchedule() {
   const employee = document.getElementById("employee").value;
   const selectedDate = new Date(document.getElementById("startDate").value);
   
@@ -958,77 +1064,71 @@ function loadSchedule() {
   const tableBody = document.getElementById("tableBody");
   
   tableHead.innerHTML = "";
-  tableBody.innerHTML = "";
   
-  if (!scheduleData.length) {
-    showNotification("Нет данных для отображения", "warning");
+  // Показываем скелетон сразу
+  showSkeleton(8);
+  
+  if (!currentBranch || !currentMonth) {
+    showNotification("Сначала выберите торговую точку и месяц", "warning");
+    hideSkeleton();
     return;
   }
   
   const weekStart = getWeekStart(selectedDate);
-  const weekDates = [];
   
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(weekStart);
-    d.setDate(weekStart.getDate() + i);
-    weekDates.push(d);
-  }
-  
-  const dateRow = (scheduleData[1] || []).slice(2);
-  const dateIndexMap = weekDates.map(d => {
-    for (let i = 0; i < dateRow.length; i++) {
-      const parts = dateRow[i].split('.');
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10);
+  try {
+    // Ленивая загрузка данных недели
+    const weekData = await loadWeekData(currentBranch, currentMonth, weekStart);
+    const { dateIndexMap, rows, weekDates } = weekData;
+    
+    const today = new Date();
+    
+    // Обновляем заголовок таблицы
+    let headerHTML = "<tr><th class='name name-header'>Сотрудник</th>";
+    weekDates.forEach(d => {
+      const isToday = d.toDateString() === today.toDateString();
+      headerHTML += `<th${isToday ? ' class="today"' : ''}>
+        ${formatDate(d)}
+        <span class="day-name">${getDayNameShort(d)}</span>
+      </th>`;
+    });
+    headerHTML += "</tr>";
+    tableHead.innerHTML = headerHTML;
+    
+    // Обновляем тело таблицы
+    hideSkeleton();
+    let visibleRows = 0;
+    
+    rows.forEach((r, rowIndex) => {
+      if (employee !== "all" && r[0] !== employee) return;
       
-      if (day === d.getDate() && month === d.getMonth() + 1) {
-        return i + 2;
-      }
-    }
-    return null;
-  });
-  
-  const today = new Date();
-  
-  let headerHTML = "<tr><th class='name name-header'>Сотрудник</th>";
-  weekDates.forEach(d => {
-    const isToday = d.toDateString() === today.toDateString();
-    headerHTML += `<th${isToday ? ' class="today"' : ''}>
-      ${formatDate(d)}
-      <span class="day-name">${getDayNameShort(d)}</span>
-    </th>`;
-  });
-  headerHTML += "</tr>";
-  tableHead.innerHTML = headerHTML;
-  
-  const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
-  
-  let visibleRows = 0;
-  
-  rows.forEach((r, rowIndex) => {
-    if (employee !== "all" && r[0] !== employee) return;
-    
-    const tr = document.createElement("tr");
-    
-    let html = `<td class="name" title="${r[0]}">${r[0]}</td>`;
-    
-    dateIndexMap.forEach(idx => {
-      let val = "";
-      if (idx !== null && r[idx]) val = r[idx].trim();
+      const tr = document.createElement("tr");
       
-      const sh = parseShift(val);
-      html += `<td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>`;
+      let html = `<td class="name" title="${r[0]}">${r[0]}</td>`;
+      
+      dateIndexMap.forEach(idx => {
+        let val = "";
+        if (idx !== null && r[idx]) val = r[idx].trim();
+        
+        const sh = parseShift(val);
+        html += `<td class="${sh.type}" data-tooltip="${val}">${sh.label}</td>`;
+      });
+      
+      tr.innerHTML = html;
+      tableBody.appendChild(tr);
+      visibleRows++;
     });
     
-    tr.innerHTML = html;
-    tableBody.appendChild(tr);
-    visibleRows++;
-  });
-  
-  if (visibleRows === 0) {
-    showNotification("Нет данных для выбранного сотрудника", "warning");
-  } else {
-    showNotification(`Показано: ${employee === "all" ? "все сотрудники" : employee}`, "success", 2000);
+    if (visibleRows === 0) {
+      showNotification("Нет данных для выбранного сотрудника", "warning");
+    } else {
+      showNotification(`Показано: ${employee === "all" ? "все сотрудники" : employee}`, "success", 2000);
+    }
+    
+  } catch (error) {
+    hideSkeleton();
+    showNotification("Ошибка при загрузке данных недели", "error");
+    console.error('Ошибка загрузки недели:', error);
   }
   
   saveState();
@@ -1053,7 +1153,11 @@ async function init() {
     document.getElementById("startDate").valueAsDate = firstDay;
   }
   
-  loadSchedule();
+  // Показываем скелетон при первой загрузке
+  showSkeleton(8);
+  setTimeout(() => {
+    loadSchedule();
+  }, 100);
 }
 
 // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
@@ -1061,6 +1165,14 @@ document.getElementById("branch").addEventListener("change", async e => {
   const b = e.target.value;
   populateMonths(b);
   saveState();
+  
+  // Очищаем кэш при смене торговой точки
+  Object.keys(cachedCSVs).forEach(key => {
+    if (key.startsWith(b)) delete cachedCSVs[key];
+  });
+  Object.keys(cachedWeekData).forEach(key => {
+    if (key.startsWith(b)) delete cachedWeekData[key];
+  });
   
   const firstMonth = document.getElementById("month").value;
   if (firstMonth) {
@@ -1070,6 +1182,15 @@ document.getElementById("branch").addEventListener("change", async e => {
 
 document.getElementById("month").addEventListener("change", async e => {
   const branch = document.getElementById("branch").value;
+  
+  // Очищаем кэш при смене месяца
+  Object.keys(cachedCSVs).forEach(key => {
+    if (key.startsWith(`${branch}_`)) delete cachedCSVs[key];
+  });
+  Object.keys(cachedWeekData).forEach(key => {
+    if (key.startsWith(`${branch}_`)) delete cachedWeekData[key];
+  });
+  
   await populateEmployees(branch, e.target.value);
   saveState();
 });
@@ -1090,8 +1211,9 @@ document.getElementById("refreshBtn").addEventListener("click", async () => {
   const branch = document.getElementById("branch").value;
   const month = document.getElementById("month").value;
   
-  const cacheKey = `${branch}_${month}`;
-  delete cachedCSVs[cacheKey];
+  // Полностью очищаем кэш
+  Object.keys(cachedCSVs).forEach(key => delete cachedCSVs[key]);
+  Object.keys(cachedWeekData).forEach(key => delete cachedWeekData[key]);
   
   showNotification("Обновление данных...", "warning", 2000);
   await populateEmployees(branch, month);
