@@ -6,14 +6,6 @@
 <title>График сотрудников</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- PWA Manifest -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00c853">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="График">
-<link rel="apple-touch-icon" href="icons/icon-192x192.png">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
 <style>
 :root {
   --bg-gradient: linear-gradient(135deg, #0f0f0f, #1a1a1a);
@@ -63,7 +55,7 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 20px;
 }
 
 /* Header */
@@ -71,17 +63,16 @@ body {
   background: var(--card);
   border-radius: var(--radius);
   padding: 20px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   box-shadow: var(--shadow);
   border: 1px solid var(--thin-border);
-  backdrop-filter: blur(10px);
 }
 
 .header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
@@ -103,7 +94,7 @@ body {
 }
 
 .logo-text h1 {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   margin: 0;
   background: linear-gradient(135deg, var(--accent), var(--today));
@@ -114,9 +105,8 @@ body {
 
 .logo-text .subtitle {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   margin-top: 2px;
-  font-weight: 400;
 }
 
 /* Controls */
@@ -124,7 +114,7 @@ body {
   background: var(--card);
   border-radius: var(--radius);
   padding: 20px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   box-shadow: var(--shadow);
   border: 1px solid var(--thin-border);
 }
@@ -149,14 +139,11 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 2px;
 }
 
 .control-label i {
   font-size: 14px;
   opacity: 0.7;
-  width: 14px;
-  text-align: center;
 }
 
 select, input[type="date"], input[type="text"], button {
@@ -169,25 +156,14 @@ select, input[type="date"], input[type="text"], button {
   transition: var(--transition);
   font-family: var(--font-sans);
   font-weight: 500;
-  height: 48px;
+  height: 46px;
   width: 100%;
-}
-
-select, input[type="date"], input[type="text"] {
-  background: var(--card);
-  cursor: pointer;
 }
 
 select:focus, input[type="date"]:focus, input[type="text"]:focus {
   border-color: var(--accent);
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
-  background: var(--card-hover);
-}
-
-select:hover, input[type="date"]:hover, input[type="text"]:hover {
-  background: var(--card-hover);
-  border-color: #555;
 }
 
 button {
@@ -200,24 +176,11 @@ button {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
-  white-space: nowrap;
 }
 
 button:hover {
   background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
+  transform: translateY(-1px);
 }
 
 button.secondary {
@@ -245,56 +208,7 @@ button.today:hover {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   grid-column: 1 / -1;
-  margin-top: 6px;
-}
-
-/* Admin Panel */
-.admin-panel {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 16px;
-  border: 2px dashed var(--warning);
-  display: none;
-}
-
-.admin-panel.visible {
-  display: block;
-}
-
-.admin-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.admin-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--warning);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.admin-form {
-  display: grid;
-  grid-template-columns: 2fr 2fr 1fr 1fr;
-  gap: 10px;
-  align-items: end;
-}
-
-.admin-button {
-  background: var(--warning);
-  color: #333;
-  font-size: 12px;
-  padding: 8px;
-  height: auto;
-}
-
-.admin-button:hover {
-  background: #ffca28;
+  margin-top: 8px;
 }
 
 /* Table */
@@ -309,9 +223,9 @@ button.today:hover {
 }
 
 .table-header {
-  padding: 16px 16px 0;
+  padding: 16px 20px 0;
   display: flex;
-  justify-content: between;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
@@ -329,14 +243,13 @@ button.today:hover {
 .table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  position: relative;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  min-width: 600px;
+  min-width: 700px;
 }
 
 thead {
@@ -346,7 +259,7 @@ thead {
 }
 
 thead th {
-  padding: 14px 8px;
+  padding: 14px 10px;
   text-align: center;
   font-weight: 600;
   color: var(--text-secondary);
@@ -386,7 +299,6 @@ thead th.today::after {
   font-weight: 400;
   color: var(--muted);
   margin-top: 2px;
-  text-transform: lowercase;
 }
 
 @keyframes pulse {
@@ -412,26 +324,6 @@ td.name, th.name {
   border-right: 2px solid var(--thin-border);
 }
 
-/* Стили для режима "Сегодня" - уменьшенные столбцы */
-.today-mode td.name, 
-.today-mode th.name {
-  min-width: 100px;
-  max-width: 100px;
-  padding: 10px 6px;
-  font-size: 12px;
-}
-
-.today-mode thead th:not(.name) {
-  min-width: 80px;
-  max-width: 80px;
-}
-
-.today-mode tbody td:not(.name) {
-  min-width: 80px;
-  max-width: 80px;
-  padding: 10px 6px;
-}
-
 /* Shift cells */
 td.empty { background: var(--empty); }
 td.morning { background: var(--morning); }
@@ -453,16 +345,6 @@ tbody td {
 
 tbody tr {
   transition: var(--transition);
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.5s ease forwards;
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 tbody tr:hover {
@@ -485,17 +367,10 @@ tbody td::after {
   pointer-events: none;
   z-index: 20;
   box-shadow: var(--shadow);
-  border: 1px solid var(--thin-border);
 }
 
 tbody td:hover::after {
   display: block;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* Legend */
@@ -514,12 +389,6 @@ tbody td:hover::after {
   background: var(--card-hover);
   border-radius: var(--radius-sm);
   border: 1px solid var(--thin-border);
-  transition: var(--transition);
-}
-
-.legend-item:hover {
-  background: var(--card);
-  transform: translateY(-1px);
 }
 
 .legend-color {
@@ -563,7 +432,6 @@ tbody td:hover::after {
   justify-content: center;
   gap: 12px;
   z-index: 100;
-  backdrop-filter: blur(4px);
 }
 
 .loading-text {
@@ -575,8 +443,8 @@ tbody td:hover::after {
 /* Notifications */
 .notification {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  top: 20px;
+  right: 20px;
   padding: 14px 16px;
   border-radius: var(--radius);
   color: white;
@@ -587,7 +455,6 @@ tbody td:hover::after {
   max-width: 350px;
   box-shadow: var(--shadow);
   border: 1px solid var(--thin-border);
-  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -622,80 +489,22 @@ tbody td:hover::after {
   font-size: 16px;
 }
 
-/* Offline Indicator */
-.offline-indicator {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: var(--error);
-  color: white;
-  text-align: center;
-  padding: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  z-index: 1001;
-  transform: translateY(-100%);
-  transition: transform 0.3s ease;
-}
-
-.offline-indicator.show {
-  transform: translateY(0);
-}
-
-.offline-indicator i {
-  margin-right: 6px;
-}
-
 /* Мобильная оптимизация */
 @media (max-width: 1024px) {
   .controls-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  
-  .buttons-container {
-    grid-template-columns: 1fr;
-  }
-  
-  .admin-form {
-    grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 12px;
-  }
-  
-  .header {
     padding: 16px;
-    margin-bottom: 12px;
   }
   
   .header-content {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-  }
-  
-  .logo {
-    gap: 10px;
-  }
-  
-  .logo-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
-  }
-  
-  .logo-text h1 {
-    font-size: 20px;
-  }
-  
-  .controls {
-    padding: 16px;
-    margin-bottom: 12px;
+    gap: 16px;
   }
   
   .controls-grid {
@@ -705,141 +514,61 @@ tbody td:hover::after {
   
   .buttons-container {
     grid-template-columns: 1fr;
-    gap: 8px;
   }
   
   .table-header {
-    padding: 12px 12px 0;
+    padding: 16px 16px 0;
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 12px;
   }
   
   .legend {
     justify-content: center;
-    gap: 8px;
-  }
-  
-  .legend-item {
-    padding: 5px 8px;
-    font-size: 11px;
   }
   
   /* Компактная таблица для мобильных */
   table {
-    min-width: 500px;
+    min-width: 600px;
     font-size: 13px;
   }
   
-  /* Узкий столбец с именами */
   td.name, th.name {
-    min-width: 80px;
-    max-width: 90px;
-    padding: 10px 6px;
+    min-width: 100px;
+    max-width: 120px;
+    padding: 10px 8px;
     font-size: 12px;
-    padding-left: 8px;
   }
   
   thead th, tbody td {
-    padding: 10px 4px;
+    padding: 10px 6px;
     font-size: 12px;
     min-width: 50px;
   }
   
   thead th {
-    padding: 12px 4px;
-    font-size: 11px;
-  }
-  
-  .day-name {
-    font-size: 9px;
+    padding: 12px 6px;
   }
   
   .notification {
-    top: 12px;
-    right: 12px;
-    left: 12px;
+    top: 16px;
+    right: 16px;
+    left: 16px;
     max-width: none;
-    font-size: 14px;
-  }
-  
-  .admin-form {
-    grid-template-columns: 1fr;
-  }
-  
-  /* Скрываем админ-панель и кнопку на мобильных */
-  .admin-panel {
-    display: none !important;
-  }
-  
-  #adminToggle {
-    display: none !important;
-  }
-  
-  /* Оптимизированный режим "Сегодня" для мобильных */
-  .today-mode table {
-    min-width: unset;
-    width: 100%;
-    font-size: 14px;
-  }
-  
-  .today-mode td.name, 
-  .today-mode th.name {
-    min-width: 70px !important;
-    max-width: 80px !important;
-    padding: 8px 4px !important;
-    font-size: 11px !important;
-  }
-  
-  .today-mode thead th:not(.name) {
-    min-width: 60px !important;
-    max-width: 70px !important;
-    padding: 10px 4px !important;
-    font-size: 12px !important;
-  }
-  
-  .today-mode tbody td:not(.name) {
-    min-width: 60px !important;
-    max-width: 70px !important;
-    padding: 8px 4px !important;
-    font-size: 13px !important;
-    font-weight: 600;
-  }
-  
-  /* Улучшенные отступы для мобильных */
-  .today-mode .table-wrap {
-    padding: 0 8px;
-  }
-  
-  .today-mode .day-name {
-    font-size: 10px;
   }
 }
 
 @media (max-width: 480px) {
   .container {
-    padding: 8px;
-  }
-  
-  .header, .controls {
     padding: 12px;
   }
   
+  .header, .controls {
+    padding: 16px;
+  }
+  
   .logo-text h1 {
-    font-size: 18px;
-  }
-  
-  .logo-text .subtitle {
-    font-size: 11px;
-  }
-  
-  .legend {
-    gap: 6px;
-  }
-  
-  .legend-item {
-    padding: 4px 6px;
-    font-size: 10px;
+    font-size: 20px;
   }
   
   select, input[type="date"], input[type="text"], button {
@@ -848,149 +577,17 @@ tbody td:hover::after {
     height: 44px;
   }
   
-  .table-container {
-    border-radius: 10px;
-  }
-  
-  /* Супер-компактная таблица для очень маленьких экранов */
   table {
-    min-width: 400px;
-    font-size: 12px;
+    min-width: 500px;
   }
   
   td.name, th.name {
-    min-width: 70px;
-    max-width: 80px;
-    padding: 8px 4px;
-    font-size: 11px;
-  }
-  
-  thead th, tbody td {
-    padding: 8px 3px;
-    font-size: 11px;
-    min-width: 45px;
-  }
-  
-  thead th {
-    padding: 10px 3px;
-    font-size: 10px;
-  }
-  
-  /* Оптимизация режима "Сегодня" для очень маленьких экранов */
-  .today-mode td.name, 
-  .today-mode th.name {
-    min-width: 60px !important;
-    max-width: 70px !important;
-    padding: 6px 3px !important;
-    font-size: 10px !important;
-  }
-  
-  .today-mode thead th:not(.name) {
-    min-width: 50px !important;
-    max-width: 60px !important;
-    padding: 8px 3px !important;
-    font-size: 11px !important;
-  }
-  
-  .today-mode tbody td:not(.name) {
-    min-width: 50px !important;
-    max-width: 60px !important;
-    padding: 6px 3px !important;
-    font-size: 12px !important;
+    min-width: 90px;
+    padding: 8px 6px;
   }
 }
 
-/* Специальные стили для очень узких экранов (менее 360px) */
-@media (max-width: 360px) {
-  .container {
-    padding: 6px;
-  }
-  
-  .header, .controls {
-    padding: 10px;
-  }
-  
-  .today-mode td.name, 
-  .today-mode th.name {
-    min-width: 55px !important;
-    max-width: 65px !important;
-    padding: 5px 2px !important;
-    font-size: 9px !important;
-  }
-  
-  .today-mode thead th:not(.name) {
-    min-width: 45px !important;
-    max-width: 55px !important;
-    padding: 7px 2px !important;
-    font-size: 10px !important;
-  }
-  
-  .today-mode tbody td:not(.name) {
-    min-width: 45px !important;
-    max-width: 55px !important;
-    padding: 5px 2px !important;
-    font-size: 11px !important;
-  }
-  
-  .today-mode .table-wrap {
-    padding: 0 4px;
-  }
-}
-
-/* Улучшенная навигация для мобильных */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--card);
-  border-top: 1px solid var(--thin-border);
-  padding: 8px;
-  z-index: 100;
-}
-
-.mobile-nav-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.mobile-nav-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 8px;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 11px;
-  border-radius: 8px;
-  transition: var(--transition);
-}
-
-.mobile-nav-btn.active {
-  background: var(--accent);
-  color: white;
-}
-
-.mobile-nav-btn i {
-  font-size: 16px;
-}
-
-@media (max-width: 768px) {
-  .mobile-nav {
-    display: block;
-  }
-  
-  /* Добавляем отступ снизу для мобильной навигации */
-  .container {
-    padding-bottom: 70px;
-  }
-}
-
-/* Улучшенный скроллбар для мобильных */
+/* Улучшенный скроллбар */
 .table-wrap::-webkit-scrollbar {
   height: 6px;
 }
@@ -1003,100 +600,15 @@ tbody td:hover::after {
 .table-wrap::-webkit-scrollbar-track {
   background: var(--card);
 }
-
-/* Адаптивные сокращения для длинных имен */
-.mobile-name {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .desktop-name {
-    display: none;
-  }
-  
-  .mobile-name {
-    display: inline;
-  }
-}
-
-/* Touch optimizations */
-@media (hover: none) and (pointer: coarse) {
-  tbody td::after {
-    display: none !important;
-  }
-  
-  button:active {
-    transform: scale(0.95);
-  }
-  
-  .legend-item:active {
-    transform: scale(0.95);
-  }
-  
-  /* Увеличиваем область тапа для мобильных */
-  tbody td {
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  td.name {
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-  }
-}
-
-/* Smooth animations */
-.fade-in {
-  animation: fadeInUp 0.6s ease;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--card);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--thin-border);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
 </style>
 </head>
 <body>
-<!-- Offline Indicator -->
-<div class="offline-indicator" id="offlineIndicator">
-  <i class="fas fa-wifi-slash"></i>
-  Работа в оффлайн-режиме. Данные могут быть устаревшими.
-</div>
-
 <!-- Notifications -->
 <div id="notificationsContainer"></div>
 
 <div class="container">
   <!-- Header -->
-  <header class="header fade-in">
+  <header class="header">
     <div class="header-content">
       <div class="logo">
         <div class="logo-icon">
@@ -1129,43 +641,8 @@ tbody td:hover::after {
     </div>
   </header>
 
-  <!-- Admin Panel (Hidden by default and on mobile) -->
-  <section class="admin-panel" id="adminPanel">
-    <div class="admin-header">
-      <div class="admin-title">
-        <i class="fas fa-cog"></i>
-        Панель администратора
-      </div>
-      <button onclick="toggleAdminPanel()" class="secondary" style="height: 36px; font-size: 12px;">
-        <i class="fas fa-times"></i>
-        Скрыть
-      </button>
-    </div>
-    <div class="admin-form">
-      <div class="control-group">
-        <label class="control-label">Название месяца</label>
-        <input type="text" id="newMonthName" placeholder="Например: Январь 2024">
-      </div>
-      <div class="control-group">
-        <label class="control-label">ID листа (GID)</label>
-        <input type="text" id="newMonthGID" placeholder="Например: 1234567890">
-      </div>
-      <div class="control-group">
-        <label class="control-label">Точка</label>
-        <select id="adminBranch">
-          <option value="jp">Жар-Птица</option>
-          <option value="czm">ЦУМ</option>
-        </select>
-      </div>
-      <button class="admin-button" onclick="addNewMonth()">
-        <i class="fas fa-plus"></i>
-        Добавить месяц
-      </button>
-    </div>
-  </section>
-
   <!-- Controls -->
-  <section class="controls fade-in">
+  <section class="controls">
     <div class="controls-grid">
       <!-- Торговая точка -->
       <div class="control-group">
@@ -1222,16 +699,12 @@ tbody td:hover::after {
           <i class="fas fa-calendar-day"></i>
           Сегодня
         </button>
-        <button onclick="toggleAdminPanel()" class="secondary" id="adminToggle">
-          <i class="fas fa-cog"></i>
-          Админ
-        </button>
       </div>
     </div>
   </section>
 
   <!-- Table -->
-  <section class="table-container fade-in">
+  <section class="table-container">
     <div class="table-header">
       <div class="table-title">
         <i class="fas fa-table"></i>
@@ -1252,100 +725,8 @@ tbody td:hover::after {
   </section>
 </div>
 
-<!-- Мобильная навигация -->
-<nav class="mobile-nav">
-  <div class="mobile-nav-buttons">
-    <button class="mobile-nav-btn active" onclick="loadSchedule()">
-      <i class="fas fa-calendar-week"></i>
-      <span>Неделя</span>
-    </button>
-    <button class="mobile-nav-btn" onclick="showToday()">
-      <i class="fas fa-calendar-day"></i>
-      <span>Сегодня</span>
-    </button>
-  </div>
-</nav>
-
 <script>
-// PWA Manifest с красивыми иконками
-const manifest = {
-  "name": "График сотрудников",
-  "short_name": "График",
-  "description": "Управление рабочим временем команды",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0f0f0f",
-  "theme_color": "#00c853",
-  "orientation": "portrait",
-  "scope": "/",
-  "icons": [
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzYiIGZpbGw9IiMwMGM4NTMiLz4KPHBhdGggZD0iTTk2IDU2QzcwLjIgNTYgNTQgNzIuMiA1NCA5OFM3MC4yIDE0MCA5NiAxNDAgMTM4IDEyMy44IDEzOCA5OCAxMjEuOCA1NiA5NiA1NlpNNzYgMTA0Vjg4SDgwVjEwNEg3NlpNOTYgMTA0Vjg4SDEwMFYxMDRIOTZaTTExNiAxMDRWODhIMTIwVjEwNEgxMTZaIiBmaWxsPSJ3aGl0ZSIvPgo8cmVjdCB4PSI3MiIgeT0iMTQ0IiB3aWR0aD0iNDgiIGhlaWdodD0iOCIgcng9IjQiIGZpbGw9IndoaXRlIi8+CjxyZWN0IHg9IjY0IiB5PSIxNjAiIHdpZHRoPSI2NCIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iOTYiIGZpbGw9IiMwMGM4NTMiLz4KPHBhdGggZD0iTTI1NiAxNDhDMTg0LjYgMTQ4IDEyOCAyMDQuNiAxMjggMjc2UzE4NC42IDQwNCAyNTYgNDA0IDM4NCAzNDcuNCAzODQgMjc2IDMyNy40IDE0OCAyNTYgMTQ4Wk0xOTIgMjcyVjIzMkgyMDBWMjcySDE5MlpNMjU2IDI3MlYyMzJIMjY0VjI3MkgyNTZaTTMyMCAyNzJWMjMySDMyOFYyNzJIMzIwWiIgZmlsbD0id2hpdGUiLz4KPHJlY3QgeD0iMTkyIiB5PSIzODQiIHdpZHRoPSIxMjgiIGhlaWdodD0iMTYiIHJ4PSI4IiBmaWxsPSJ3aGl0ZSIvPgo8cmVjdCB4PSIxNzAiIHk9IjQyNCIgd2lkdGg9IjE3MiIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI2MDAiIHZpZXdCb3g9IjAgMCAxMjAwIDYwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iNjAwIiBmaWxsPSIjMDBjODUzIi8+CjxyZWN0IHg9IjI0IiB5PSIyNCIgd2lkdGg9IjExNTIiIGhlaWdodD0iNTUyIiByeD0iMjQiIGZpbGw9IiMwZjBmMGYiLz4KPHJlY3QgeD0iNDgiIHk9IjQ4IiB3aWR0aD0iMTEwNCIgaGVpZ2h0PSI4MCIgcng9IjEyIiBmaWxsPSIjMmQyZDJkIi8+Cjx0ZXh0IHg9IjYwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJJbnRlciIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0id2hpdGUiPuCflLjRg9C/0YDQsNCy0LvQtdC90L4g0YHQvtC+0LHRidC10L3QuNC1PC90ZXh0Pgo8cmVjdCB4PSI0OCIgeT0iMTQwIiB3aWR0aD0iMTEwNCIgaGVpZ2h0PSI0MCIgcng9IjgiIGZpbGw9IiMzNjM2MzYiLz4KPHJlY3QgeD0iNDgiIHk9IjIwMCIgd2lkdGg9IjM1MCIgaGVpZ2h0PSIzMDAiIHJ4PSIxNiIgZmlsbD0iIzJkMmQyZCIvPgo8cmVjdCB4PSI0MjAiIHk9IjIwMCIgd2lkdGg9IjczMiIgaGVpZ2h0PSIzMDAiIHJ4PSIxNiIgZmlsbD0iIzJkMmQyZCIvPgo8L3N2Zz4=",
-      "sizes": "1200x600",
-      "type": "image/svg+xml",
-      "form_factor": "wide",
-      "label": "Главный экран приложения График сотрудников"
-    }
-  ]
-};
-
-// Регистрируем манифест
-const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-const manifestURL = URL.createObjectURL(blob);
-const link = document.createElement('link');
-link.rel = 'manifest';
-link.href = manifestURL;
-document.head.appendChild(link);
-
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    // Регистрируем простой Service Worker для PWA
-    const swCode = `
-      self.addEventListener('install', (event) => {
-        self.skipWaiting();
-      });
-      
-      self.addEventListener('fetch', (event) => {
-        event.respondWith(
-          fetch(event.request).catch(() => {
-            return new Response('Оффлайн режим', {
-              status: 503,
-              statusText: 'Service Unavailable'
-            });
-          })
-        );
-      });
-    `;
-    
-    const swBlob = new Blob([swCode], { type: 'application/javascript' });
-    const swURL = URL.createObjectURL(swBlob);
-    
-    navigator.serviceWorker.register(swURL)
-      .then(function(registration) {
-        console.log('SW registered: ', registration);
-      })
-      .catch(function(registrationError) {
-        console.log('SW registration failed: ', registrationError);
-      });
-  });
-}
-
-// Конфигурация таблиц (загружается из localStorage или используется по умолчанию)
+// Конфигурация таблиц
 let tableIDs = { 
   jp: "1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", 
   czm: "1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" 
@@ -1377,86 +758,12 @@ const dayNamesShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
 
 // Кэш данных
 const cachedCSVs = {};
-const CACHE_VERSION = 'v1';
-const CACHE_NAME = `schedule-cache-${CACHE_VERSION}`;
 
 // Переменные состояния
 let currentBranch = null;
 let currentMonth = null;
 let scheduleData = [];
 let allEmployees = [];
-let isOnline = navigator.onLine;
-
-// ========== ФУНКЦИЯ ДЛЯ АДАПТИВНОГО СОКРАЩЕНИЯ ИМЕН ==========
-function getDisplayName(fullName) {
-  if (!fullName) return '';
-  
-  if (window.innerWidth <= 480) {
-    // На очень маленьких экранах показываем только фамилию
-    const parts = fullName.trim().split(' ');
-    return parts[0];
-  } else if (window.innerWidth <= 768) {
-    // На мобильных показываем фамилию и инициалы
-    const parts = fullName.trim().split(' ');
-    if (parts.length >= 2) {
-      return `${parts[0]} ${parts[1].charAt(0)}.`;
-    }
-    return parts[0];
-  } else {
-    // На десктопе полное имя
-    return fullName;
-  }
-}
-
-// ========== PWA И ОФФЛАЙН РЕЖИМ ==========
-function initOfflineSupport() {
-  // Отслеживание статуса сети
-  window.addEventListener('online', () => {
-    isOnline = true;
-    document.getElementById('offlineIndicator').classList.remove('show');
-    showNotification('Соединение восстановлено', 'success');
-  });
-
-  window.addEventListener('offline', () => {
-    isOnline = false;
-    document.getElementById('offlineIndicator').classList.add('show');
-    showNotification('Отсутствует интернет-соединение', 'warning', 0);
-  });
-
-  // Инициализация кэша
-  initCache();
-}
-
-async function initCache() {
-  if ('caches' in window) {
-    try {
-      const cache = await caches.open(CACHE_NAME);
-      // Кэшируем основные данные при первой загрузке
-      await cacheDefaultData(cache);
-    } catch (error) {
-      console.warn('Не удалось инициализировать кэш:', error);
-    }
-  }
-}
-
-async function cacheDefaultData(cache) {
-  // Кэшируем данные по умолчанию
-  const urlsToCache = [];
-  
-  for (const branch in monthsGIDs) {
-    for (const month in monthsGIDs[branch]) {
-      const gid = monthsGIDs[branch][month];
-      const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
-      urlsToCache.push(url);
-    }
-  }
-  
-  try {
-    await cache.addAll(urlsToCache);
-  } catch (error) {
-    console.warn('Не удалось закэшировать данные:', error);
-  }
-}
 
 // ========== УВЕДОМЛЕНИЯ ==========
 function showNotification(message, type = 'success', duration = 4000) {
@@ -1476,10 +783,8 @@ function showNotification(message, type = 'success', duration = 4000) {
   
   container.appendChild(notification);
   
-  // Анимация появления
   setTimeout(() => notification.classList.add('show'), 100);
   
-  // Автоматическое скрытие (если duration > 0)
   if (duration > 0) {
     setTimeout(() => {
       notification.classList.remove('show');
@@ -1492,142 +797,13 @@ function showNotification(message, type = 'success', duration = 4000) {
   }
 }
 
-// ========== АДМИН ПАНЕЛЬ ==========
-function toggleAdminPanel() {
-  // На мобильных устройствах админ-панель недоступна
-  if (window.innerWidth <= 768) {
-    showNotification('Админ-панель недоступна на мобильных устройствах', 'info', 3000);
-    return;
-  }
-  
-  const adminPanel = document.getElementById('adminPanel');
-  const adminToggle = document.getElementById('adminToggle');
-  
-  if (adminPanel.classList.contains('visible')) {
-    adminPanel.classList.remove('visible');
-    adminToggle.innerHTML = '<i class="fas fa-cog"></i> Админ';
-  } else {
-    adminPanel.classList.add('visible');
-    adminToggle.innerHTML = '<i class="fas fa-times"></i> Скрыть';
-  }
-}
-
-function addNewMonth() {
-  const monthName = document.getElementById('newMonthName').value.trim();
-  const gid = document.getElementById('newMonthGID').value.trim();
-  const branch = document.getElementById('adminBranch').value;
-  
-  if (!monthName || !gid) {
-    showNotification('Заполните все поля', 'error');
-    return;
-  }
-  
-  if (!/^\d+$/.test(gid)) {
-    showNotification('GID должен содержать только цифры', 'error');
-    return;
-  }
-  
-  // Добавляем месяц в конфигурацию
-  if (!monthsGIDs[branch]) {
-    monthsGIDs[branch] = {};
-  }
-  
-  monthsGIDs[branch][monthName] = parseInt(gid);
-  
-  // Сохраняем конфигурацию
-  saveConfig();
-  
-  // Обновляем список месяцев
-  populateMonths(branch);
-  
-  // Очищаем поля
-  document.getElementById('newMonthName').value = '';
-  document.getElementById('newMonthGID').value = '';
-  
-  showNotification(`Месяц "${monthName}" успешно добавлен`, 'success');
-}
-
-// ========== ОБРАБОТКА ОШИБОК СЕТИ ==========
-async function loadWithFallback(url, retryCount = 3) {
-  // Пытаемся загрузить из сети
-  for (let attempt = 1; attempt <= retryCount; attempt++) {
-    try {
-      if (!isOnline) throw new Error('Offline');
-      
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
-      const data = await response.text();
-      
-      // Сохраняем в кэш
-      if ('caches' in window) {
-        const cache = await caches.open(CACHE_NAME);
-        await cache.put(url, new Response(data));
-      }
-      
-      return data;
-      
-    } catch (error) {
-      console.warn(`Попытка ${attempt} не удалась:`, error);
-      
-      if (attempt === retryCount) {
-        // Пробуем загрузить из кэша
-        if ('caches' in window) {
-          try {
-            const cache = await caches.open(CACHE_NAME);
-            const cachedResponse = await cache.match(url);
-            
-            if (cachedResponse) {
-              const cachedData = await cachedResponse.text();
-              showNotification('Данные загружены из кэша', 'info', 3000);
-              return cachedData;
-            }
-          } catch (cacheError) {
-            console.warn('Ошибка при загрузке из кэша:', cacheError);
-          }
-        }
-        
-        throw error;
-      }
-      
-      // Ждем перед повторной попыткой
-      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-    }
-  }
-}
-
-// ========== ВАЛИДАЦИЯ ДАННЫХ ==========
-function validateCSVData(parsedData) {
-  if (!Array.isArray(parsedData) || parsedData.length < 3) {
-    throw new Error('Некорректный формат данных');
-  }
-  
-  // Проверяем заголовки дат
-  const dateRow = parsedData[1];
-  if (!dateRow || dateRow.length < 3) {
-    throw new Error('Отсутствуют данные о датах');
-  }
-  
-  // Проверяем данные сотрудников
-  const employeeRows = parsedData.slice(2, 16);
-  const hasEmployees = employeeRows.some(row => row && row[0] && row[0].trim());
-  
-  if (!hasEmployees) {
-    throw new Error('Не найдены данные сотрудников');
-  }
-  
-  return true;
-}
-
 // ========== ИНДИКАТОР ЗАГРУЗКИ ==========
-function setLoading(isLoading, element = 'table') {
-  if (element === 'table') {
-    const loadingEl = document.getElementById('tableLoading');
-    if (isLoading) {
-      loadingEl.style.display = 'flex';
-    } else {
-      loadingEl.style.display = 'none';
-    }
+function setLoading(isLoading) {
+  const loadingEl = document.getElementById('tableLoading');
+  if (isLoading) {
+    loadingEl.style.display = 'flex';
+  } else {
+    loadingEl.style.display = 'none';
   }
 }
 
@@ -1664,10 +840,9 @@ function loadState() {
 }
 
 // ========== ОСНОВНЫЕ ФУНКЦИИ ==========
-async function loadCSV(branch, month, retryCount = 3) {
+async function loadCSV(branch, month) {
   const cacheKey = `${branch}_${month}`;
   
-  // Проверяем кэш в памяти
   if (cachedCSVs[cacheKey]) {
     return cachedCSVs[cacheKey];
   }
@@ -1677,28 +852,18 @@ async function loadCSV(branch, month, retryCount = 3) {
   
   try {
     setLoading(true);
-    const text = await loadWithFallback(url, retryCount);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Ошибка загрузки');
+    
+    const text = await response.text();
     const parsed = text.split("\n").map(r => r.split(","));
     
-    // Валидация данных
-    validateCSVData(parsed);
-    
-    // Сохраняем в кэш памяти
     cachedCSVs[cacheKey] = parsed;
-    showNotification(`Данные для ${month} загружены`, 'success');
     return parsed;
     
   } catch (error) {
     console.error('Ошибка загрузки данных:', error);
-    
-    if (error.message.includes('Offline')) {
-      showNotification('Режим оффлайн. Используются кэшированные данные.', 'warning', 5000);
-    } else if (error.message.includes('Некорректный формат')) {
-      showNotification('Ошибка в формате данных таблицы', 'error', 6000);
-    } else {
-      showNotification('Не удалось загрузить данные', 'error', 6000);
-    }
-    
+    showNotification('Не удалось загрузить данные', 'error');
     throw error;
   } finally {
     setLoading(false);
@@ -1717,7 +882,6 @@ function populateMonths(branch) {
     monthSelect.appendChild(opt);
   });
   
-  // Восстанавливаем значение если возможно
   if (currentValue && [...monthSelect.options].some(opt => opt.value === currentValue)) {
     monthSelect.value = currentValue;
   }
@@ -1728,13 +892,11 @@ async function populateEmployees(branch, month) {
     setLoading(true);
     scheduleData = await loadCSV(branch, month);
     
-  // Обновляем состояние
     currentBranch = branch;
     currentMonth = month;
     
     const employeesSet = new Set();
     
-    // Извлекаем имена сотрудников из данных
     for (let i = 2; i <= 15; i++) {
       if (scheduleData[i] && scheduleData[i][0] && scheduleData[i][0].trim() !== "") {
         employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/, ""));
@@ -1754,7 +916,6 @@ async function populateEmployees(branch, month) {
       select.appendChild(opt);
     });
     
-    // Восстанавливаем предыдущее значение
     if (currentValue && (currentValue === 'all' || allEmployees.includes(currentValue))) {
       select.value = currentValue;
     }
@@ -1767,31 +928,12 @@ async function populateEmployees(branch, month) {
   }
 }
 
-// Парсинг смены - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// Парсинг смены
 function parseShift(val) {
   if (!val) return { type: "empty", label: "" };
   
   const s = String(val).trim().toLowerCase();
   
-  // Обработка дробных чисел (3,5у, 2.5в и т.д.) - показываем как "Утро"/"Вечер"
-  const hourMatch = s.match(/^(\d+[,.]\d+)([ув])$/);
-  if (hourMatch) {
-    const shiftType = hourMatch[2];
-    const type = shiftType === 'у' ? 'morning' : 'evening';
-    const label = shiftType === 'у' ? 'Утро' : 'Вечер';
-    return { type: type, label: label };
-  }
-  
-  // Обработка целых чисел с часами (3у, 2в и т.д.) - показываем как "Утро"/"Вечер"
-  const intHourMatch = s.match(/^(\d+)([ув])$/);
-  if (intHourMatch) {
-    const shiftType = intHourMatch[2];
-    const type = shiftType === 'у' ? 'morning' : 'evening';
-    const label = shiftType === 'у' ? 'Утро' : 'Вечер';
-    return { type: type, label: label };
-  }
-  
-  // Стандартные проверки
   if (s.includes("вд")) return { type: "fullday", label: "Весь день" };
   if (s.endsWith("у")) return { type: "morning", label: "Утро" };
   if (s.endsWith("в")) return { type: "evening", label: "Вечер" };
@@ -1811,10 +953,6 @@ function formatDate(d) {
   return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
 }
 
-function getDayName(date) {
-  return dayNames[date.getDay() === 0 ? 6 : date.getDay() - 1];
-}
-
 function getDayNameShort(date) {
   return dayNamesShort[date.getDay() === 0 ? 6 : date.getDay() - 1];
 }
@@ -1823,7 +961,6 @@ function getDayNameShort(date) {
 function showToday() {
   const today = new Date();
   
-  // Если нет данных, выходим
   if (!scheduleData.length) {
     showNotification("Нет данных для отображения", "warning");
     return;
@@ -1832,17 +969,11 @@ function showToday() {
   const tableHead = document.getElementById("tableHead");
   const tableBody = document.getElementById("tableBody");
   
-  // Очищаем таблицу
   tableHead.innerHTML = "";
   tableBody.innerHTML = "";
   
-  // Добавляем класс для режима "Сегодня"
-  const table = document.getElementById("scheduleTable");
-  table.classList.add("today-mode");
-  
   const dateRow = (scheduleData[1] || []).slice(2);
   
-  // Находим индекс колонки для сегодняшней даты
   let todayIndex = null;
   for (let i = 0; i < dateRow.length; i++) {
     const parts = dateRow[i].split('.');
@@ -1857,12 +988,9 @@ function showToday() {
   
   if (todayIndex === null) {
     showNotification("Нет данных на сегодня", "warning");
-    // Убираем класс режима "Сегодня" если данных нет
-    table.classList.remove("today-mode");
     return;
   }
   
-  // Создаем заголовок таблицы только для сегодняшнего дня
   tableHead.innerHTML = `
     <tr>
       <th class='name name-header'>Сотрудник</th>
@@ -1873,45 +1001,29 @@ function showToday() {
     </tr>
   `;
   
-  // Фильтруем строки с данными сотрудников
   const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
   
   let visibleRows = 0;
   
-  // Создаем строки таблицы только для сотрудников, которые работают сегодня
   rows.forEach((r, rowIndex) => {
     const shiftValue = r[todayIndex] ? r[todayIndex].trim() : "";
     const shift = parseShift(shiftValue);
     
-    // Показываем только сотрудников с рабочей сменой сегодня
     if (shift.type !== "empty") {
       const tr = document.createElement("tr");
       
-      // Адаптивное отображение имени
-      const displayName = getDisplayName(r[0]);
-      
       tr.innerHTML = `
-        <td class="name" title="${r[0]}">${displayName}</td>
+        <td class="name" title="${r[0]}">${r[0]}</td>
         <td class="${shift.type}" data-tooltip="${shiftValue}">${shift.label}</td>
       `;
       
       tableBody.appendChild(tr);
-      
-      // Плавная анимация появления строк с задержкой
-      setTimeout(() => {
-        tr.style.animationDelay = `${rowIndex * 0.1}s`;
-      }, 10);
-      
       visibleRows++;
     }
   });
   
-  // Обновляем мобильную навигацию
-  updateMobileNav('today');
-  
   if (visibleRows === 0) {
     showNotification("Сегодня никто не работает", "info");
-    table.classList.remove("today-mode");
   } else {
     showNotification(`Сегодня работают: ${visibleRows} сотрудников`, "success", 3000);
   }
@@ -1920,9 +1032,6 @@ function showToday() {
 }
 
 function loadSchedule() {
-  // Убираем класс режима "Сегодня" при обычной загрузке графика
-  document.getElementById("scheduleTable").classList.remove("today-mode");
-  
   const employee = document.getElementById("employee").value;
   const selectedDate = new Date(document.getElementById("startDate").value);
   
@@ -1934,11 +1043,9 @@ function loadSchedule() {
   const tableHead = document.getElementById("tableHead");
   const tableBody = document.getElementById("tableBody");
   
-  // Очищаем таблицу
   tableHead.innerHTML = "";
   tableBody.innerHTML = "";
   
-  // Если нет данных, выходим
   if (!scheduleData.length) {
     showNotification("Нет данных для отображения", "warning");
     return;
@@ -1969,7 +1076,6 @@ function loadSchedule() {
   
   const today = new Date();
   
-  // Создаем заголовок таблицы с днями недели
   let headerHTML = "<tr><th class='name name-header'>Сотрудник</th>";
   weekDates.forEach(d => {
     const isToday = d.toDateString() === today.toDateString();
@@ -1981,21 +1087,16 @@ function loadSchedule() {
   headerHTML += "</tr>";
   tableHead.innerHTML = headerHTML;
   
-  // Фильтруем строки с данными сотрудников
   const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
   
   let visibleRows = 0;
   
-  // Создаем строки таблицы
   rows.forEach((r, rowIndex) => {
     if (employee !== "all" && r[0] !== employee) return;
     
     const tr = document.createElement("tr");
     
-    // Адаптивное отображение имени
-    const displayName = getDisplayName(r[0]);
-    
-    let html = `<td class="name" title="${r[0]}">${displayName}</td>`;
+    let html = `<td class="name" title="${r[0]}">${r[0]}</td>`;
     
     dateIndexMap.forEach(idx => {
       let val = "";
@@ -2007,17 +1108,8 @@ function loadSchedule() {
     
     tr.innerHTML = html;
     tableBody.appendChild(tr);
-    
-    // Плавная анимация появления строк с задержкой
-    setTimeout(() => {
-      tr.style.animationDelay = `${rowIndex * 0.1}s`;
-    }, 10);
-    
     visibleRows++;
   });
-  
-  // Обновляем мобильную навигацию
-  updateMobileNav('week');
   
   if (visibleRows === 0) {
     showNotification("Нет данных для выбранного сотрудника", "warning");
@@ -2028,53 +1120,25 @@ function loadSchedule() {
   saveState();
 }
 
-// ========== МОБИЛЬНАЯ НАВИГАЦИЯ ==========
-function updateMobileNav(activeView) {
-  if (window.innerWidth <= 768) {
-    const weekBtn = document.querySelector('.mobile-nav-btn:nth-child(1)');
-    const todayBtn = document.querySelector('.mobile-nav-btn:nth-child(2)');
-    
-    weekBtn.classList.remove('active');
-    todayBtn.classList.remove('active');
-    
-    if (activeView === 'week') {
-      weekBtn.classList.add('active');
-    } else {
-      todayBtn.classList.add('active');
-    }
-  }
-}
-
 // ========== ИНИЦИАЛИЗАЦИЯ ==========
 async function init() {
-  // Загружаем конфигурацию
   loadConfig();
-  
-  // Инициализируем оффлайн поддержку
-  initOfflineSupport();
-  
-  // Загружаем сохраненное состояние
   loadState();
   
   const branchSelect = document.getElementById("branch");
-  
-  // Заполняем месяцы для текущей точки
   populateMonths(branchSelect.value);
   
-  // Загружаем сотрудников для текущего месяца
   const currentMonth = document.getElementById("month").value;
   if (currentMonth) {
     await populateEmployees(branchSelect.value, currentMonth);
   }
   
-  // Устанавливаем дату начала текущей недели если не установлена
   if (!document.getElementById("startDate").value) {
     const today = new Date();
     const firstDay = getWeekStart(today);
     document.getElementById("startDate").valueAsDate = firstDay;
   }
   
-  // Загружаем график
   loadSchedule();
 }
 
@@ -2114,37 +1178,11 @@ document.getElementById("refreshBtn").addEventListener("click", async () => {
   const branch = document.getElementById("branch").value;
   const month = document.getElementById("month").value;
   
-  // Очищаем кэш для текущей точки и месяца
   const cacheKey = `${branch}_${month}`;
   delete cachedCSVs[cacheKey];
   
-  if ('caches' in window) {
-    try {
-      const cache = await caches.open(CACHE_NAME);
-      const gid = monthsGIDs[branch][month];
-      const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
-      await cache.delete(url);
-    } catch (error) {
-      console.warn('Не удалось очистить кэш:', error);
-    }
-  }
-  
   showNotification("Обновление данных...", "warning", 2000);
-  
-  // Перезагружаем данные
   await populateEmployees(branch, month);
-});
-
-// Автоматическое обновление данных при возвращении онлайн
-window.addEventListener('online', async () => {
-  const branch = document.getElementById("branch").value;
-  const month = document.getElementById("month").value;
-  
-  if (branch && month) {
-    const cacheKey = `${branch}_${month}`;
-    delete cachedCSVs[cacheKey];
-    await populateEmployees(branch, month);
-  }
 });
 
 // Инициализация при загрузке страницы
