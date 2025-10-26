@@ -714,9 +714,23 @@ let tableIDs = {
   czm: "1TjZ3EGeviO-23EoYanLv2ZMGLgdg5eozZl59BCgyAao" 
 };
 
+// GID для разных месяцев
+let monthsGIDs = { 
+  jp: {
+    "Октябрь": "0",
+    "Ноябрь": "1956542531", 
+    "Декабрь": "987654321"
+  }, 
+  czm: {
+    "Октябрь": "0",
+    "Ноябрь": "1078468054", 
+    "Декабрь": "987654321"
+  } 
+};
+
 // ========== КОНФИГУРАЦИЯ ОПТИМИЗАЦИЙ ==========
 const CACHE_CONFIG = {
-  VERSION: '1.4',
+  VERSION: '1.5',
   DURATION: 10 * 60 * 1000, // 10 минут
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
@@ -759,12 +773,12 @@ function delay(ms) {
 const cachedCSVs = {};
 const cachedWeekData = {};
 
-function getCacheKey(branch) {
-  return `${branch}_${CACHE_CONFIG.VERSION}`;
+function getCacheKey(branch, month) {
+  return `${branch}_${month}_${CACHE_CONFIG.VERSION}`;
 }
 
-function getWeekCacheKey(branch, weekStartDate) {
-  return `${branch}_${weekStartDate.getTime()}_${CACHE_CONFIG.VERSION}`;
+function getWeekCacheKey(branch, month, weekStartDate) {
+  return `${branch}_${month}_${weekStartDate.getTime()}_${CACHE_CONFIG.VERSION}`;
 }
 
 function isCacheValid(cacheEntry) {
@@ -825,7 +839,7 @@ async function fetchWithRetry(url, options = {}) {
   }
 }
 
-function handleNetworkError(error, branch) {
+function handleNetworkError(error, branch, month) {
   console.error('Network error:', error);
   
   if (error.name === 'AbortError') {
@@ -895,6 +909,7 @@ function renderTableOptimized(weekData, employee) {
 
 // ========== ПЕРЕМЕННЫЕ СОСТОЯНИЯ ==========
 let currentBranch = null;
+let currentMonth = null;
 let scheduleData = [];
 let allEmployees = [];
 
@@ -993,6 +1008,7 @@ function loadState() {
 // Загрузка конфигурации из localStorage
 function loadConfig() {
   const savedTableIDs = localStorage.getItem('scheduleTableIDs');
+  const savedMonthsGIDs = localStorage.getItem('scheduleMonthsGIDs');
   
   if (savedTableIDs) {
     try {
@@ -1001,12 +1017,21 @@ function loadConfig() {
       console.warn('Ошибка загрузки tableIDs:', e);
     }
   }
+  
+  if (savedMonthsGIDs) {
+    try {
+      monthsGIDs = JSON.parse(savedMonthsGIDs);
+    } catch (e) {
+      console.warn('Ошибка загрузки monthsGIDs:', e);
+    }
+  }
 }
 
 // Сохранение конфигурации в localStorage
 function saveConfig() {
   try {
     localStorage.setItem('scheduleTableIDs', JSON.stringify(tableIDs));
+    localStorage.setItem('scheduleMonthsGIDs', JSON.stringify(monthsGIDs));
   } catch (e) {
     console.warn('Не удалось сохранить конфигурацию:', e);
   }
@@ -1016,9 +1041,20 @@ function saveConfig() {
 const dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
 const dayNamesShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
 
+// ========== ОПРЕДЕЛЕНИЕ МЕСЯЦА ПО ДАТЕ ==========
+function getMonthForDate(date) {
+  const month = date.getMonth() + 1; // 1-12
+  if (month === 10) return "Октябрь";
+  if (month === 11) return "Ноябрь";
+  if (month === 12) return "Декабрь";
+  return "Октябрь"; // по умолчанию
+}
+
 // ========== ЛЕНИВАЯ ЗАГРУЗКА ДАННЫХ ==========
 async function loadWeekData(branch, weekStartDate) {
-  const weekKey = getWeekCacheKey(branch, weekStartDate);
+  // Определяем месяц для начала недели
+  const month = getMonthForDate(weekStartDate);
+  const weekKey = getWeekCacheKey(branch, month, weekStartDate);
   
   // Проверяем кэш недельных данных
   const cachedWeek = getFromCache(cachedWeekData, weekKey);
@@ -1026,9 +1062,9 @@ async function loadWeekData(branch, weekStartDate) {
     return cachedWeek;
   }
   
-  // Загружаем полные данные, если их нет
-  if (!getFromCache(cachedCSVs, getCacheKey(branch))) {
-    await loadCSV(branch);
+  // Загружаем данные для нужного месяца
+  if (!getFromCache(cachedCSVs, getCacheKey(branch, month))) {
+    await loadCSV(branch, month);
   }
   
   // Извлекаем данные только для нужной недели
@@ -1055,8 +1091,12 @@ function findDateColumnIndex(dateRow, targetDate) {
   
   for (let i = 0; i < dateRow.length; i++) {
     const cellValue = dateRow[i] ? dateRow[i].trim() : '';
-    if (possibleFormats.some(format => cellValue.startsWith(format))) {
-      return i;
+    
+    // Проверяем все возможные форматы
+    for (const format of possibleFormats) {
+      if (cellValue.startsWith(format)) {
+        return i;
+      }
     }
     
     // Дополнительная проверка для случаев, когда в ячейке есть лишние символы
@@ -1095,64 +1135,86 @@ function extractWeekData(weekStartDate) {
 }
 
 // ========== ОСНОВНЫЕ ФУНКЦИИ ==========
-async function loadCSV(branch) {
-  const cacheKey = getCacheKey(branch);
+async function loadCSV(branch, month) {
+  const cacheKey = getCacheKey(branch, month);
   
   // Проверяем валидный кэш
   const cachedData = getFromCache(cachedCSVs, cacheKey);
   if (cachedData) {
     scheduleData = cachedData;
+    currentMonth = month;
     return scheduleData;
   }
   
-  const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv`;
+  const gid = monthsGIDs[branch][month];
+  const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
   
   try {
     setLoading(true);
     const response = await fetchWithRetry(url);
     const text = await response.text();
-    const parsed = text.split("\n").map(r => {
-      // Улучшенный парсинг CSV с учетом кавычек
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-      
-      for (let i = 0; i < r.length; i++) {
-        const char = r[i];
-        
-        if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          result.push(current);
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      
-      result.push(current);
-      return result;
-    });
+    
+    // Улучшенный парсинг CSV
+    const parsed = parseCSV(text);
     
     // Сохраняем с метаданными
     saveToCache(cachedCSVs, cacheKey, parsed);
     scheduleData = parsed;
+    currentMonth = month;
     
-    showNotification('Данные успешно загружены', 'success', 2000);
+    showNotification(`Данные за ${month} успешно загружены`, 'success', 2000);
     return parsed;
     
   } catch (error) {
-    handleNetworkError(error, branch);
+    handleNetworkError(error, branch, month);
     throw error;
   } finally {
     setLoading(false);
   }
 }
 
+// Улучшенный парсер CSV
+function parseCSV(text) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  let row = [];
+  
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      row.push(current);
+      current = '';
+    } else if (char === '\n' && !inQuotes) {
+      row.push(current);
+      result.push(row);
+      row = [];
+      current = '';
+    } else if (char === '\r') {
+      // Игнорируем \r
+    } else {
+      current += char;
+    }
+  }
+  
+  // Добавляем последнюю строку
+  if (current !== '' || row.length > 0) {
+    row.push(current);
+    result.push(row);
+  }
+  
+  return result;
+}
+
 async function populateEmployees(branch) {
   try {
+    // Загружаем данные за октябрь по умолчанию для списка сотрудников
+    const month = "Октябрь";
     setLoading(true);
-    await loadCSV(branch);
+    await loadCSV(branch, month);
     
     currentBranch = branch;
     
