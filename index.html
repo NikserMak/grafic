@@ -730,7 +730,7 @@ let monthsGIDs = {
 
 // ========== КОНФИГУРАЦИЯ ОПТИМИЗАЦИЙ ==========
 const CACHE_CONFIG = {
-  VERSION: '1.5',
+  VERSION: '1.6',
   DURATION: 10 * 60 * 1000, // 10 минут
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
@@ -777,8 +777,8 @@ function getCacheKey(branch, month) {
   return `${branch}_${month}_${CACHE_CONFIG.VERSION}`;
 }
 
-function getWeekCacheKey(branch, month, weekStartDate) {
-  return `${branch}_${month}_${weekStartDate.getTime()}_${CACHE_CONFIG.VERSION}`;
+function getWeekCacheKey(branch, weekStartDate) {
+  return `${branch}_${weekStartDate.getTime()}_${CACHE_CONFIG.VERSION}`;
 }
 
 function isCacheValid(cacheEntry) {
@@ -909,7 +909,6 @@ function renderTableOptimized(weekData, employee) {
 
 // ========== ПЕРЕМЕННЫЕ СОСТОЯНИЯ ==========
 let currentBranch = null;
-let currentMonth = null;
 let scheduleData = [];
 let allEmployees = [];
 
@@ -1052,9 +1051,7 @@ function getMonthForDate(date) {
 
 // ========== ЛЕНИВАЯ ЗАГРУЗКА ДАННЫХ ==========
 async function loadWeekData(branch, weekStartDate) {
-  // Определяем месяц для начала недели
-  const month = getMonthForDate(weekStartDate);
-  const weekKey = getWeekCacheKey(branch, month, weekStartDate);
+  const weekKey = getWeekCacheKey(branch, weekStartDate);
   
   // Проверяем кэш недельных данных
   const cachedWeek = getFromCache(cachedWeekData, weekKey);
@@ -1062,20 +1059,35 @@ async function loadWeekData(branch, weekStartDate) {
     return cachedWeek;
   }
   
-  // Загружаем данные для нужного месяца
-  if (!getFromCache(cachedCSVs, getCacheKey(branch, month))) {
-    await loadCSV(branch, month);
+  // Определяем, какие месяцы нужны для этой недели
+  const neededMonths = new Set();
+  const weekDates = [];
+  
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStartDate);
+    d.setDate(weekStartDate.getDate() + i);
+    weekDates.push(d);
+    neededMonths.add(getMonthForDate(d));
+  }
+  
+  // Загружаем данные для всех нужных месяцев
+  const monthData = {};
+  for (const month of neededMonths) {
+    if (!getFromCache(cachedCSVs, getCacheKey(branch, month))) {
+      await loadCSV(branch, month);
+    }
+    monthData[month] = scheduleData;
   }
   
   // Извлекаем данные только для нужной недели
-  const weekData = extractWeekData(weekStartDate);
+  const weekData = extractWeekData(weekDates, monthData);
   saveToCache(cachedWeekData, weekKey, weekData);
   
   return weekData;
 }
 
-// Функция для поиска индекса колонки по дате
-function findDateColumnIndex(dateRow, targetDate) {
+// Функция для поиска индекса колонки по дате в данных месяца
+function findDateColumnIndexInMonth(dateRow, targetDate) {
   if (!dateRow || !dateRow.length) return null;
   
   const targetDay = targetDate.getDate();
@@ -1109,27 +1121,53 @@ function findDateColumnIndex(dateRow, targetDate) {
   return null;
 }
 
-function extractWeekData(weekStartDate) {
-  if (!scheduleData.length) return [];
+function extractWeekData(weekDates, monthData) {
+  // Собираем все строки сотрудников из всех месяцев
+  const allRows = {};
   
-  const weekDates = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(weekStartDate);
-    d.setDate(weekStartDate.getDate() + i);
-    weekDates.push(d);
+  // Проходим по всем месяцам и собираем данные сотрудников
+  for (const [month, data] of Object.entries(monthData)) {
+    if (!data || !data.length) continue;
+    
+    const dateRow = (data[1] || []).slice(2);
+    const rows = (data.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
+    
+    // Для каждого сотрудника в этом месяце
+    rows.forEach(row => {
+      const employeeName = row[0].trim();
+      if (!allRows[employeeName]) {
+        allRows[employeeName] = {};
+      }
+      
+      // Для каждой даты в неделе
+      weekDates.forEach(date => {
+        const dateMonth = getMonthForDate(date);
+        if (dateMonth === month) {
+          const colIndex = findDateColumnIndexInMonth(dateRow, date);
+          if (colIndex !== null) {
+            allRows[employeeName][date.getTime()] = row[colIndex + 2];
+          }
+        }
+      });
+    });
   }
   
-  const dateRow = (scheduleData[1] || []).slice(2);
-  const dateIndexMap = weekDates.map(d => {
-    const colIndex = findDateColumnIndex(dateRow, d);
-    return colIndex !== null ? colIndex + 2 : null;
-  });
+  // Создаем финальный массив строк
+  const finalRows = [];
+  for (const [employeeName, dateData] of Object.entries(allRows)) {
+    const row = [employeeName];
+    weekDates.forEach(date => {
+      row.push(dateData[date.getTime()] || '');
+    });
+    finalRows.push(row);
+  }
   
-  const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
+  // Создаем карту индексов (всегда с 0, так как мы уже собрали данные)
+  const dateIndexMap = weekDates.map((_, index) => index + 1);
   
   return {
     dateIndexMap,
-    rows,
+    rows: finalRows,
     weekDates
   };
 }
@@ -1142,7 +1180,6 @@ async function loadCSV(branch, month) {
   const cachedData = getFromCache(cachedCSVs, cacheKey);
   if (cachedData) {
     scheduleData = cachedData;
-    currentMonth = month;
     return scheduleData;
   }
   
@@ -1160,12 +1197,13 @@ async function loadCSV(branch, month) {
     // Сохраняем с метаданными
     saveToCache(cachedCSVs, cacheKey, parsed);
     scheduleData = parsed;
-    currentMonth = month;
     
+    console.log(`Данные за ${month} загружены:`, parsed);
     showNotification(`Данные за ${month} успешно загружены`, 'success', 2000);
     return parsed;
     
   } catch (error) {
+    console.error(`Ошибка загрузки данных за ${month}:`, error);
     handleNetworkError(error, branch, month);
     throw error;
   } finally {
