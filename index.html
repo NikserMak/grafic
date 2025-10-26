@@ -716,7 +716,7 @@ let tableIDs = {
 
 // ========== КОНФИГУРАЦИЯ ОПТИМИЗАЦИЙ ==========
 const CACHE_CONFIG = {
-  VERSION: '1.3',
+  VERSION: '1.4',
   DURATION: 10 * 60 * 1000, // 10 минут
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
@@ -1038,6 +1038,37 @@ async function loadWeekData(branch, weekStartDate) {
   return weekData;
 }
 
+// Функция для поиска индекса колонки по дате
+function findDateColumnIndex(dateRow, targetDate) {
+  if (!dateRow || !dateRow.length) return null;
+  
+  const targetDay = targetDate.getDate();
+  const targetMonth = targetDate.getMonth() + 1;
+  
+  // Пробуем разные форматы дат
+  const possibleFormats = [
+    `${targetDay}.${targetMonth}`,           // 1.11
+    `${targetDay}.${targetMonth}.`,          // 1.11.
+    `${targetDay}.${targetMonth.toString().padStart(2, '0')}`, // 01.11
+    `${targetDay}.${targetMonth.toString().padStart(2, '0')}.` // 01.11.
+  ];
+  
+  for (let i = 0; i < dateRow.length; i++) {
+    const cellValue = dateRow[i] ? dateRow[i].trim() : '';
+    if (possibleFormats.some(format => cellValue.startsWith(format))) {
+      return i;
+    }
+    
+    // Дополнительная проверка для случаев, когда в ячейке есть лишние символы
+    if (cellValue.includes(`${targetDay}.${targetMonth}`) || 
+        cellValue.includes(`${targetDay}.${targetMonth.toString().padStart(2, '0')}`)) {
+      return i;
+    }
+  }
+  
+  return null;
+}
+
 function extractWeekData(weekStartDate) {
   if (!scheduleData.length) return [];
   
@@ -1050,16 +1081,8 @@ function extractWeekData(weekStartDate) {
   
   const dateRow = (scheduleData[1] || []).slice(2);
   const dateIndexMap = weekDates.map(d => {
-    for (let i = 0; i < dateRow.length; i++) {
-      const parts = dateRow[i].split('.');
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10);
-      
-      if (day === d.getDate() && month === d.getMonth() + 1) {
-        return i + 2;
-      }
-    }
-    return null;
+    const colIndex = findDateColumnIndex(dateRow, d);
+    return colIndex !== null ? colIndex + 2 : null;
   });
   
   const rows = (scheduleData.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
@@ -1088,7 +1111,28 @@ async function loadCSV(branch) {
     setLoading(true);
     const response = await fetchWithRetry(url);
     const text = await response.text();
-    const parsed = text.split("\n").map(r => r.split(","));
+    const parsed = text.split("\n").map(r => {
+      // Улучшенный парсинг CSV с учетом кавычек
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < r.length; i++) {
+        const char = r[i];
+        
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      
+      result.push(current);
+      return result;
+    });
     
     // Сохраняем с метаданными
     saveToCache(cachedCSVs, cacheKey, parsed);
