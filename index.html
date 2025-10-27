@@ -730,7 +730,7 @@ let monthsGIDs = {
 
 // ========== КОНФИГУРАЦИЯ ОПТИМИЗАЦИЙ ==========
 const CACHE_CONFIG = {
-  VERSION: '1.6',
+  VERSION: '1.7',
   DURATION: 10 * 60 * 1000, // 10 минут
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
@@ -810,7 +810,7 @@ async function fetchWithRetry(url, options = {}) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      const timeoutId = setTimeout(() => controller.abbit(), timeout);
       
       const response = await fetch(url, { 
         signal: controller.signal,
@@ -1121,6 +1121,29 @@ function findDateColumnIndexInMonth(dateRow, targetDate) {
   return null;
 }
 
+// Функция для получения строк сотрудников без дубликатов и пустых строк
+function getEmployeeRows(data) {
+  if (!data || !data.length) return [];
+  
+  const rows = [];
+  const seenNames = new Set();
+  
+  // Начинаем с 3 строки (индекс 2) и идем до 15 строки (индекс 14)
+  for (let i = 2; i <= 14; i++) {
+    if (data[i] && data[i][0] && data[i][0].trim() !== "") {
+      const employeeName = data[i][0].trim();
+      
+      // Проверяем, нет ли уже такого сотрудника
+      if (!seenNames.has(employeeName)) {
+        seenNames.add(employeeName);
+        rows.push(data[i]);
+      }
+    }
+  }
+  
+  return rows;
+}
+
 function extractWeekData(weekDates, monthData) {
   // Собираем все строки сотрудников из всех месяцев
   const allRows = {};
@@ -1130,7 +1153,7 @@ function extractWeekData(weekDates, monthData) {
     if (!data || !data.length) continue;
     
     const dateRow = (data[1] || []).slice(2);
-    const rows = (data.slice(2, 16) || []).filter(r => r[0] && r[0].trim() !== "");
+    const rows = getEmployeeRows(data);
     
     // Для каждого сотрудника в этом месяце
     rows.forEach(row => {
@@ -1198,7 +1221,7 @@ async function loadCSV(branch, month) {
     saveToCache(cachedCSVs, cacheKey, parsed);
     scheduleData = parsed;
     
-    console.log(`Данные за ${month} загружены:`, parsed);
+    console.log(`Данные за ${month} загружены:`, parsed.length, 'строк');
     showNotification(`Данные за ${month} успешно загружены`, 'success', 2000);
     return parsed;
     
@@ -1257,12 +1280,13 @@ async function populateEmployees(branch) {
     currentBranch = branch;
     
     const employeesSet = new Set();
+    const rows = getEmployeeRows(scheduleData);
     
-    for (let i = 2; i <= 15; i++) {
-      if (scheduleData[i] && scheduleData[i][0] && scheduleData[i][0].trim() !== "") {
-        employeesSet.add(scheduleData[i][0].trim().replace(/^\uFEFF/, ""));
+    rows.forEach(r => {
+      if (r[0] && r[0].trim() !== "") {
+        employeesSet.add(r[0].trim().replace(/^\uFEFF/, ""));
       }
-    }
+    });
     
     allEmployees = Array.from(employeesSet);
     const select = document.getElementById("employee");
