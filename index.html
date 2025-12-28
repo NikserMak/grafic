@@ -592,7 +592,7 @@ tbody td:hover::after {
 }
 
 .skeleton-cell {
-  background: linear-gradient(90deg, #3d3d3d 25%, #4a4a4a 50%, #3d3d3d 75%);
+  background: linear-gradient(90deg, #3d3d3d 25%, #4a4a4d 50%, #3d3d3d 75%);
   background-size: 200% 100%;
   animation: skeleton-shine 1.5s infinite;
   border-radius: 4px;
@@ -729,7 +729,7 @@ tbody td:hover::after {
 <div class="container">
   <!-- Новогодняя шапка -->
   <div class="new-year-header">
-    🎄 С Новым 2025 Годом! Пусть ваш график будет четким, а рабочие дни — продуктивными! 🎅
+    🎄 С Новым 2026 Годом! Пусть ваш график будет четким, а рабочие дни — продуктивными! 🎅
   </div>
   
   <!-- Header -->
@@ -837,7 +837,7 @@ let tableIDs = {
   jp: "1F_pQYU-Z6DrG7kiIw8EMONKcQ3G2XGO5j41fcisC15U", 
 };
 
-// GID для разных месяцев
+// GID для разных месяцев - начинаем с декабря 2025
 let monthsGIDs = { 
   jp: { 
     "Декабрь": "1935518136",
@@ -1205,10 +1205,15 @@ const dayNamesShort = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
 // ========== ОПРЕДЕЛЕНИЕ МЕСЯЦА ПО ДАТЕ ==========
 function getMonthForDate(date) {
   const month = date.getMonth() + 1; // 1-12
-  if (month === 10) return "Октябрь";
-  if (month === 11) return "Ноябрь";
   if (month === 12) return "Декабрь";
-  return "Октябрь"; // по умолчанию
+  if (month === 1) return "Январь";
+  if (month === 2) return "Февраль";
+  if (month === 3) return "Март";
+  if (month === 4) return "Апрель";
+  if (month === 5) return "Май";
+  if (month === 6) return "Июнь";
+  // Добавляем остальные месяцы по необходимости
+  return "Декабрь"; // по умолчанию
 }
 
 // ========== ЛЕНИВАЯ ЗАГРУЗКА ДАННЫХ ==========
@@ -1257,10 +1262,10 @@ function findDateColumnIndexInMonth(dateRow, targetDate) {
   
   // Пробуем разные форматы дат
   const possibleFormats = [
-    `${targetDay}.${targetMonth}`,           // 1.11
-    `${targetDay}.${targetMonth}.`,          // 1.11.
-    `${targetDay}.${targetMonth.toString().padStart(2, '0')}`, // 01.11
-    `${targetDay}.${targetMonth.toString().padStart(2, '0')}.` // 01.11.
+    `${targetDay}.${targetMonth}`,           // 1.12
+    `${targetDay}.${targetMonth}.`,          // 1.12.
+    `${targetDay}.${targetMonth.toString().padStart(2, '0')}`, // 01.12
+    `${targetDay}.${targetMonth.toString().padStart(2, '0')}.` // 01.12.
   ];
   
   for (let i = 0; i < dateRow.length; i++) {
@@ -1368,7 +1373,13 @@ async function loadCSV(branch, month) {
     return scheduleData;
   }
   
-  const gid = monthsGIDs[branch][month];
+  const gid = monthsGIDs[branch] && monthsGIDs[branch][month];
+  if (!gid) {
+    console.error(`Не найден GID для месяца ${month} в точке ${branch}`);
+    showNotification(`Не найден GID для месяца ${month}`, 'error');
+    return [];
+  }
+  
   const url = `https://docs.google.com/spreadsheets/d/${tableIDs[branch]}/export?format=csv&gid=${gid}`;
   
   try {
@@ -1434,8 +1445,8 @@ function parseCSV(text) {
 
 async function populateEmployees(branch) {
   try {
-    // Загружаем данные за октябрь по умолчанию для списка сотрудников
-    const month = "Октябрь";
+    // Загружаем данные за декабрь для списка сотрудников
+    const month = "Декабрь";
     setLoading(true);
     await loadCSV(branch, month);
     
@@ -1484,6 +1495,12 @@ const debouncedLoadSchedule = debounce(async function loadSchedule() {
     return;
   }
   
+  const branch = document.getElementById("branch").value;
+  if (!branch) {
+    showNotification("Выберите торговую точку", "warning");
+    return;
+  }
+  
   const tableHead = document.getElementById("tableHead");
   const tableBody = document.getElementById("tableBody");
   
@@ -1492,17 +1509,11 @@ const debouncedLoadSchedule = debounce(async function loadSchedule() {
   // Показываем скелетон сразу
   showSkeleton(8);
   
-  if (!currentBranch) {
-    showNotification("Сначала выберите торговую точку", "warning");
-    hideSkeleton();
-    return;
-  }
-  
   const weekStart = getWeekStart(selectedDate);
   
   try {
     // Ленивая загрузка данных недели
-    const weekData = await loadWeekData(currentBranch, weekStart);
+    const weekData = await loadWeekData(branch, weekStart);
     const { weekDates } = weekData;
     
     const today = new Date();
@@ -1547,7 +1558,12 @@ async function init() {
   loadState();
   
   const branchSelect = document.getElementById("branch");
-  await populateEmployees(branchSelect.value);
+  const branch = branchSelect.value;
+  
+  // Инициализируем currentBranch сразу
+  currentBranch = branch;
+  
+  await populateEmployees(branch);
   
   if (!document.getElementById("startDate").value) {
     const today = new Date();
@@ -1565,6 +1581,7 @@ async function init() {
 // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
 document.getElementById("branch").addEventListener("change", async e => {
   const b = e.target.value;
+  currentBranch = b; // Обновляем currentBranch
   saveState();
   
   // Очищаем кэш при смене торговой точки
